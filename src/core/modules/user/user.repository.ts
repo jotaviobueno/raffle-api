@@ -5,15 +5,42 @@ import { QueryBuilderEntity, UserEntity } from 'src/domain/entities';
 
 @Injectable()
 export class UserRepository extends RepositoryFactory<
-  UserEntity,
-  CreateUserDto & { avatar: string },
-  UpdateUserDto & { avatar?: string }
+  UserEntity | Omit<UserEntity, 'password'>,
+  CreateUserDto,
+  UpdateUserDto
 > {
   constructor() {
     super('user');
   }
 
-  findById(id: string): Promise<UserEntity> {
+  findByEmail(email: string): Promise<UserEntity | null> {
+    return this.prismaService.user.findFirst({
+      where: {
+        email,
+        deletedAt: null,
+      },
+    });
+  }
+
+  findByUsername(username: string): Promise<UserEntity | null> {
+    return this.prismaService.user.findFirst({
+      where: {
+        username,
+        deletedAt: null,
+      },
+    });
+  }
+
+  findByPhone(phone: string): Promise<UserEntity | null> {
+    return this.prismaService.user.findFirst({
+      where: {
+        phone,
+        deletedAt: null,
+      },
+    });
+  }
+
+  findById(id: string): Promise<UserEntity | null> {
     return this.prismaService.user.findFirst({
       where: {
         id,
@@ -22,7 +49,22 @@ export class UserRepository extends RepositoryFactory<
     });
   }
 
-  findAll(query: QueryBuilderEntity): Promise<UserEntity[]> {
-    return this.prismaService.user.findMany(query);
+  findAll(query: QueryBuilderEntity): Promise<Omit<UserEntity, 'password'>[]> {
+    return this.prismaService.user.findMany({
+      ...query,
+      select: {
+        id: true,
+        lastName: true,
+        firstName: true,
+        role: true,
+        phone: true,
+        avatar: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+        username: true,
+        email: true,
+      },
+    });
   }
 }

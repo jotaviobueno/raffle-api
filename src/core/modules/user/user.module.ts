@@ -3,27 +3,15 @@ import { UserController } from './user.controller';
 import { PrismaModule } from 'src/infra/database/prisma/prisma.module';
 import { RedisModule } from 'src/infra/redis/redis.module';
 import { UserRepository } from './user.repository';
-import {
-  CreateUserUseCase,
-  FindAllUserUseCase,
-  FindByIdUserUseCase,
-  SoftDeleteUserUseCase,
-  UpdateUserUseCase,
-} from './use-cases';
+
 import { S3Module } from '../s3/s3.module';
+import { UserService } from './user.service';
 
 export const userModuleMock = {
   imports: [PrismaModule, RedisModule, S3Module],
   controllers: [UserController],
-  providers: [
-    UserRepository,
-    CreateUserUseCase,
-    FindAllUserUseCase,
-    FindByIdUserUseCase,
-    SoftDeleteUserUseCase,
-    UpdateUserUseCase,
-  ],
-  exports: [FindByIdUserUseCase],
+  providers: [UserRepository, UserService],
+  exports: [UserService],
 };
 
 @Module(userModuleMock)

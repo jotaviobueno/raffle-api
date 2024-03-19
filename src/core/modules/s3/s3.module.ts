@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { UploadManyFileUseCase, UploadSingleFileUseCase } from './use-cases';
+import { S3Service } from './s3.service';
 
 export const s3ModuleMock = {
-  providers: [UploadSingleFileUseCase, UploadManyFileUseCase],
-  exports: [UploadSingleFileUseCase, UploadManyFileUseCase],
+  providers: [S3Service],
+  exports: [S3Service],
 };
 
 @Module(s3ModuleMock)

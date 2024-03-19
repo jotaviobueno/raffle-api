@@ -3,7 +3,7 @@ import { PrismaService } from 'src/infra/database/prisma/prisma.service';
 
 export class RepositoryFactory<K, T = void, J = void> {
   @Inject(PrismaService)
-  public readonly prismaService: PrismaService;
+  protected readonly prismaService: PrismaService;
 
   constructor(public model: string) {}
 

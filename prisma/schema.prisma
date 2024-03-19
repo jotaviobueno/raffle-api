@@ -15,11 +15,24 @@ datasource db {
 
 model User {
   id        String    @id @default(uuid())
-  name      String
-  avatar    String
+  firstName String
+  lastName  String
+  username  String
+  role      USER_ROLE
+  email     String
+  password  String
+  phone     String
+  avatar    String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   @@map("user")
+}
+
+enum USER_ROLE {
+  USER
+  ADMIN
+  DEV
+  CUSTOMER
 }
