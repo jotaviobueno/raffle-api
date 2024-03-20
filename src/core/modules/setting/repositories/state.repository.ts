@@ -11,4 +11,13 @@ export class StateRepository extends RepositoryFactory<StateEntity> {
   findAll(query: QueryBuilderEntity): Promise<StateEntity[]> {
     return this.prismaService.state.findMany(query);
   }
+
+  findById(id: string): Promise<StateEntity | null> {
+    return this.prismaService.state.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
+    });
+  }
 }

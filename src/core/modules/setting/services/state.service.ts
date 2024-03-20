@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import { StateEntity } from 'src/domain/entities';
 import { StateRepository } from '../repositories/state.repository';
@@ -26,6 +26,15 @@ export class StateService implements ServiceBase<StateEntity> {
     await this.cacheManager.set('states', states);
 
     return states;
+  }
+
+  async findById(id: string): Promise<StateEntity> {
+    const state = await this.stateRepository.findById(id);
+
+    if (!state)
+      throw new HttpException('State not found', HttpStatus.NOT_FOUND);
+
+    return state;
   }
 
   async findAllCountryId({

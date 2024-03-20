@@ -9,6 +9,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './core/modules/auth/guards';
 import { AuthModule } from './core/modules/auth/auth.module';
 import { SettingModule } from './core/modules/setting/setting.module';
+import { AddressModule } from './core/modules/address/address.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SettingModule } from './core/modules/setting/setting.module';
     RoleModule,
     AuthModule,
     SettingModule,
+    AddressModule,
   ],
   providers: [
     {

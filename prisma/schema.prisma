@@ -41,17 +41,16 @@ enum USER_ROLE {
 }
 
 model Address {
-  id         String  @id @default(uuid())
-  street     String
-  reference  String?
-  complement String?
-  neighboord String
-  countryId  String  @map("country_id")
-  stateId    String  @map("state_id")
-  cityId     String  @map("city_id")
-  userId     String? @map("user_id")
-  postcode   String
-  city       String
+  id           String  @id @default(uuid())
+  street       String
+  reference    String?
+  complement   String?
+  neighborhood String
+  countryId    String  @map("country_id")
+  stateId      String  @map("state_id")
+  userId       String? @map("user_id")
+  postcode     String
+  city         String
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
