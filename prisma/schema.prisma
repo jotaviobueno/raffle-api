@@ -29,6 +29,7 @@ model User {
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   addresses Address[]
+  sellers   Seller[]
 
   @@map("user")
 }
@@ -40,6 +41,25 @@ enum USER_ROLE {
   CUSTOMER
 }
 
+model Seller {
+  id     String @id @default(uuid())
+  name   String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  imageUrl   String? @map("image_url")
+  logoUrl    String? @map("logo_url")
+  faviconUrl String? @map("favicon_url")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  addresses Address[]
+
+  @@map("seller")
+}
+
 model Address {
   id           String  @id @default(uuid())
   street       String
@@ -49,6 +69,7 @@ model Address {
   countryId    String  @map("country_id")
   stateId      String  @map("state_id")
   userId       String? @map("user_id")
+  sellerId     String? @map("seller_id")
   postcode     String
   city         String
 
@@ -56,6 +77,7 @@ model Address {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
+  seller  Seller? @relation(fields: [sellerId], references: [id])
   user    User?   @relation(fields: [userId], references: [id])
   state   State   @relation(fields: [stateId], references: [id])
   country Country @relation(fields: [countryId], references: [id])

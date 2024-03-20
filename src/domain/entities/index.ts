@@ -5,3 +5,4 @@ export * from './country';
 export * from './state';
 export * from './currency';
 export * from './address';
+export * from './seller';

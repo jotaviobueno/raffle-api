@@ -6,6 +6,7 @@ import { StateService } from '../setting/services/state.service';
 import { CountryService } from '../setting/services/country.service';
 import { UserService } from '../user/user.service';
 import { AddressRepository } from './address.repository';
+import { SellerService } from '../seller/seller.service';
 
 @Injectable()
 export class AddressService
@@ -16,6 +17,7 @@ export class AddressService
     private readonly countryService: CountryService,
     private readonly userService: UserService,
     private readonly addressRepository: AddressRepository,
+    private readonly sellerService: SellerService,
   ) {}
 
   async create(dto: CreateAddressDto): Promise<AddressEntity> {
@@ -24,6 +26,8 @@ export class AddressService
     const state = await this.stateService.findById(dto.stateId);
 
     if (dto.userId) await this.userService.findById(dto.userId);
+
+    if (dto.sellerId) await this.userService.findById(dto.sellerId);
 
     const address = await this.addressRepository.create({
       ...dto,
