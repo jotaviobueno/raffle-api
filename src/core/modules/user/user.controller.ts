@@ -13,8 +13,10 @@ import { CreateUserDto, QueryParamsDto, UpdateUserDto } from 'src/domain/dtos';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { UserService } from './user.service';
 import { IsPublic } from '../auth/decorators';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('user')
+@ApiTags('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 

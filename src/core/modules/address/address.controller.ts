@@ -9,8 +9,10 @@ import {
 } from '@nestjs/common';
 import { AddressService } from './address.service';
 import { CreateAddressDto, UpdateAddressDto } from 'src/domain/dtos';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('address')
+@ApiTags('address')
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 

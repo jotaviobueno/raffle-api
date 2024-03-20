@@ -3,9 +3,11 @@ import { QueryParamsDto } from 'src/domain/dtos';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { CountryService } from '../services/country.service';
 import { IsPublic } from '../../auth/decorators';
+import { ApiTags } from '@nestjs/swagger';
 
 @IsPublic()
 @Controller('country')
+@ApiTags('setting')
 export class CountryController {
   constructor(private readonly countryService: CountryService) {}
 

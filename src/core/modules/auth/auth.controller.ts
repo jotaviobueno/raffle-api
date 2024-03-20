@@ -11,8 +11,10 @@ import { CurrentUser } from '../user/decorators';
 import { UserEntity } from 'src/domain/entities';
 import { IsPublic } from './decorators';
 import { CreateAuthDto } from 'src/domain/dtos';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
