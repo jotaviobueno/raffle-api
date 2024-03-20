@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import { CreateUserDto, QueryParamsDto, UpdateUserDto } from 'src/domain/dtos';
-import { UserEntity } from 'src/domain/entities';
+import { FindAllResultEntity, UserEntity } from 'src/domain/entities';
 import { UserRepository } from './user.repository';
 import { QueryBuilder, hash } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
@@ -57,18 +57,28 @@ export class UserService
 
   async findAll(
     queryParams: QueryParamsDto,
-  ): Promise<Omit<UserEntity, 'password'>[]> {
-    const cache = await this.cacheManager.get<UserEntity[] | null>('users');
+  ): Promise<FindAllResultEntity<Omit<UserEntity, 'password'>>> {
+    const cache = await this.cacheManager.get<FindAllResultEntity<
+      Omit<UserEntity, 'password'>
+    > | null>('users');
 
     if (cache) return cache;
 
     const query = new QueryBuilder(queryParams).pagination().handle();
 
     const users = await this.userRepository.findAll(query);
+    const total = await this.userRepository.count();
 
-    await this.cacheManager.set('users', users);
+    const info = {
+      page: queryParams.page,
+      pages: Math.ceil(total / queryParams.pageSize),
+      pageSize: queryParams.pageSize,
+      total,
+    };
 
-    return users;
+    await this.cacheManager.set(`users`, { data: users, info });
+
+    return { data: users, info };
   }
 
   async findById(id: string): Promise<Omit<UserEntity, 'password'>> {

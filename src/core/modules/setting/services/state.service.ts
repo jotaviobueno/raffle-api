@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
-import { StateEntity } from 'src/domain/entities';
+import { FindAllResultEntity, StateEntity } from 'src/domain/entities';
 import { StateRepository } from '../repositories/state.repository';
 import { QueryParamsDto } from 'src/domain/dtos';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
@@ -14,18 +14,31 @@ export class StateService implements ServiceBase<StateEntity> {
     private readonly cacheManager: Cache,
   ) {}
 
-  async findAll(queryParams: QueryParamsDto): Promise<StateEntity[]> {
-    const cache = await this.cacheManager.get<StateEntity[] | null>('states');
+  async findAll(
+    queryParams: QueryParamsDto,
+  ): Promise<FindAllResultEntity<StateEntity>> {
+    const cache =
+      await this.cacheManager.get<FindAllResultEntity<StateEntity> | null>(
+        `states`,
+      );
 
     if (cache) return cache;
 
     const query = new QueryBuilder(queryParams).pagination().handle();
 
     const states = await this.stateRepository.findAll(query);
+    const total = await this.stateRepository.count();
 
-    await this.cacheManager.set('states', states);
+    const info = {
+      page: queryParams.page,
+      pages: Math.ceil(total / queryParams.pageSize),
+      pageSize: queryParams.pageSize,
+      total,
+    };
 
-    return states;
+    await this.cacheManager.set(`states`, { data: states, info });
+
+    return { data: states, info };
   }
 
   async findById(id: string): Promise<StateEntity> {
@@ -39,23 +52,34 @@ export class StateService implements ServiceBase<StateEntity> {
 
   async findAllCountryId({
     countryId,
-    ...dto
-  }: QueryParamsDto & { countryId: string }): Promise<StateEntity[]> {
-    const cache = await this.cacheManager.get<StateEntity[] | null>(
-      `states_${countryId}`,
-    );
+    ...queryParams
+  }: QueryParamsDto & { countryId: string }): Promise<
+    FindAllResultEntity<StateEntity>
+  > {
+    const cache =
+      await this.cacheManager.get<FindAllResultEntity<StateEntity> | null>(
+        `states_${countryId}`,
+      );
 
     if (cache) return cache;
 
-    const query = new QueryBuilder(dto)
+    const query = new QueryBuilder(queryParams)
       .where({ countryId })
       .pagination()
       .handle();
 
     const states = await this.stateRepository.findAll(query);
+    const total = await this.stateRepository.count();
 
-    await this.cacheManager.set(`states_${countryId}`, states);
+    const info = {
+      page: queryParams.page,
+      pages: Math.ceil(total / queryParams.pageSize),
+      pageSize: queryParams.pageSize,
+      total,
+    };
 
-    return states;
+    await this.cacheManager.set(`states_${countryId}`, { data: states, info });
+
+    return { data: states, info };
   }
 }

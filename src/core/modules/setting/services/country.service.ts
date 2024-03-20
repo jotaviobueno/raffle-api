@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import { QueryBuilder } from 'src/common/utils';
 import { QueryParamsDto } from 'src/domain/dtos';
-import { CountryEntity } from 'src/domain/entities';
+import { CountryEntity, FindAllResultEntity } from 'src/domain/entities';
 import { CountryRepository } from '../repositories/country.repository';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { StateService } from './state.service';
@@ -16,21 +16,36 @@ export class CountryService implements ServiceBase<CountryEntity> {
     private readonly stateService: StateService,
   ) {}
 
-  async findAll(queryParams: QueryParamsDto): Promise<CountryEntity[]> {
-    const cache = await this.cacheManager.get<CountryEntity[] | null>(
-      'countries',
-    );
+  async findAll(
+    queryParams: QueryParamsDto,
+  ): Promise<FindAllResultEntity<CountryEntity>> {
+    const cache =
+      await this.cacheManager.get<FindAllResultEntity<CountryEntity> | null>(
+        'countries',
+      );
 
     if (cache) return cache;
 
     const query = new QueryBuilder(queryParams).pagination().handle();
 
     const countries = await this.countryRepository.findAll(query);
+    const total = await this.countryRepository.count();
 
-    await this.cacheManager.set('countries', countries);
+    const info = {
+      page: queryParams.page,
+      pages: Math.ceil(total / queryParams.pageSize),
+      pageSize: queryParams.pageSize,
+      total,
+    };
 
-    return countries;
+    await this.cacheManager.set('countries', { data: countries, info });
+
+    return { data: countries, info };
   }
+
+  // async findAll(queryParams: QueryParamsDto): Promise<CountryEntity[]> {
+
+  // }
 
   async findById(id: string): Promise<CountryEntity> {
     const country = await this.countryRepository.findById(id);
