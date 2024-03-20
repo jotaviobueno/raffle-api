@@ -23,9 +23,12 @@ model User {
   password  String
   phone     String
   avatar    String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
+
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  addresses Address[]
 
   @@map("user")
 }
@@ -35,4 +38,76 @@ enum USER_ROLE {
   ADMIN
   DEV
   CUSTOMER
+}
+
+model Address {
+  id         String  @id @default(uuid())
+  street     String
+  reference  String?
+  complement String?
+  neighboord String
+  countryId  String  @map("country_id")
+  stateId    String  @map("state_id")
+  cityId     String  @map("city_id")
+  userId     String? @map("user_id")
+  postcode   String
+  city       String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  user    User?   @relation(fields: [userId], references: [id])
+  state   State   @relation(fields: [stateId], references: [id])
+  country Country @relation(fields: [countryId], references: [id])
+
+  @@map("address")
+}
+
+model Country {
+  id                 String  @id @default(uuid())
+  name               String
+  iso3               String  @map("iso_3")
+  iso2               String  @map("iso_2")
+  intermediaryRegion String? @map("intermediary_region")
+  subRegion          String? @map("sub_region")
+  continent          String?
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  states  State[]
+  address Address[]
+
+  @@map("country")
+}
+
+model Currency {
+  id     String @id @default(uuid())
+  code   String
+  symbol String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  @@map("currency")
+}
+
+model State {
+  id        String    @id @default(uuid())
+  name      String
+  code3     String?   @map("code_3")
+  ibgeId    String?   @map("ibge_id")
+  region    String
+  countryId String    @map("country_id")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  country Country   @relation(fields: [countryId], references: [id])
+  address Address[]
+
+  @@map("state")
 }

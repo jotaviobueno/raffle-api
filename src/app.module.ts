@@ -8,6 +8,7 @@ import { RoleModule } from './core/modules/role/role.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './core/modules/auth/guards';
 import { AuthModule } from './core/modules/auth/auth.module';
+import { SettingModule } from './core/modules/setting/setting.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AuthModule } from './core/modules/auth/auth.module';
     UserModule,
     RoleModule,
     AuthModule,
+    SettingModule,
   ],
   providers: [
     {

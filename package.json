@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prisma:seed": "npx ts-node prisma/seeds/country/seed-countries.ts && npx ts-node prisma/seeds/currencies/seed-currency.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.521.0",
@@ -30,6 +31,7 @@
     "@nestjs/terminus": "^10.2.3",
     "@prisma/client": "^5.10.2",
     "@types/multer": "^1.4.11",
+    "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
     "cache-manager": "^5.4.0",
     "class-transformer": "^0.5.1",
