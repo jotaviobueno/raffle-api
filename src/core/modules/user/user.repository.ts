@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ROLE_ENUM } from 'src/common/enums';
 import { RepositoryFactory } from 'src/common/factories';
 import { CreateUserDto, UpdateUserDto } from 'src/domain/dtos';
 import { QueryBuilderEntity, UserEntity } from 'src/domain/entities';
@@ -11,6 +12,27 @@ export class UserRepository extends RepositoryFactory<
 > {
   constructor() {
     super('user');
+  }
+
+  create(
+    data: CreateUserDto & { role: ROLE_ENUM },
+  ): Promise<UserEntity | Omit<UserEntity, 'password'>> {
+    return this.prismaService.user.create({
+      data,
+      select: {
+        id: true,
+        lastName: true,
+        firstName: true,
+        role: true,
+        phone: true,
+        avatar: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+        username: true,
+        email: true,
+      },
+    });
   }
 
   findByEmail(email: string): Promise<UserEntity | null> {

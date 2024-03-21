@@ -1,10 +1,16 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import { CreateUserDto, QueryParamsDto, UpdateUserDto } from 'src/domain/dtos';
-import { FindAllResultEntity, UserEntity } from 'src/domain/entities';
+import {
+  FindAllResultEntity,
+  SellerEntity,
+  UserEntity,
+} from 'src/domain/entities';
 import { UserRepository } from './user.repository';
 import { QueryBuilder, hash } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { ROLE_ENUM } from 'src/common/enums';
+import { SellerService } from '../seller/seller.service';
 
 @Injectable()
 export class UserService
@@ -19,6 +25,7 @@ export class UserService
     private readonly userRepository: UserRepository,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    private readonly sellerService: SellerService,
   ) {}
 
   async create(dto: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
@@ -50,7 +57,10 @@ export class UserService
 
     dto.password = await hash(dto.password);
 
-    const user = await this.userRepository.create(dto);
+    const user = await this.userRepository.create({
+      ...dto,
+      role: ROLE_ENUM.USER,
+    });
 
     return user;
   }
@@ -87,6 +97,22 @@ export class UserService
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 
     return user;
+  }
+
+  async findAllSellerByUserId({
+    userId,
+    ...queryParams
+  }: QueryParamsDto & { userId: string }): Promise<
+    FindAllResultEntity<SellerEntity>
+  > {
+    const user = await this.findById(userId);
+
+    const sellers = await this.sellerService.findAllSellerByUserId({
+      ...queryParams,
+      userId: user.id,
+    });
+
+    return sellers;
   }
 
   async findByEmail(email: string): Promise<UserEntity> {

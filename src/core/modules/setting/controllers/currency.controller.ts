@@ -7,7 +7,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 @IsPublic()
 @Controller('currency')
-@ApiTags('setting')
+@ApiTags('currency')
 export class CurrencyController {
   constructor(private readonly currencyService: CurrencyService) {}
 

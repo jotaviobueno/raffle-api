@@ -132,3 +132,21 @@ model State {
 
   @@map("state")
 }
+
+model Menu {
+  id    String  @id @default(uuid())
+  label String?
+  name  String
+  icon  String?
+  href  String
+
+  parentId String? @map("parent_id")
+  parent   Menu?   @relation("SubMenu", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subMenus Menu[]  @relation("SubMenu")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  @@map("menu")
+}

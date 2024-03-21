@@ -7,7 +7,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 @IsPublic()
 @Controller('state')
-@ApiTags('setting')
+@ApiTags('state')
 export class StateController {
   constructor(private readonly countryService: StateService) {}
 

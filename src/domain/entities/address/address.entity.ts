@@ -9,6 +9,7 @@ export class AddressEntity implements Address {
   countryId: string;
   stateId: string;
   userId: string | null;
+  sellerId: string | null;
   postcode: string;
   city: string;
   createdAt: Date;

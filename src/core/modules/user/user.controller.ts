@@ -33,6 +33,24 @@ export class UserController {
     return this.userService.findAll(queryParams);
   }
 
+  @Get(':id')
+  findById(@Param('id') id: string) {
+    return this.userService.findById(id);
+  }
+
+  @Get(':id/seller')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(15)
+  findAllSellerByUserId(
+    @Query() queryParams: QueryParamsDto,
+    @Param('id') id: string,
+  ) {
+    return this.userService.findAllSellerByUserId({
+      ...queryParams,
+      userId: id,
+    });
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update({ ...updateUserDto, id });

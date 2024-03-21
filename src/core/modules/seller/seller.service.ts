@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import {
   CreateSellerDto,
@@ -16,6 +22,7 @@ export class SellerService
   implements ServiceBase<SellerEntity, CreateSellerDto, UpdateSellerDto>
 {
   constructor(
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly sellerRepository: SellerRepository,
     @Inject(CACHE_MANAGER)
@@ -65,6 +72,39 @@ export class SellerService
     };
 
     await this.cacheManager.set(`sellers`, { data: sellers, info });
+
+    return { data: sellers, info };
+  }
+
+  async findAllSellerByUserId({
+    userId,
+    ...queryParams
+  }: QueryParamsDto & { userId: string }): Promise<
+    FindAllResultEntity<SellerEntity>
+  > {
+    const cache =
+      await this.cacheManager.get<FindAllResultEntity<SellerEntity> | null>(
+        `sellers_${userId}`,
+      );
+
+    if (cache) return cache;
+
+    const query = new QueryBuilder(queryParams)
+      .where({ userId })
+      .pagination()
+      .handle();
+
+    const sellers = await this.sellerRepository.findAll(query);
+    const total = await this.sellerRepository.count();
+
+    const info = {
+      page: queryParams.page,
+      pages: Math.ceil(total / queryParams.pageSize),
+      pageSize: queryParams.pageSize,
+      total,
+    };
+
+    await this.cacheManager.set(`sellers_${userId}`, { data: sellers, info });
 
     return { data: sellers, info };
   }

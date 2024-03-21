@@ -8,9 +8,17 @@ import { StateRepository } from './repositories/state.repository';
 import { CurrencyRepository } from './repositories/currency.repository';
 import { CurrencyService } from './services/currency.service';
 import { CurrencyController } from './controllers/currency.controller';
+import { MenuService } from './services/menu.service';
+import { MenuRepository } from './repositories/menu.repository';
+import { MenuController } from './controllers/menu.controller';
 
 @Module({
-  controllers: [CountryController, StateController, CurrencyController],
+  controllers: [
+    CountryController,
+    StateController,
+    CurrencyController,
+    MenuController,
+  ],
   providers: [
     CountryService,
     CountryRepository,
@@ -18,7 +26,9 @@ import { CurrencyController } from './controllers/currency.controller';
     StateRepository,
     CurrencyRepository,
     CurrencyService,
+    MenuService,
+    MenuRepository,
   ],
-  exports: [CountryService, StateService, CurrencyService],
+  exports: [CountryService, StateService, CurrencyService, MenuService],
 })
 export class SettingModule {}

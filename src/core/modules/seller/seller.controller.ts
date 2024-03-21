@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { SellerService } from './seller.service';
 import {
@@ -15,6 +16,7 @@ import {
   UpdateSellerDto,
 } from 'src/domain/dtos';
 import { ApiTags } from '@nestjs/swagger';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('seller')
 @ApiTags('seller')
@@ -27,6 +29,8 @@ export class SellerController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(15)
   findAll(@Query() queryParams: QueryParamsDto) {
     return this.sellerService.findAll(queryParams);
   }

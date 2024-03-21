@@ -6,3 +6,4 @@ export * from './state';
 export * from './currency';
 export * from './address';
 export * from './seller';
+export * from './menu';
