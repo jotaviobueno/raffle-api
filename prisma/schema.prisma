@@ -138,7 +138,7 @@ model Menu {
   label String?
   name  String
   icon  String?
-  href  String
+  href  String?
 
   parentId String? @map("parent_id")
   parent   Menu?   @relation("SubMenu", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)

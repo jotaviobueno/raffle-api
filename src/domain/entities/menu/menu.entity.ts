@@ -5,7 +5,7 @@ export class MenuEntity implements Menu {
   label: string | null;
   name: string;
   icon: string | null;
-  href: string;
+  href: string | null;
   parentId: string | null;
   createdAt: Date;
   updatedAt: Date;

@@ -14,8 +14,8 @@ export class CreateMenuDto {
   icon?: string;
 
   @IsString()
-  @IsNotEmpty()
-  href: string;
+  @IsOptional()
+  href?: string;
 
   @IsUUID()
   @IsOptional()
