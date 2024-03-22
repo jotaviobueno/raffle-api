@@ -10,7 +10,7 @@ import { AuthGuard } from './core/modules/auth/guards';
 import { AuthModule } from './core/modules/auth/auth.module';
 import { SettingModule } from './core/modules/setting/setting.module';
 import { AddressModule } from './core/modules/address/address.module';
-import { SellerModule } from './core/modules/seller/seller.module';
+import { CatalogModule } from './core/modules/catalog/catalog.module';
 
 @Module({
   imports: [
@@ -23,7 +23,7 @@ import { SellerModule } from './core/modules/seller/seller.module';
     AuthModule,
     SettingModule,
     AddressModule,
-    SellerModule,
+    CatalogModule,
   ],
   providers: [
     {

@@ -10,7 +10,7 @@ import { UserRepository } from './user.repository';
 import { QueryBuilder, hash } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { ROLE_ENUM } from 'src/common/enums';
-import { SellerService } from '../seller/seller.service';
+import { SellerService } from '../catalog/services/seller.service';
 
 @Injectable()
 export class UserService

@@ -6,7 +6,7 @@ import { StateService } from '../setting/services/state.service';
 import { CountryService } from '../setting/services/country.service';
 import { UserService } from '../user/user.service';
 import { AddressRepository } from './address.repository';
-import { SellerService } from '../seller/seller.service';
+import { SellerService } from '../catalog/services/seller.service';
 
 @Injectable()
 export class AddressService
@@ -27,7 +27,7 @@ export class AddressService
 
     if (dto.userId) await this.userService.findById(dto.userId);
 
-    if (dto.sellerId) await this.userService.findById(dto.sellerId);
+    if (dto.sellerId) await this.sellerService.findById(dto.sellerId);
 
     const address = await this.addressRepository.create({
       ...dto,

@@ -4,3 +4,5 @@ export * from './auth';
 export * from './address';
 export * from './seller';
 export * from './menu';
+export * from './product';
+export * from './brand';

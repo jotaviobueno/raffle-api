@@ -9,7 +9,6 @@ import {
   Query,
   UseInterceptors,
 } from '@nestjs/common';
-import { SellerService } from './seller.service';
 import {
   CreateSellerDto,
   QueryParamsDto,
@@ -17,6 +16,7 @@ import {
 } from 'src/domain/dtos';
 import { ApiTags } from '@nestjs/swagger';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { SellerService } from '../services/seller.service';
 
 @Controller('seller')
 @ApiTags('seller')

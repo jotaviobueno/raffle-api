@@ -4,10 +4,10 @@ import { AddressController } from './address.controller';
 import { UserModule } from '../user/user.module';
 import { SettingModule } from '../setting/setting.module';
 import { AddressRepository } from './address.repository';
-import { SellerModule } from '../seller/seller.module';
+import { CatalogModule } from '../catalog/catalog.module';
 
 @Module({
-  imports: [UserModule, SettingModule, SellerModule],
+  imports: [UserModule, SettingModule, CatalogModule],
   controllers: [AddressController],
   providers: [AddressService, AddressRepository],
   exports: [AddressService],

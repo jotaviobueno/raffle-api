@@ -12,10 +12,10 @@ import {
   UpdateSellerDto,
 } from 'src/domain/dtos';
 import { FindAllResultEntity, SellerEntity } from 'src/domain/entities';
-import { UserService } from '../user/user.service';
-import { SellerRepository } from './seller.repository';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { QueryBuilder } from 'src/common/utils';
+import { UserService } from '../../user/user.service';
+import { SellerRepository } from '../repository/seller.repository';
 
 @Injectable()
 export class SellerService
