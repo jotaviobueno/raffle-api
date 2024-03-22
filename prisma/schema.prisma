@@ -55,7 +55,10 @@ model Seller {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  addresses Address[]
+  addresses  Address[]
+  products   Product[]
+  brands     Brand[]
+  categories Category[]
 
   @@map("seller")
 }
@@ -149,4 +152,77 @@ model Menu {
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   @@map("menu")
+}
+
+// Não feito
+model Brand {
+  id       String @id @default(uuid())
+  name     String
+  sellerId String @map("seller_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  seller   Seller    @relation(fields: [sellerId], references: [id])
+  products Product[]
+
+  @@map("brand")
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String
+
+  sellerId String @map("seller_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  productCategories ProductCategory[]
+  seller            Seller            @relation(fields: [sellerId], references: [id])
+
+  @@map("category")
+}
+
+model ProductCategory {
+  id         String @id @default(uuid())
+  productId  String @map("product_Id")
+  categoryId String @map("category_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  product  Product  @relation(fields: [productId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@map("product_category")
+}
+
+model Product {
+  id               String   @id @default(uuid())
+  name             String
+  shortDescription String   @map("short_description")
+  description      String
+  metaTitle        String   @map("meta_title")
+  metaDescription  String   @map("meta_description")
+  metaKeyword      String[] @default([]) @map("meta_keyword")
+  price            Float
+  isVisible        Boolean  @default(true) @map("is_visible")
+  isActive         Boolean  @default(true) @map("is_active")
+
+  sellerId String  @map("seller_id")
+  brandId  String? @map("brand_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  seller            Seller            @relation(fields: [sellerId], references: [id])
+  brand             Brand?            @relation(fields: [brandId], references: [id])
+  productCategories ProductCategory[]
+
+  @@map("product")
 }
