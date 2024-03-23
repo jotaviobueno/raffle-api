@@ -10,6 +10,9 @@ export class UserEntity implements User {
   password: string;
   phone: string;
   avatar: string;
+  cpf: string | null;
+  rg: string | null;
+  birthDate: Date | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;

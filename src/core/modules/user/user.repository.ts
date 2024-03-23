@@ -31,6 +31,9 @@ export class UserRepository extends RepositoryFactory<
         deletedAt: true,
         username: true,
         email: true,
+        cpf: true,
+        rg: true,
+        birthDate: true,
       },
     });
   }
@@ -86,6 +89,35 @@ export class UserRepository extends RepositoryFactory<
         deletedAt: true,
         username: true,
         email: true,
+        cpf: true,
+        rg: true,
+        birthDate: true,
+      },
+    });
+  }
+
+  update({
+    id,
+    ...data
+  }: UpdateUserDto & { id: string }): Promise<Omit<UserEntity, 'password'>> {
+    return this.prismaService.user.update({
+      where: { id },
+      data,
+      select: {
+        id: true,
+        lastName: true,
+        firstName: true,
+        role: true,
+        phone: true,
+        avatar: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+        username: true,
+        email: true,
+        cpf: true,
+        rg: true,
+        birthDate: true,
       },
     });
   }
