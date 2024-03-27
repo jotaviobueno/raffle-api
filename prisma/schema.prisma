@@ -58,10 +58,11 @@ model Seller {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  addresses  Address[]
-  products   Product[]
-  brands     Brand[]
-  categories Category[]
+  addresses    Address[]
+  products     Product[]
+  categories   Category[]
+  condominiums Condominium[]
+  attributes   Attribute[]
 
   @@map("seller")
 }
@@ -157,22 +158,6 @@ model Menu {
   @@map("menu")
 }
 
-// Não feito
-model Brand {
-  id       String @id @default(uuid())
-  name     String
-  sellerId String @map("seller_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  seller   Seller    @relation(fields: [sellerId], references: [id])
-  products Product[]
-
-  @@map("brand")
-}
-
 model Category {
   id   String @id @default(uuid())
   name String
@@ -215,17 +200,89 @@ model Product {
   price            Float
   isVisible        Boolean  @default(true) @map("is_visible")
   isActive         Boolean  @default(true) @map("is_active")
-
-  sellerId String  @map("seller_id")
-  brandId  String? @map("brand_id")
+  sellerId         String   @map("seller_id")
+  condominiumId    String?  @map("condominium_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   seller            Seller            @relation(fields: [sellerId], references: [id])
-  brand             Brand?            @relation(fields: [brandId], references: [id])
   productCategories ProductCategory[]
+  specifications    Specification?
+  condominium       Condominium?      @relation(fields: [condominiumId], references: [id])
 
   @@map("product")
+}
+
+model Condominium {
+  id       String @id @default(uuid())
+  name     String
+  sellerId String @map("seller_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  seller   Seller    @relation(fields: [sellerId], references: [id])
+  products Product[]
+
+  @@map("condominium")
+}
+
+model Specification {
+  id           String  @id @default(uuid())
+  buildingArea String  @map("building_area")
+  totalArea    String  @map("total_area")
+  isFurnished  Boolean @map("is_furnished")
+
+  isBuilding      Boolean @map("is_building")
+  buildingContext String? @map("building_context")
+
+  isAcceptExchange Boolean @map("is_accept_exchange")
+  exchangeContext  String? @map("exchange_context")
+
+  productId String @unique @map("product_id")
+
+  locations String[] @default([])
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  product                 Product                  @relation(fields: [productId], references: [id])
+  specificationAttributes SpecificationAttribute[]
+
+  @@map("specification")
+}
+
+model SpecificationAttribute {
+  id              String @id @default(uuid())
+  attributeId     String @map("attribute_id")
+  specificationId String @map("specification_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  specification Specification @relation(fields: [specificationId], references: [id])
+  attribute     Attribute     @relation(fields: [attributeId], references: [id])
+
+  @@map("specification_attribute")
+}
+
+model Attribute {
+  id       String @id @default(uuid())
+  name     String
+  icon     String
+  sellerId String @map("seller_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  specificationAttributes SpecificationAttribute[]
+  seller                  Seller                   @relation(fields: [sellerId], references: [id])
+
+  @@map("attribute")
 }

@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import {
   CreateProductDto,
-  QueryParamsDto,
+  SearchProductDto,
   UpdateProductDto,
 } from 'src/domain/dtos';
 import { FindAllResultEntity, ProductEntity } from 'src/domain/entities';
@@ -10,7 +10,7 @@ import { ProductRepository } from '../repository/product.repository';
 import { QueryBuilder } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from './seller.service';
-import { BrandService } from './brand.service';
+import { CondominiumService } from './condominium.service';
 
 @Injectable()
 export class ProductService
@@ -19,7 +19,7 @@ export class ProductService
   constructor(
     private readonly productRepository: ProductRepository,
     private readonly sellerService: SellerService,
-    private readonly brandService: BrandService,
+    private readonly condominiumService: CondominiumService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
   ) {}
@@ -27,7 +27,8 @@ export class ProductService
   async create(dto: CreateProductDto): Promise<ProductEntity> {
     const seller = await this.sellerService.findById(dto.sellerId);
 
-    if (dto.brandId) await this.brandService.findById(dto.brandId);
+    if (dto.condominiumId)
+      await this.condominiumService.findById(dto.condominiumId);
 
     const product = await this.productRepository.create({
       ...dto,
@@ -37,17 +38,32 @@ export class ProductService
     return product;
   }
 
-  async findAll(
-    queryParams: QueryParamsDto,
-  ): Promise<FindAllResultEntity<ProductEntity>> {
+  async findAll({
+    sellerId,
+    isActive,
+    isVisible,
+    name,
+    ...queryParams
+  }: SearchProductDto): Promise<FindAllResultEntity<ProductEntity>> {
+    const queryParamsStringfy = JSON.stringify(queryParams);
+
     const cache =
       await this.cacheManager.get<FindAllResultEntity<ProductEntity> | null>(
-        'products',
+        `products_${queryParamsStringfy}`,
       );
 
     if (cache) return cache;
 
-    const query = new QueryBuilder(queryParams).pagination().handle();
+    const query = new QueryBuilder(queryParams)
+      .where({
+        sellerId: sellerId && sellerId,
+        isActive: isActive && isActive,
+        isVisible: isVisible && isVisible,
+        name: name && { contains: name },
+      })
+      .sort()
+      .pagination()
+      .handle();
 
     const products = await this.productRepository.findAll(query);
     const total = await this.productRepository.count();
@@ -59,7 +75,10 @@ export class ProductService
       total,
     };
 
-    await this.cacheManager.set(`products`, { data: products, info });
+    await this.cacheManager.set(`products_${queryParamsStringfy}`, {
+      data: products,
+      info,
+    });
 
     return { data: products, info };
   }
@@ -75,8 +94,6 @@ export class ProductService
 
   async update(dto: UpdateProductDto): Promise<ProductEntity> {
     const product = await this.findById(dto.id);
-
-    if (dto.brandId) await this.brandService.findById(dto.brandId);
 
     const update = await this.productRepository.update({
       ...dto,

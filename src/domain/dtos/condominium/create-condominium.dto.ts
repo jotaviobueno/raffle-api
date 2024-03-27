@@ -1,11 +1,11 @@
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-export class CreateBrandDto {
-  @IsUUID()
-  @IsNotEmpty()
-  sellerId: string;
-
+export class CreateCondominiumDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @IsUUID()
+  @IsNotEmpty()
+  sellerId: string;
 }

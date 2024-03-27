@@ -17,9 +17,11 @@ export class CurrencyService implements ServiceBase<CurrencyEntity> {
   async findAll(
     queryParams: QueryParamsDto,
   ): Promise<FindAllResultEntity<CurrencyEntity>> {
+    const queryParamsStringfy = JSON.stringify(queryParams);
+
     const cache =
       await this.cacheManager.get<FindAllResultEntity<CurrencyEntity> | null>(
-        'currencies',
+        `currencies_${queryParamsStringfy}`,
       );
 
     if (cache) return cache;
@@ -36,7 +38,10 @@ export class CurrencyService implements ServiceBase<CurrencyEntity> {
       total,
     };
 
-    await this.cacheManager.set('currencies', { data: currencies, info });
+    await this.cacheManager.set(`currencies_${queryParamsStringfy}`, {
+      data: currencies,
+      info,
+    });
 
     return { data: currencies, info };
   }

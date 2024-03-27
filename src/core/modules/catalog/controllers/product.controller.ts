@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import {
   CreateProductDto,
-  QueryParamsDto,
+  SearchProductDto,
   UpdateProductDto,
 } from 'src/domain/dtos';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
@@ -33,7 +33,7 @@ export class ProductController {
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
   @IsPublic()
-  findAll(@Query() queryParams: QueryParamsDto) {
+  findAll(@Query() queryParams: SearchProductDto) {
     return this.productService.findAll(queryParams);
   }
 

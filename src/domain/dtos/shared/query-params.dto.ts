@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsSort } from 'src/common/validators';
 
 export class QueryParamsDto {
   @IsNumber()
@@ -13,5 +14,10 @@ export class QueryParamsDto {
   @ApiProperty({ nullable: true })
   @IsOptional()
   @Transform(({ value }) => +value)
-  pageSize: number = 200;
+  pageSize: number = 10;
+
+  @IsString()
+  @IsOptional()
+  @IsSort()
+  orderBy?: string;
 }

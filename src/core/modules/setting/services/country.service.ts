@@ -19,9 +19,11 @@ export class CountryService implements ServiceBase<CountryEntity> {
   async findAll(
     queryParams: QueryParamsDto,
   ): Promise<FindAllResultEntity<CountryEntity>> {
+    const queryParamsStringfy = JSON.stringify(queryParams);
+
     const cache =
       await this.cacheManager.get<FindAllResultEntity<CountryEntity> | null>(
-        'countries',
+        `countries_${queryParamsStringfy}`,
       );
 
     if (cache) return cache;
@@ -38,14 +40,13 @@ export class CountryService implements ServiceBase<CountryEntity> {
       total,
     };
 
-    await this.cacheManager.set('countries', { data: countries, info });
+    await this.cacheManager.set(`countries_${queryParamsStringfy}`, {
+      data: countries,
+      info,
+    });
 
     return { data: countries, info };
   }
-
-  // async findAll(queryParams: QueryParamsDto): Promise<CountryEntity[]> {
-
-  // }
 
   async findById(id: string): Promise<CountryEntity> {
     const country = await this.countryRepository.findById(id);

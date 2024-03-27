@@ -5,4 +5,5 @@ export * from './address';
 export * from './seller';
 export * from './menu';
 export * from './product';
-export * from './brand';
+export * from './condominium';
+export * from './attribute';

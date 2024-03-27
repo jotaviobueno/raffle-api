@@ -12,7 +12,7 @@ export class ProductEntity implements Product {
   isVisible: boolean;
   isActive: boolean;
   sellerId: string;
-  brandId: string | null;
+  condominiumId: string | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;

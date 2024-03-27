@@ -23,9 +23,9 @@ export class UserService
 {
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly sellerService: SellerService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    private readonly sellerService: SellerService,
   ) {}
 
   async create(dto: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
@@ -68,9 +68,11 @@ export class UserService
   async findAll(
     queryParams: QueryParamsDto,
   ): Promise<FindAllResultEntity<Omit<UserEntity, 'password'>>> {
+    const queryParamsStringfy = JSON.stringify(queryParams);
+
     const cache = await this.cacheManager.get<FindAllResultEntity<
       Omit<UserEntity, 'password'>
-    > | null>('users');
+    > | null>(`users_${queryParamsStringfy}`);
 
     if (cache) return cache;
 
@@ -86,7 +88,10 @@ export class UserService
       total,
     };
 
-    await this.cacheManager.set(`users`, { data: users, info });
+    await this.cacheManager.set(`users_${queryParamsStringfy}`, {
+      data: users,
+      info,
+    });
 
     return { data: users, info };
   }

@@ -17,9 +17,11 @@ export class StateService implements ServiceBase<StateEntity> {
   async findAll(
     queryParams: QueryParamsDto,
   ): Promise<FindAllResultEntity<StateEntity>> {
+    const queryParamsStringfy = JSON.stringify(queryParams);
+
     const cache =
       await this.cacheManager.get<FindAllResultEntity<StateEntity> | null>(
-        `states`,
+        `states_${queryParamsStringfy}`,
       );
 
     if (cache) return cache;
@@ -36,7 +38,10 @@ export class StateService implements ServiceBase<StateEntity> {
       total,
     };
 
-    await this.cacheManager.set(`states`, { data: states, info });
+    await this.cacheManager.set(`states_${queryParamsStringfy}`, {
+      data: states,
+      info,
+    });
 
     return { data: states, info };
   }

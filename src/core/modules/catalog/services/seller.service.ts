@@ -22,9 +22,9 @@ export class SellerService
   implements ServiceBase<SellerEntity, CreateSellerDto, UpdateSellerDto>
 {
   constructor(
+    private readonly sellerRepository: SellerRepository,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
-    private readonly sellerRepository: SellerRepository,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
   ) {}
@@ -52,9 +52,11 @@ export class SellerService
   async findAll(
     queryParams: QueryParamsDto,
   ): Promise<FindAllResultEntity<SellerEntity>> {
+    const queryParamsStringfy = JSON.stringify(queryParams);
+
     const cache =
       await this.cacheManager.get<FindAllResultEntity<SellerEntity> | null>(
-        'sellers',
+        `sellers_${queryParamsStringfy}`,
       );
 
     if (cache) return cache;
@@ -71,7 +73,10 @@ export class SellerService
       total,
     };
 
-    await this.cacheManager.set(`sellers`, { data: sellers, info });
+    await this.cacheManager.set(`sellers_${queryParamsStringfy}`, {
+      data: sellers,
+      info,
+    });
 
     return { data: sellers, info };
   }

@@ -35,10 +35,6 @@ export class CreateProductDto {
   @IsString({ each: true })
   metaKeyword: string[];
 
-  @IsNumber()
-  @IsNotEmpty()
-  price: number;
-
   @IsBoolean()
   @IsOptional()
   isVisible: boolean;
@@ -53,5 +49,9 @@ export class CreateProductDto {
 
   @IsUUID()
   @IsOptional()
-  brandId?: string;
+  condominiumId?: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
 }

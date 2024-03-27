@@ -1,6 +1,6 @@
-import { Brand } from '@prisma/client';
+import { Condominium } from '@prisma/client';
 
-export class BrandEntity implements Brand {
+export class CondominiumEntity implements Condominium {
   id: string;
   name: string;
   sellerId: string;

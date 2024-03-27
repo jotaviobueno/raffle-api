@@ -29,6 +29,20 @@ export class QueryBuilder {
     return this;
   }
 
+  sort() {
+    try {
+      const [field, value] = this.queryParams?.orderBy?.split('.');
+
+      this.query.orderBy = {
+        [field]: value,
+      };
+
+      return this;
+    } catch (e) {
+      return this;
+    }
+  }
+
   handle() {
     return this.query;
   }

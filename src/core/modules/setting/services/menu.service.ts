@@ -36,9 +36,11 @@ export class MenuService
   async findAll(
     queryParams: QueryParamsDto,
   ): Promise<FindAllResultEntity<MenuEntity>> {
+    const queryParamsStringfy = JSON.stringify(queryParams);
+
     const cache =
       await this.cacheManager.get<FindAllResultEntity<MenuEntity> | null>(
-        'menus',
+        `menus_${queryParamsStringfy}`,
       );
 
     if (cache) return cache;
@@ -58,7 +60,10 @@ export class MenuService
       total,
     };
 
-    await this.cacheManager.set('menus', { data: menus, info });
+    await this.cacheManager.set(`menus_${queryParamsStringfy}`, {
+      data: menus,
+      info,
+    });
 
     return { data: menus, info };
   }
