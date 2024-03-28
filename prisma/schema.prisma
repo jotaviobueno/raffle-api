@@ -68,26 +68,29 @@ model Seller {
 }
 
 model Address {
-  id           String  @id @default(uuid())
-  street       String
-  reference    String?
-  complement   String?
-  neighborhood String
-  countryId    String  @map("country_id")
-  stateId      String  @map("state_id")
-  userId       String? @map("user_id")
-  sellerId     String? @map("seller_id")
-  postcode     String
-  city         String
+  id            String  @id @default(uuid())
+  street        String
+  reference     String?
+  complement    String?
+  neighborhood  String
+  countryId     String  @map("country_id")
+  stateId       String  @map("state_id")
+  userId        String? @map("user_id")
+  sellerId      String? @map("seller_id")
+  condominiumId String? @unique @map("condominium_id")
+  postcode      String
+  city          String
+  number        String
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  seller  Seller? @relation(fields: [sellerId], references: [id])
-  user    User?   @relation(fields: [userId], references: [id])
-  state   State   @relation(fields: [stateId], references: [id])
-  country Country @relation(fields: [countryId], references: [id])
+  seller      Seller?      @relation(fields: [sellerId], references: [id])
+  user        User?        @relation(fields: [userId], references: [id])
+  condominium Condominium? @relation(fields: [condominiumId], references: [id])
+  state       State        @relation(fields: [stateId], references: [id])
+  country     Country      @relation(fields: [countryId], references: [id])
 
   @@map("address")
 }
@@ -226,6 +229,7 @@ model Condominium {
 
   seller   Seller    @relation(fields: [sellerId], references: [id])
   products Product[]
+  address  Address?
 
   @@map("condominium")
 }

@@ -7,6 +7,7 @@ import { CountryService } from '../setting/services/country.service';
 import { UserService } from '../user/user.service';
 import { AddressRepository } from './address.repository';
 import { SellerService } from '../catalog/services/seller.service';
+import { CondominiumService } from '../catalog/services/condominium.service';
 
 @Injectable()
 export class AddressService
@@ -18,6 +19,7 @@ export class AddressService
     private readonly userService: UserService,
     private readonly addressRepository: AddressRepository,
     private readonly sellerService: SellerService,
+    private readonly condominiumService: CondominiumService,
   ) {}
 
   async create(dto: CreateAddressDto): Promise<AddressEntity> {
@@ -28,6 +30,21 @@ export class AddressService
     if (dto.userId) await this.userService.findById(dto.userId);
 
     if (dto.sellerId) await this.sellerService.findById(dto.sellerId);
+
+    if (dto.condominiumId) {
+      const condominium = await this.condominiumService.findById(
+        dto.condominiumId,
+      );
+
+      const condominiumAlreadyExist =
+        await this.addressRepository.findByCondominiumId(condominium.id);
+
+      if (condominiumAlreadyExist)
+        throw new HttpException(
+          'This condominium already have address created',
+          HttpStatus.CONFLICT,
+        );
+    }
 
     const address = await this.addressRepository.create({
       ...dto,

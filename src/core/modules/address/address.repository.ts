@@ -13,6 +13,15 @@ export class AddressRepository extends RepositoryFactory<
     super('address');
   }
 
+  findByCondominiumId(condominiumId: string): Promise<AddressEntity | null> {
+    return this.prismaService.address.findFirst({
+      where: {
+        condominiumId,
+        deletedAt: null,
+      },
+    });
+  }
+
   findById(id: string): Promise<AddressEntity | null> {
     return this.prismaService.address.findFirst({
       where: {

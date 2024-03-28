@@ -37,6 +37,11 @@ export class CreateAddressDto {
   @ApiProperty({ nullable: true })
   userId?: string;
 
+  @IsUUID()
+  @IsOptional()
+  @ApiProperty({ nullable: true })
+  condominiumId?: string;
+
   @IsString()
   @IsNotEmpty()
   @ApiProperty()

@@ -11,7 +11,7 @@ export const data = [
     subMenus: [
       {
         name: 'Propriedades',
-        href: '/listagem-de-propriedade',
+        href: '/listagem-de-propriedades',
       },
       {
         name: 'Condominios',
