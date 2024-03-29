@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import {
   CreateAttributeDto,
-  QueryParamsDto,
+  SearchAttributeDto,
   UpdateAttributeDto,
 } from 'src/domain/dtos';
 import { AttributeEntity, FindAllResultEntity } from 'src/domain/entities';
@@ -34,9 +34,11 @@ export class AttributeService
     return attribute;
   }
 
-  async findAll(
-    queryParams: QueryParamsDto,
-  ): Promise<FindAllResultEntity<AttributeEntity>> {
+  async findAll({
+    sellerId,
+    name,
+    ...queryParams
+  }: SearchAttributeDto): Promise<FindAllResultEntity<AttributeEntity>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =
@@ -46,7 +48,16 @@ export class AttributeService
 
     if (cache) return cache;
 
-    const query = new QueryBuilder(queryParams).pagination().handle();
+    const query = new QueryBuilder(queryParams)
+      .where({
+        sellerId: sellerId && sellerId,
+        name: name && {
+          contains: name,
+        },
+      })
+      .sort()
+      .pagination()
+      .handle();
 
     const attributes = await this.attributeRepository.findAll(query);
     const total = await this.attributeRepository.count();

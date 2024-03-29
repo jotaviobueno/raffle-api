@@ -17,6 +17,10 @@ export const data = [
         name: 'Condominios',
         href: '/listagem-de-condominios',
       },
+      {
+        name: 'Atributos',
+        href: '/listagem-de-atributos',
+      },
     ],
   },
 ];

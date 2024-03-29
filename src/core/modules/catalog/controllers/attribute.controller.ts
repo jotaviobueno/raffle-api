@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import {
   CreateAttributeDto,
-  QueryParamsDto,
+  SearchAttributeDto,
   UpdateAttributeDto,
 } from 'src/domain/dtos';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
@@ -32,7 +32,7 @@ export class AttributeController {
   @Get()
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
-  findAll(@Query() queryParams: QueryParamsDto) {
+  findAll(@Query() queryParams: SearchAttributeDto) {
     return this.attributeService.findAll(queryParams);
   }
 
