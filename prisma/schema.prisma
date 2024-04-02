@@ -58,39 +58,35 @@ model Seller {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  addresses    Address[]
-  products     Product[]
-  categories   Category[]
-  condominiums Condominium[]
-  attributes   Attribute[]
+  addresses  Address[]
+  products   Product[]
+  categories Category[]
 
   @@map("seller")
 }
 
 model Address {
-  id            String  @id @default(uuid())
-  street        String
-  reference     String?
-  complement    String?
-  neighborhood  String
-  countryId     String  @map("country_id")
-  stateId       String  @map("state_id")
-  userId        String? @map("user_id")
-  sellerId      String? @map("seller_id")
-  condominiumId String? @unique @map("condominium_id")
-  postcode      String
-  city          String
-  number        String
+  id           String  @id @default(uuid())
+  street       String
+  reference    String?
+  complement   String?
+  neighborhood String
+  countryId    String  @map("country_id")
+  stateId      String  @map("state_id")
+  userId       String? @map("user_id")
+  sellerId     String? @map("seller_id")
+  postcode     String
+  city         String
+  number       String
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  seller      Seller?      @relation(fields: [sellerId], references: [id])
-  user        User?        @relation(fields: [userId], references: [id])
-  condominium Condominium? @relation(fields: [condominiumId], references: [id])
-  state       State        @relation(fields: [stateId], references: [id])
-  country     Country      @relation(fields: [countryId], references: [id])
+  seller  Seller? @relation(fields: [sellerId], references: [id])
+  user    User?   @relation(fields: [userId], references: [id])
+  state   State   @relation(fields: [stateId], references: [id])
+  country Country @relation(fields: [countryId], references: [id])
 
   @@map("address")
 }
@@ -204,7 +200,6 @@ model Product {
   isVisible        Boolean  @default(true) @map("is_visible")
   isActive         Boolean  @default(true) @map("is_active")
   sellerId         String   @map("seller_id")
-  condominiumId    String?  @map("condominium_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
@@ -212,81 +207,6 @@ model Product {
 
   seller            Seller            @relation(fields: [sellerId], references: [id])
   productCategories ProductCategory[]
-  specifications    Specification?
-  condominium       Condominium?      @relation(fields: [condominiumId], references: [id])
 
   @@map("product")
-}
-
-model Condominium {
-  id       String @id @default(uuid())
-  name     String
-  sellerId String @map("seller_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  seller   Seller    @relation(fields: [sellerId], references: [id])
-  products Product[]
-  address  Address?
-
-  @@map("condominium")
-}
-
-model Specification {
-  id           String  @id @default(uuid())
-  buildingArea String  @map("building_area")
-  totalArea    String  @map("total_area")
-  isFurnished  Boolean @map("is_furnished")
-
-  isBuilding      Boolean @map("is_building")
-  buildingContext String? @map("building_context")
-
-  isAcceptExchange Boolean @map("is_accept_exchange")
-  exchangeContext  String? @map("exchange_context")
-
-  productId String @unique @map("product_id")
-
-  locations String[] @default([])
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  product                 Product                  @relation(fields: [productId], references: [id])
-  specificationAttributes SpecificationAttribute[]
-
-  @@map("specification")
-}
-
-model SpecificationAttribute {
-  id              String @id @default(uuid())
-  attributeId     String @map("attribute_id")
-  specificationId String @map("specification_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  specification Specification @relation(fields: [specificationId], references: [id])
-  attribute     Attribute     @relation(fields: [attributeId], references: [id])
-
-  @@map("specification_attribute")
-}
-
-model Attribute {
-  id       String @id @default(uuid())
-  name     String
-  icon     String
-  sellerId String @map("seller_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  specificationAttributes SpecificationAttribute[]
-  seller                  Seller                   @relation(fields: [sellerId], references: [id])
-
-  @@map("attribute")
 }

@@ -1,13 +1,9 @@
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-export class CreateAttributeDto {
+export class CreateCategoryDto {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  @IsString()
-  @IsNotEmpty()
-  icon: string;
 
   @IsUUID()
   @IsNotEmpty()

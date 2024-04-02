@@ -10,7 +10,6 @@ import { ProductRepository } from '../repository/product.repository';
 import { QueryBuilder } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from './seller.service';
-import { CondominiumService } from './condominium.service';
 
 @Injectable()
 export class ProductService
@@ -19,16 +18,12 @@ export class ProductService
   constructor(
     private readonly productRepository: ProductRepository,
     private readonly sellerService: SellerService,
-    private readonly condominiumService: CondominiumService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
   ) {}
 
   async create(dto: CreateProductDto): Promise<ProductEntity> {
     const seller = await this.sellerService.findById(dto.sellerId);
-
-    if (dto.condominiumId)
-      await this.condominiumService.findById(dto.condominiumId);
 
     const product = await this.productRepository.create({
       ...dto,

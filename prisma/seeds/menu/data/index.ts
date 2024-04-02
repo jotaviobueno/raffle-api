@@ -10,16 +10,12 @@ export const data = [
     icon: 'CopyMinus',
     subMenus: [
       {
-        name: 'Propriedades',
-        href: '/listagem-de-propriedades',
+        name: 'Produtos',
+        href: '/listagem-de-produtos',
       },
       {
-        name: 'Condominios',
-        href: '/listagem-de-condominios',
-      },
-      {
-        name: 'Atributos',
-        href: '/listagem-de-atributos',
+        name: 'Categorias',
+        href: '/listagem-de-categorias',
       },
     ],
   },

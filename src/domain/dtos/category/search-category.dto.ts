@@ -1,12 +1,12 @@
 import { IsOptional, IsString, IsUUID } from 'class-validator';
 import { QueryParamsDto } from '../shared';
 
-export class SearchAttributeDto extends QueryParamsDto {
-  @IsUUID()
+export class SearchCategoryDto extends QueryParamsDto {
   @IsOptional()
-  sellerId?: string;
-
   @IsString()
-  @IsOptional()
   name?: string;
+
+  @IsOptional()
+  @IsUUID()
+  sellerId?: string;
 }

@@ -5,5 +5,4 @@ export * from './address';
 export * from './seller';
 export * from './menu';
 export * from './product';
-export * from './condominium';
-export * from './attribute';
+export * from './category';

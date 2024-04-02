@@ -6,43 +6,21 @@ import { SellerRepository } from './repository/seller.repository';
 import { UserModule } from '../user/user.module';
 import { SellerController } from './controllers/seller.controller';
 import { ProductController } from './controllers/product.controller';
-import { CondominiumController } from './controllers/condominium.controller';
-import { CondominiumRepository } from './repository/condominium.repository';
-import { CondominiumService } from './services/condominium.service';
-import { SpecificationRepository } from './repository/specification.repository';
-import { SpecificationService } from './services/specification.service';
-import { SpecificationController } from './controllers/specifciation.controller';
-import { AttributeController } from './controllers/attribute.controller';
-import { AttributeService } from './services/attribute.service';
-import { AttributeRepository } from './repository/attribute.repository';
+import { CategortyController } from './controllers/category.controller';
+import { CategoryService } from './services/category.service';
+import { CategoryRepository } from './repository/category.repository';
 
 @Module({
   imports: [forwardRef(() => UserModule)],
-  controllers: [
-    SellerController,
-    ProductController,
-    CondominiumController,
-    SpecificationController,
-    AttributeController,
-  ],
+  controllers: [SellerController, ProductController, CategortyController],
   providers: [
     ProductService,
     ProductRepository,
     SellerService,
     SellerRepository,
-    CondominiumService,
-    CondominiumRepository,
-    SpecificationRepository,
-    SpecificationService,
-    AttributeService,
-    AttributeRepository,
+    CategoryService,
+    CategoryRepository,
   ],
-  exports: [
-    SellerService,
-    ProductService,
-    CondominiumService,
-    SpecificationService,
-    AttributeService,
-  ],
+  exports: [SellerService, ProductService, CategoryService],
 })
 export class CatalogModule {}
