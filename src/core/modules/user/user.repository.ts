@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ROLE_ENUM } from 'src/common/enums';
 import { RepositoryFactory } from 'src/common/factories';
 import { CreateUserDto, UpdateUserDto } from 'src/domain/dtos';
 import { QueryBuilderEntity, UserEntity } from 'src/domain/entities';
@@ -15,7 +14,7 @@ export class UserRepository extends RepositoryFactory<
   }
 
   create(
-    data: CreateUserDto & { role: ROLE_ENUM },
+    data: CreateUserDto,
   ): Promise<UserEntity | Omit<UserEntity, 'password'>> {
     return this.prismaService.user.create({
       data,
@@ -29,7 +28,6 @@ export class UserRepository extends RepositoryFactory<
         createdAt: true,
         updatedAt: true,
         deletedAt: true,
-        username: true,
         email: true,
         cpf: true,
         rg: true,
@@ -42,24 +40,6 @@ export class UserRepository extends RepositoryFactory<
     return this.prismaService.user.findFirst({
       where: {
         email,
-        deletedAt: null,
-      },
-    });
-  }
-
-  findByUsername(username: string): Promise<UserEntity | null> {
-    return this.prismaService.user.findFirst({
-      where: {
-        username,
-        deletedAt: null,
-      },
-    });
-  }
-
-  findByPhone(phone: string): Promise<UserEntity | null> {
-    return this.prismaService.user.findFirst({
-      where: {
-        phone,
         deletedAt: null,
       },
     });
@@ -87,7 +67,6 @@ export class UserRepository extends RepositoryFactory<
         createdAt: true,
         updatedAt: true,
         deletedAt: true,
-        username: true,
         email: true,
         cpf: true,
         rg: true,
@@ -113,7 +92,6 @@ export class UserRepository extends RepositoryFactory<
         createdAt: true,
         updatedAt: true,
         deletedAt: true,
-        username: true,
         email: true,
         cpf: true,
         rg: true,

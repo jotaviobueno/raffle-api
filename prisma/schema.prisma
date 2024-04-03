@@ -17,24 +17,52 @@ model User {
   id        String    @id @default(uuid())
   firstName String
   lastName  String
-  username  String
   role      USER_ROLE
   email     String
-  password  String
-  phone     String
+  password  String?
+  phone     String?
   avatar    String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
   cpf       String?
   rg        String?
   birthDate DateTime? @map("birth_date") @db.Timestamp
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  addresses       Address[]
+  sellers         Seller[]
+  sellerSuppliers SellerSupplier[]
+  sellerCustomers SellerCustomer[]
+
+  @@map("user")
+}
+
+model SellerSupplier {
+  id         String @id @default(uuid())
+  seller     Seller @relation(fields: [sellerId], references: [id])
+  sellerId   String @map("seller_id")
+  supplier   User   @relation(fields: [supplierId], references: [id])
+  supplierId String @map("supplier_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  addresses Address[]
-  sellers   Seller[]
+  @@map("seller_supplier")
+}
 
-  @@map("user")
+model SellerCustomer {
+  id         String @id @default(uuid())
+  seller     Seller @relation(fields: [sellerId], references: [id])
+  sellerId   String @map("seller_id")
+  customer   User   @relation(fields: [customerId], references: [id])
+  customerId String @map("customer_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  @@map("seller_customer")
 }
 
 enum USER_ROLE {
@@ -42,6 +70,7 @@ enum USER_ROLE {
   ADMIN
   DEV
   CUSTOMER
+  SUPPLIER
 }
 
 model Seller {
@@ -58,10 +87,12 @@ model Seller {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  addresses  Address[]
-  products   Product[]
-  categories Category[]
-  brands     Brand[]
+  addresses       Address[]
+  products        Product[]
+  categories      Category[]
+  brands          Brand[]
+  sellerSuppliers SellerSupplier[]
+  sellerCustomers SellerCustomer[]
 
   @@map("seller")
 }

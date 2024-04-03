@@ -3,4 +3,11 @@ export enum ROLE_ENUM {
   ADMIN = 'ADMIN',
   DEV = 'DEV',
   CUSTOMER = 'CUSTOMER',
+  SUPPLIER = 'SUPPLIER',
+}
+
+export enum PUBLIC_ROLE_ENUM {
+  USER = 'USER',
+  CUSTOMER = 'CUSTOMER',
+  SUPPLIER = 'SUPPLIER',
 }

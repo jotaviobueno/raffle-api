@@ -9,8 +9,10 @@ import {
 import { UserRepository } from './user.repository';
 import { QueryBuilder, hash } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
-import { ROLE_ENUM } from 'src/common/enums';
+import { PUBLIC_ROLE_ENUM } from 'src/common/enums';
 import { SellerService } from '../catalog/services/seller.service';
+import { SellerSupplierService } from '../seller-supplier/seller-supplier.service';
+import { SellerCustomerService } from '../seller-customer/seller-customer.service';
 
 @Injectable()
 export class UserService
@@ -26,41 +28,87 @@ export class UserService
     private readonly sellerService: SellerService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    private readonly sellerSupplierService: SellerSupplierService,
+    private readonly sellerCustomerService: SellerCustomerService,
   ) {}
 
-  async create(dto: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
+  async create({
+    sellerId,
+    ...dto
+  }: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
+    if (dto.role != PUBLIC_ROLE_ENUM.USER) {
+      if (dto.password)
+        throw new HttpException(
+          'Not possible to create SUPPLIER or CUSTOMER with password',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+
+      if (!sellerId)
+        throw new HttpException(
+          'Seller id is not sent',
+          HttpStatus.BAD_REQUEST,
+        );
+    }
+
+    if (dto.role === PUBLIC_ROLE_ENUM.USER && !dto.password)
+      throw new HttpException(
+        'Not possible to create USER without password',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
+    if (sellerId) await this.sellerService.findById(sellerId);
+
     const emailAlreadyExist = await this.userRepository.findByEmail(dto.email);
 
-    if (emailAlreadyExist)
-      throw new HttpException(
-        'Email, phone or username already exist.',
-        HttpStatus.CONFLICT,
-      );
+    if (
+      dto.role === PUBLIC_ROLE_ENUM.SUPPLIER &&
+      emailAlreadyExist &&
+      emailAlreadyExist.role === dto.role
+    ) {
+      await this.sellerSupplierService.create({
+        sellerId: sellerId,
+        supplierId: emailAlreadyExist.id,
+      });
 
-    const usernameAlreadyExist = await this.userRepository.findByUsername(
-      dto.username,
-    );
+      return emailAlreadyExist;
+    }
 
-    if (usernameAlreadyExist)
-      throw new HttpException(
-        'Email, phone or username already exist.',
-        HttpStatus.CONFLICT,
-      );
+    if (
+      dto.role === PUBLIC_ROLE_ENUM.CUSTOMER &&
+      emailAlreadyExist &&
+      emailAlreadyExist.role === dto.role
+    ) {
+      await this.sellerCustomerService.create({
+        sellerId: sellerId,
+        customerId: emailAlreadyExist.id,
+      });
 
-    const phoneAlreadyExist = await this.userRepository.findByPhone(dto.phone);
+      return emailAlreadyExist;
+    }
 
-    if (phoneAlreadyExist)
-      throw new HttpException(
-        'Email, phone or username already exist.',
-        HttpStatus.CONFLICT,
-      );
+    if (dto.role === PUBLIC_ROLE_ENUM.USER) {
+      if (emailAlreadyExist)
+        throw new HttpException(
+          'Email, phone or username already exist.',
+          HttpStatus.CONFLICT,
+        );
 
-    dto.password = await hash(dto.password);
+      dto.password = await hash(dto.password);
+    }
 
-    const user = await this.userRepository.create({
-      ...dto,
-      role: ROLE_ENUM.USER,
-    });
+    const user = await this.userRepository.create(dto);
+
+    if (dto.role === PUBLIC_ROLE_ENUM.SUPPLIER)
+      await this.sellerSupplierService.create({
+        sellerId: sellerId,
+        supplierId: user.id,
+      });
+
+    if (dto.role === PUBLIC_ROLE_ENUM.CUSTOMER)
+      await this.sellerCustomerService.create({
+        sellerId: sellerId,
+        customerId: user.id,
+      });
 
     return user;
   }
@@ -130,30 +178,6 @@ export class UserService
 
   async update(dto: UpdateUserDto): Promise<Omit<UserEntity, 'password'>> {
     const user = await this.findById(dto.id);
-
-    if (dto.username && dto.username != user.username) {
-      const usernameAlreadyExist = await this.userRepository.findByUsername(
-        dto.username,
-      );
-
-      if (usernameAlreadyExist)
-        throw new HttpException(
-          'phone or username already exist.',
-          HttpStatus.CONFLICT,
-        );
-    }
-
-    if (dto.phone && dto.phone != user.phone) {
-      const phoneAlreadyExist = await this.userRepository.findByPhone(
-        dto.phone,
-      );
-
-      if (phoneAlreadyExist)
-        throw new HttpException(
-          'phone or username already exist.',
-          HttpStatus.CONFLICT,
-        );
-    }
 
     const update = await this.userRepository.update({ ...dto, id: user.id });
 

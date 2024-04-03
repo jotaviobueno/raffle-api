@@ -3,11 +3,14 @@ import { Transform } from 'class-transformer';
 import {
   IsDate,
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
   IsString,
+  IsUUID,
 } from 'class-validator';
+import { PUBLIC_ROLE_ENUM } from 'src/common/enums';
 
 export class CreateUserDto {
   @IsString()
@@ -20,25 +23,20 @@ export class CreateUserDto {
   @ApiProperty()
   lastName: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  username: string;
-
   @IsEmail()
   @IsNotEmpty()
   @ApiProperty()
   email: string;
 
   @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  password: string;
+  @IsOptional()
+  @ApiProperty({ nullable: true })
+  password?: string;
 
   @IsPhoneNumber()
-  @IsNotEmpty()
+  @IsOptional()
   @ApiProperty()
-  phone: string;
+  phone?: string;
 
   @IsString()
   @IsOptional()
@@ -52,4 +50,12 @@ export class CreateUserDto {
   @IsOptional()
   @Transform(({ value }) => new Date(value))
   birthDate?: Date;
+
+  @IsEnum(PUBLIC_ROLE_ENUM)
+  @IsNotEmpty()
+  role: keyof typeof PUBLIC_ROLE_ENUM;
+
+  @IsUUID()
+  @IsOptional()
+  sellerId?: string;
 }

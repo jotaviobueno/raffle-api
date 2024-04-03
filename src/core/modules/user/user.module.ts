@@ -6,12 +6,16 @@ import { UserRepository } from './user.repository';
 import { S3Module } from '../s3/s3.module';
 import { UserService } from './user.service';
 import { CatalogModule } from '../catalog/catalog.module';
+import { SellerSupplierModule } from '../seller-supplier/seller-supplier.module';
+import { SellerCustomerModule } from '../seller-customer/seller-customer.module';
 
 export const userModuleMock = {
   imports: [
     PrismaModule,
     RedisModule,
     S3Module,
+    SellerSupplierModule,
+    SellerCustomerModule,
     forwardRef(() => CatalogModule),
   ],
   controllers: [UserController],
