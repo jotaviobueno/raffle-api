@@ -17,6 +17,10 @@ export const data = [
         name: 'Categorias',
         href: '/listagem-de-categorias',
       },
+      {
+        name: 'Marcas',
+        href: '/listagem-de-marcas',
+      },
     ],
   },
 ];

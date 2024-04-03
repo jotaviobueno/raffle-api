@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import {
   CreateCategoryDto,
-  SearchProductDto,
+  SearchCategoryDto,
   UpdateCategoryDto,
 } from 'src/domain/dtos';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
@@ -33,13 +33,12 @@ export class CategortyController {
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
   @IsPublic()
-  findAll(@Query() queryParams: SearchProductDto) {
+  findAll(@Query() queryParams: SearchCategoryDto) {
     return this.categoryService.findAll(queryParams);
   }
 
   @Get(':id')
-  @IsPublic()
-  findAllCountryId(@Param('id') id: string) {
+  findById(@Param('id') id: string) {
     return this.categoryService.findById(id);
   }
 

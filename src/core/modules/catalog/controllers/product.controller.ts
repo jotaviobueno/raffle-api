@@ -38,8 +38,7 @@ export class ProductController {
   }
 
   @Get(':id')
-  @IsPublic()
-  findAllCountryId(@Param('id') id: string) {
+  findById(@Param('id') id: string) {
     return this.productService.findById(id);
   }
 
