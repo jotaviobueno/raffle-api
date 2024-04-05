@@ -11,8 +11,6 @@ import { AuthModule } from './core/modules/auth/auth.module';
 import { SettingModule } from './core/modules/setting/setting.module';
 import { AddressModule } from './core/modules/address/address.module';
 import { CatalogModule } from './core/modules/catalog/catalog.module';
-import { SellerSupplierModule } from './core/modules/seller-supplier/seller-supplier.module';
-import { SellerCustomerModule } from './core/modules/seller-customer/seller-customer.module';
 
 @Module({
   imports: [
@@ -26,8 +24,6 @@ import { SellerCustomerModule } from './core/modules/seller-customer/seller-cust
     SettingModule,
     AddressModule,
     CatalogModule,
-    SellerSupplierModule,
-    SellerCustomerModule,
   ],
   providers: [
     {

@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import {
@@ -18,9 +19,14 @@ import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { ApiTags } from '@nestjs/swagger';
 import { IsPublic } from '../../auth/decorators';
 import { CategoryService } from '../services/category.service';
+import { RoleGuard } from '../../role/guards';
+import { Roles } from '../../role/decorators';
+import { ROLE_ENUM } from 'src/common/enums';
 
 @Controller('category')
 @ApiTags('category')
+@UseGuards(RoleGuard)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
 export class CategortyController {
   constructor(private readonly categoryService: CategoryService) {}
 

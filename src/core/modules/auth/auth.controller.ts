@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CurrentUser } from '../user/decorators';
-import { UserEntity } from 'src/domain/entities';
 import { IsPublic } from './decorators';
 import { CreateAuthDto } from 'src/domain/dtos';
 import { ApiTags } from '@nestjs/swagger';
@@ -26,8 +25,7 @@ export class AuthController {
   }
 
   @Get('/who-am-i')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  whoAmI(@CurrentUser() { password, ...user }: UserEntity) {
-    return user;
+  whoAmI(@CurrentUser() userId: string) {
+    return this.authService.whoAmI(userId);
   }
 }

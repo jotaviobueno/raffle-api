@@ -3,16 +3,17 @@ import { ServiceBase } from 'src/common/base';
 import { CreateUserDto, QueryParamsDto, UpdateUserDto } from 'src/domain/dtos';
 import {
   FindAllResultEntity,
+  RoleEntity,
   SellerEntity,
   UserEntity,
+  UserRoleEntity,
 } from 'src/domain/entities';
 import { UserRepository } from './user.repository';
 import { QueryBuilder, hash } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
-import { PUBLIC_ROLE_ENUM } from 'src/common/enums';
 import { SellerService } from '../catalog/services/seller.service';
-import { SellerSupplierService } from '../seller-supplier/seller-supplier.service';
-import { SellerCustomerService } from '../seller-customer/seller-customer.service';
+import { UserRoleService } from '../role/services/user-role.service';
+import { ROLE_ENUM } from 'src/common/enums';
 
 @Injectable()
 export class UserService
@@ -28,15 +29,15 @@ export class UserService
     private readonly sellerService: SellerService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    private readonly sellerSupplierService: SellerSupplierService,
-    private readonly sellerCustomerService: SellerCustomerService,
+    private readonly userRoleService: UserRoleService,
   ) {}
 
   async create({
     sellerId,
+    code,
     ...dto
   }: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
-    if (dto.role != PUBLIC_ROLE_ENUM.USER) {
+    if (code != ROLE_ENUM.USER) {
       if (dto.password)
         throw new HttpException(
           'Not possible to create SUPPLIER or CUSTOMER with password',
@@ -50,7 +51,7 @@ export class UserService
         );
     }
 
-    if (dto.role === PUBLIC_ROLE_ENUM.USER && !dto.password)
+    if (code === ROLE_ENUM.USER && !dto.password)
       throw new HttpException(
         'Not possible to create USER without password',
         HttpStatus.UNPROCESSABLE_ENTITY,
@@ -60,55 +61,20 @@ export class UserService
 
     const emailAlreadyExist = await this.userRepository.findByEmail(dto.email);
 
-    if (
-      dto.role === PUBLIC_ROLE_ENUM.SUPPLIER &&
-      emailAlreadyExist &&
-      emailAlreadyExist.role === dto.role
-    ) {
-      await this.sellerSupplierService.create({
-        sellerId: sellerId,
-        supplierId: emailAlreadyExist.id,
-      });
+    if (emailAlreadyExist)
+      throw new HttpException(
+        'Email, phone or username already exist.',
+        HttpStatus.CONFLICT,
+      );
 
-      return emailAlreadyExist;
-    }
-
-    if (
-      dto.role === PUBLIC_ROLE_ENUM.CUSTOMER &&
-      emailAlreadyExist &&
-      emailAlreadyExist.role === dto.role
-    ) {
-      await this.sellerCustomerService.create({
-        sellerId: sellerId,
-        customerId: emailAlreadyExist.id,
-      });
-
-      return emailAlreadyExist;
-    }
-
-    if (dto.role === PUBLIC_ROLE_ENUM.USER) {
-      if (emailAlreadyExist)
-        throw new HttpException(
-          'Email, phone or username already exist.',
-          HttpStatus.CONFLICT,
-        );
-
-      dto.password = await hash(dto.password);
-    }
+    if (code === ROLE_ENUM.USER) dto.password = await hash(dto.password);
 
     const user = await this.userRepository.create(dto);
 
-    if (dto.role === PUBLIC_ROLE_ENUM.SUPPLIER)
-      await this.sellerSupplierService.create({
-        sellerId: sellerId,
-        supplierId: user.id,
-      });
-
-    if (dto.role === PUBLIC_ROLE_ENUM.CUSTOMER)
-      await this.sellerCustomerService.create({
-        sellerId: sellerId,
-        customerId: user.id,
-      });
+    await this.userRoleService.assing({
+      code,
+      userId: user.id,
+    });
 
     return user;
   }
@@ -144,7 +110,21 @@ export class UserService
     return { data: users, info };
   }
 
-  async findById(id: string): Promise<Omit<UserEntity, 'password'>> {
+  async findByIdAndPopulate(id: string): Promise<
+    Omit<UserEntity, 'password'> & {
+      userRoles: (UserRoleEntity & {
+        role: RoleEntity;
+      })[];
+    }
+  > {
+    const user = await this.userRepository.findByIdAndPopulate(id);
+
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+
+    return user;
+  }
+
+  async findById(id: string): Promise<UserEntity> {
     const user = await this.userRepository.findById(id);
 
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);

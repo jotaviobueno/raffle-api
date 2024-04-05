@@ -1,11 +1,11 @@
 import { IsNotEmpty, IsUUID } from 'class-validator';
 
-export class CreateSellerSupplierDto {
+export class CreateUserRoleDto {
   @IsUUID()
   @IsNotEmpty()
-  sellerId: string;
+  roleId: string;
 
   @IsUUID()
   @IsNotEmpty()
-  supplierId: string;
+  userId: string;
 }

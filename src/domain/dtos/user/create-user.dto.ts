@@ -53,7 +53,7 @@ export class CreateUserDto {
 
   @IsEnum(PUBLIC_ROLE_ENUM)
   @IsNotEmpty()
-  role: keyof typeof PUBLIC_ROLE_ENUM;
+  code: keyof typeof PUBLIC_ROLE_ENUM;
 
   @IsUUID()
   @IsOptional()

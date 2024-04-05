@@ -11,8 +11,10 @@ import { CurrencyController } from './controllers/currency.controller';
 import { MenuService } from './services/menu.service';
 import { MenuRepository } from './repositories/menu.repository';
 import { MenuController } from './controllers/menu.controller';
+import { UserModule } from '../user/user.module';
 
 @Module({
+  imports: [UserModule],
   controllers: [
     CountryController,
     StateController,

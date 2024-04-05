@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import {
@@ -18,9 +19,14 @@ import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { ApiTags } from '@nestjs/swagger';
 import { ProductService } from '../services/product.service';
 import { IsPublic } from '../../auth/decorators';
+import { Roles } from '../../role/decorators';
+import { ROLE_ENUM } from 'src/common/enums';
+import { RoleGuard } from '../../role/guards';
 
 @Controller('product')
 @ApiTags('product')
+@UseGuards(RoleGuard)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
@@ -38,6 +44,7 @@ export class ProductController {
   }
 
   @Get(':id')
+  @IsPublic()
   findById(@Param('id') id: string) {
     return this.productService.findById(id);
   }

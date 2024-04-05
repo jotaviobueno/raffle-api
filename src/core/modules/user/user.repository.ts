@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { RepositoryFactory } from 'src/common/factories';
 import { CreateUserDto, UpdateUserDto } from 'src/domain/dtos';
-import { QueryBuilderEntity, UserEntity } from 'src/domain/entities';
+import {
+  QueryBuilderEntity,
+  RoleEntity,
+  UserEntity,
+  UserRoleEntity,
+} from 'src/domain/entities';
 
 @Injectable()
 export class UserRepository extends RepositoryFactory<
   UserEntity | Omit<UserEntity, 'password'>,
-  CreateUserDto,
+  Omit<CreateUserDto, 'code'>,
   UpdateUserDto
 > {
   constructor() {
@@ -14,7 +19,7 @@ export class UserRepository extends RepositoryFactory<
   }
 
   create(
-    data: CreateUserDto,
+    data: Omit<CreateUserDto, 'code'>,
   ): Promise<UserEntity | Omit<UserEntity, 'password'>> {
     return this.prismaService.user.create({
       data,
@@ -22,7 +27,6 @@ export class UserRepository extends RepositoryFactory<
         id: true,
         lastName: true,
         firstName: true,
-        role: true,
         phone: true,
         avatar: true,
         createdAt: true,
@@ -45,6 +49,41 @@ export class UserRepository extends RepositoryFactory<
     });
   }
 
+  findByIdAndPopulate(id: string): Promise<
+    | (Omit<UserEntity, 'password'> & {
+        userRoles: (UserRoleEntity & {
+          role: RoleEntity;
+        })[];
+      })
+    | null
+  > {
+    return this.prismaService.user.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        lastName: true,
+        firstName: true,
+        phone: true,
+        avatar: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+        email: true,
+        cpf: true,
+        rg: true,
+        birthDate: true,
+        userRoles: {
+          include: {
+            role: true,
+          },
+        },
+      },
+    });
+  }
+
   findById(id: string): Promise<UserEntity | null> {
     return this.prismaService.user.findFirst({
       where: {
@@ -61,7 +100,6 @@ export class UserRepository extends RepositoryFactory<
         id: true,
         lastName: true,
         firstName: true,
-        role: true,
         phone: true,
         avatar: true,
         createdAt: true,
@@ -86,7 +124,6 @@ export class UserRepository extends RepositoryFactory<
         id: true,
         lastName: true,
         firstName: true,
-        role: true,
         phone: true,
         avatar: true,
         createdAt: true,

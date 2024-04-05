@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import {
   CreateSellerDto,
@@ -17,9 +18,14 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { SellerService } from '../services/seller.service';
+import { ROLE_ENUM } from 'src/common/enums';
+import { Roles } from '../../role/decorators';
+import { RoleGuard } from '../../role/guards';
 
 @Controller('seller')
 @ApiTags('seller')
+@UseGuards(RoleGuard)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
 export class SellerController {
   constructor(private readonly sellerService: SellerService) {}
 

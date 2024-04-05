@@ -17,7 +17,6 @@ model User {
   id        String    @id @default(uuid())
   firstName String
   lastName  String
-  role      USER_ROLE
   email     String
   password  String?
   phone     String?
@@ -29,48 +28,40 @@ model User {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  addresses       Address[]
-  sellers         Seller[]
-  sellerSuppliers SellerSupplier[]
-  sellerCustomers SellerCustomer[]
+  addresses Address[]
+  sellers   Seller[]
+  userRoles UserRole[]
 
   @@map("user")
 }
 
-model SellerSupplier {
-  id         String @id @default(uuid())
-  seller     Seller @relation(fields: [sellerId], references: [id])
-  sellerId   String @map("seller_id")
-  supplier   User   @relation(fields: [supplierId], references: [id])
-  supplierId String @map("supplier_id")
+model UserRole {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  roleId String @map("role_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  @@map("seller_supplier")
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@map("user_role")
 }
 
-model SellerCustomer {
-  id         String @id @default(uuid())
-  seller     Seller @relation(fields: [sellerId], references: [id])
-  sellerId   String @map("seller_id")
-  customer   User   @relation(fields: [customerId], references: [id])
-  customerId String @map("customer_id")
+model Role {
+  id   String @id @default(uuid())
+  name String
+  code String
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  @@map("seller_customer")
-}
+  userRoles UserRole[]
 
-enum USER_ROLE {
-  USER
-  ADMIN
-  DEV
-  CUSTOMER
-  SUPPLIER
+  @@map("role")
 }
 
 model Seller {
@@ -87,12 +78,10 @@ model Seller {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  addresses       Address[]
-  products        Product[]
-  categories      Category[]
-  brands          Brand[]
-  sellerSuppliers SellerSupplier[]
-  sellerCustomers SellerCustomer[]
+  addresses  Address[]
+  products   Product[]
+  categories Category[]
+  brands     Brand[]
 
   @@map("seller")
 }
@@ -254,4 +243,6 @@ model Brand {
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   seller Seller @relation(fields: [sellerId], references: [id])
+
+  @@map("brand")
 }

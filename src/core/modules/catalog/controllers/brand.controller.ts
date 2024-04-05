@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import {
@@ -18,9 +19,14 @@ import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { ApiTags } from '@nestjs/swagger';
 import { IsPublic } from '../../auth/decorators';
 import { BrandService } from '../services/brand.service';
+import { RoleGuard } from '../../role/guards';
+import { Roles } from '../../role/decorators';
+import { ROLE_ENUM } from 'src/common/enums';
 
 @Controller('brand')
 @ApiTags('brand')
+@UseGuards(RoleGuard)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
 export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
