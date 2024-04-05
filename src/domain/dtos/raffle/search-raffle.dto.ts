@@ -2,7 +2,7 @@ import { IsBoolean, IsOptional, IsString, IsUUID } from 'class-validator';
 import { QueryParamsDto } from '../shared';
 import { Transform } from 'class-transformer';
 
-export class SearchProductDto extends QueryParamsDto {
+export class SearchRaffleDto extends QueryParamsDto {
   @IsUUID()
   @IsOptional()
   sellerId?: string;

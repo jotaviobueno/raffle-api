@@ -79,8 +79,8 @@ model Seller {
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   addresses  Address[]
-  products   Product[]
   categories Category[]
+  raffles    Raffle[]
 
   @@map("seller")
 }
@@ -187,28 +187,28 @@ model Category {
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  productCategories ProductCategory[]
-  seller            Seller            @relation(fields: [sellerId], references: [id])
+  seller           Seller           @relation(fields: [sellerId], references: [id])
+  raffleCategories RaffleCategory[]
 
   @@map("category")
 }
 
-model ProductCategory {
+model RaffleCategory {
   id         String @id @default(uuid())
-  productId  String @map("product_Id")
   categoryId String @map("category_id")
+  raffleId   String @map("raffle_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  product  Product  @relation(fields: [productId], references: [id])
   category Category @relation(fields: [categoryId], references: [id])
+  raffle   Raffle   @relation(fields: [raffleId], references: [id])
 
-  @@map("product_category")
+  @@map("raffle_category")
 }
 
-model Product {
+model Raffle {
   id               String   @id @default(uuid())
   name             String
   shortDescription String   @map("short_description")
@@ -225,8 +225,8 @@ model Product {
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  seller            Seller            @relation(fields: [sellerId], references: [id])
-  productCategories ProductCategory[]
+  seller           Seller           @relation(fields: [sellerId], references: [id])
+  raffleCategories RaffleCategory[]
 
-  @@map("product")
+  @@map("raffle")
 }

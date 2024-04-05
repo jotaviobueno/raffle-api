@@ -1,31 +1,31 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import {
-  CreateProductDto,
-  SearchProductDto,
-  UpdateProductDto,
+  CreateRaffleDto,
+  SearchRaffleDto,
+  UpdateRaffleDto,
 } from 'src/domain/dtos';
-import { FindAllResultEntity, ProductEntity } from 'src/domain/entities';
-import { ProductRepository } from '../repository/product.repository';
+import { FindAllResultEntity, RaffleEntity } from 'src/domain/entities';
+import { RaffleRepository } from '../repository/raffle.repository';
 import { QueryBuilder } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from './seller.service';
 
 @Injectable()
-export class ProductService
-  implements ServiceBase<ProductEntity, CreateProductDto, UpdateProductDto>
+export class RaffleService
+  implements ServiceBase<RaffleEntity, CreateRaffleDto, UpdateRaffleDto>
 {
   constructor(
-    private readonly productRepository: ProductRepository,
+    private readonly raffleRepository: RaffleRepository,
     private readonly sellerService: SellerService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
   ) {}
 
-  async create(dto: CreateProductDto): Promise<ProductEntity> {
+  async create(dto: CreateRaffleDto): Promise<RaffleEntity> {
     const seller = await this.sellerService.findById(dto.sellerId);
 
-    const product = await this.productRepository.create({
+    const product = await this.raffleRepository.create({
       ...dto,
       sellerId: seller.id,
     });
@@ -39,11 +39,11 @@ export class ProductService
     isVisible,
     name,
     ...queryParams
-  }: SearchProductDto): Promise<FindAllResultEntity<ProductEntity>> {
+  }: SearchRaffleDto): Promise<FindAllResultEntity<RaffleEntity>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =
-      await this.cacheManager.get<FindAllResultEntity<ProductEntity> | null>(
+      await this.cacheManager.get<FindAllResultEntity<RaffleEntity> | null>(
         `products_${queryParamsStringfy}`,
       );
 
@@ -60,8 +60,8 @@ export class ProductService
       .pagination()
       .handle();
 
-    const products = await this.productRepository.findAll(query);
-    const total = await this.productRepository.count();
+    const products = await this.raffleRepository.findAll(query);
+    const total = await this.raffleRepository.count();
 
     const info = {
       page: queryParams.page,
@@ -78,8 +78,8 @@ export class ProductService
     return { data: products, info };
   }
 
-  async findById(id: string): Promise<ProductEntity> {
-    const product = await this.productRepository.findById(id);
+  async findById(id: string): Promise<RaffleEntity> {
+    const product = await this.raffleRepository.findById(id);
 
     if (!product)
       throw new HttpException('product not found', HttpStatus.NOT_FOUND);
@@ -87,10 +87,10 @@ export class ProductService
     return product;
   }
 
-  async update(dto: UpdateProductDto): Promise<ProductEntity> {
+  async update(dto: UpdateRaffleDto): Promise<RaffleEntity> {
     const product = await this.findById(dto.id);
 
-    const update = await this.productRepository.update({
+    const update = await this.raffleRepository.update({
       ...dto,
       id: product.id,
     });
@@ -104,7 +104,7 @@ export class ProductService
   async remove(id: string): Promise<boolean> {
     const product = await this.findById(id);
 
-    const remove = await this.productRepository.softDelete(product.id);
+    const remove = await this.raffleRepository.softDelete(product.id);
 
     if (!remove)
       throw new HttpException('Failed to remove', HttpStatus.NOT_ACCEPTABLE);

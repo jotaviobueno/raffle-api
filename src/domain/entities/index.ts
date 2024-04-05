@@ -7,7 +7,7 @@ export * from './currency';
 export * from './address';
 export * from './seller';
 export * from './menu';
-export * from './product';
+export * from './raffle';
 export * from './category';
 export * from './role';
 export * from './user-role';

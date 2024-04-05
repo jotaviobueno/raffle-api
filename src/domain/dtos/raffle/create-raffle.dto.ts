@@ -9,7 +9,7 @@ import {
   IsUUID,
 } from 'class-validator';
 
-export class CreateProductDto {
+export class CreateRaffleDto {
   @IsString()
   @IsNotEmpty()
   name: string;

@@ -1,6 +1,6 @@
-import { Product } from '@prisma/client';
+import { Raffle } from '@prisma/client';
 
-export class ProductEntity implements Product {
+export class RaffleEntity implements Raffle {
   id: string;
   name: string;
   shortDescription: string;
