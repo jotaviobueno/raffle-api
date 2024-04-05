@@ -70,9 +70,9 @@ model Seller {
   user   User   @relation(fields: [userId], references: [id])
   userId String @map("user_id")
 
-  imageUrl   String? @map("image_url")
-  logoUrl    String? @map("logo_url")
-  faviconUrl String? @map("favicon_url")
+  image   String @default("")
+  logo    String @default("")
+  favicon String @default("")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
@@ -81,7 +81,6 @@ model Seller {
   addresses  Address[]
   products   Product[]
   categories Category[]
-  brands     Brand[]
 
   @@map("seller")
 }
@@ -230,19 +229,4 @@ model Product {
   productCategories ProductCategory[]
 
   @@map("product")
-}
-
-model Brand {
-  id       String  @id @default(uuid())
-  name     String
-  isActive Boolean @map("is_active")
-  sellerId String  @map("seller_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  seller Seller @relation(fields: [sellerId], references: [id])
-
-  @@map("brand")
 }

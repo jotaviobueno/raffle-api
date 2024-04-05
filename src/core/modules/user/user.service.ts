@@ -90,7 +90,7 @@ export class UserService
 
     if (cache) return cache;
 
-    const query = new QueryBuilder(queryParams).pagination().handle();
+    const query = new QueryBuilder(queryParams).sort().pagination().handle();
 
     const users = await this.userRepository.findAll(query);
     const total = await this.userRepository.count();
