@@ -27,7 +27,7 @@ import { ROLE_ENUM } from 'src/common/enums';
 @ApiTags('category')
 @UseGuards(RoleGuard)
 @Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
-export class CategortyController {
+export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
