@@ -14,3 +14,4 @@ export * from './user-role';
 export * from './award';
 export * from './social-media';
 export * from './raffle-category';
+export * from './pack';

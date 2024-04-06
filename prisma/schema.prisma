@@ -86,6 +86,7 @@ model Seller {
   quotas       Quotas[]
   awards       Award[]
   socialMedias SocialMedia[]
+  packs        Pack[]
 
   @@map("seller")
 }
@@ -270,18 +271,19 @@ model Pack {
   quantity Int
   price    Float
   raffleId String @map("raffle_id")
+  sellerId String @map("seller_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   raffle Raffle   @relation(fields: [raffleId], references: [id])
+  seller Seller   @relation(fields: [sellerId], references: [id])
   quotas Quotas[]
 
   @@map("pack")
 }
 
-// Cotas
 model Quotas {
   id       String  @id @default(uuid())
   number   Int
