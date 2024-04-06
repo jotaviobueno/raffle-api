@@ -19,11 +19,7 @@ export class RoleGuard implements CanActivate {
 
     if (isPublic) return true;
 
-    const userId = context.switchToHttp().getRequest()?.userId;
-
-    if (!userId) return false;
-
-    const user = await this.userService.findByIdAndPopulate(userId);
+    const user = context.switchToHttp().getRequest()?.user;
 
     const requiredRoles: string[] = this.reflector.getAllAndOverride(ROLE_KEY, [
       context.getHandler(),
@@ -35,13 +31,13 @@ export class RoleGuard implements CanActivate {
     let hasPermission = false;
 
     for (const userRole of user.userRoles) {
-      if (userRole.role.name === 'ADMIN' || userRole.role.name === 'DEV')
+      if (userRole.role.code === 'ADMIN' || userRole.role.code === 'DEV')
         hasPermission = true;
 
       if (
         requiredRoles?.length >= 1 &&
         requiredRoles.some(
-          (requiredRole) => requiredRole === userRole.role.name,
+          (requiredRole) => requiredRole === userRole.role.code,
         )
       )
         hasPermission = true;

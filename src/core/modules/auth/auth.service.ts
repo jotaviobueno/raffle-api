@@ -27,8 +27,4 @@ export class AuthService implements ServiceBase<AuthEntity, CreateAuthDto> {
 
     return { token };
   }
-
-  whoAmI(userId: string) {
-    return this.userService.findByIdAndPopulate(userId);
-  }
 }

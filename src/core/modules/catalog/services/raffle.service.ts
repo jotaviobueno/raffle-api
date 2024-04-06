@@ -38,13 +38,13 @@ export class RaffleService
         files.map((file) => ({ file, path: 'raffle' })),
       ));
 
-    const product = await this.raffleRepository.create({
+    const raffle = await this.raffleRepository.create({
       ...dto,
       images,
       sellerId: seller.id,
     });
 
-    return product;
+    return raffle;
   }
 
   async findAll({
@@ -58,7 +58,7 @@ export class RaffleService
 
     const cache =
       await this.cacheManager.get<FindAllResultEntity<RaffleEntity> | null>(
-        `products_${queryParamsStringfy}`,
+        `raffles_${queryParamsStringfy}`,
       );
 
     if (cache) return cache;
@@ -74,7 +74,7 @@ export class RaffleService
       .pagination()
       .handle();
 
-    const products = await this.raffleRepository.findAll(query);
+    const raffles = await this.raffleRepository.findAll(query);
     const total = await this.raffleRepository.count();
 
     const info = {
@@ -84,21 +84,21 @@ export class RaffleService
       total,
     };
 
-    await this.cacheManager.set(`products_${queryParamsStringfy}`, {
-      data: products,
+    await this.cacheManager.set(`raffles_${queryParamsStringfy}`, {
+      data: raffles,
       info,
     });
 
-    return { data: products, info };
+    return { data: raffles, info };
   }
 
   async findById(id: string): Promise<RaffleEntity> {
-    const product = await this.raffleRepository.findById(id);
+    const raffle = await this.raffleRepository.findById(id);
 
-    if (!product)
-      throw new HttpException('product not found', HttpStatus.NOT_FOUND);
+    if (!raffle)
+      throw new HttpException('raffle not found', HttpStatus.NOT_FOUND);
 
-    return product;
+    return raffle;
   }
 
   async update({
@@ -107,7 +107,7 @@ export class RaffleService
   }: UpdateRaffleDto & {
     files?: Express.Multer.File[];
   }): Promise<RaffleEntity> {
-    const product = await this.findById(dto.id);
+    const raffle = await this.findById(dto.id);
 
     const images =
       files &&
@@ -118,7 +118,7 @@ export class RaffleService
     const update = await this.raffleRepository.update({
       ...dto,
       images,
-      id: product.id,
+      id: raffle.id,
     });
 
     if (!update)
@@ -128,9 +128,9 @@ export class RaffleService
   }
 
   async remove(id: string): Promise<boolean> {
-    const product = await this.findById(id);
+    const raffle = await this.findById(id);
 
-    const remove = await this.raffleRepository.softDelete(product.id);
+    const remove = await this.raffleRepository.softDelete(raffle.id);
 
     if (!remove)
       throw new HttpException('Failed to remove', HttpStatus.NOT_ACCEPTABLE);

@@ -10,12 +10,14 @@ import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators';
 import { JwtService } from '@nestjs/jwt';
 import { environment } from 'src/config';
+import { UserService } from '../../user/user.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly jwtService: JwtService,
+    private readonly userService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext) {
@@ -37,7 +39,7 @@ export class AuthGuard implements CanActivate {
         secret: environment.JWT_SECRET,
       });
 
-      request['userId'] = payload.sub;
+      request['user'] = await this.userService.findByIdAndPopulate(payload.sub);
     } catch (e) {
       Logger.debug('FAILED TO AUTH', e.message);
 

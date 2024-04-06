@@ -11,6 +11,7 @@ import { CurrentUser } from '../user/decorators';
 import { IsPublic } from './decorators';
 import { CreateAuthDto } from 'src/domain/dtos';
 import { ApiTags } from '@nestjs/swagger';
+import { UserEntity } from 'src/domain/entities';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -25,7 +26,7 @@ export class AuthController {
   }
 
   @Get('/who-am-i')
-  whoAmI(@CurrentUser() userId: string) {
-    return this.authService.whoAmI(userId);
+  whoAmI(@CurrentUser() user: Omit<UserEntity, 'password'>) {
+    return user;
   }
 }
