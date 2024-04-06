@@ -10,10 +10,18 @@ import { CategoryService } from './services/category.service';
 import { CategoryRepository } from './repository/category.repository';
 import { RaffleService } from './services/raffle.service';
 import { S3Module } from '../s3/s3.module';
+import { AwardController } from './controllers/award.controller';
+import { AwardService } from './services/award.service';
+import { AwardRepository } from './repository/award.repository';
 
 @Module({
   imports: [forwardRef(() => UserModule), S3Module],
-  controllers: [SellerController, ProductController, CategortyController],
+  controllers: [
+    SellerController,
+    ProductController,
+    CategortyController,
+    AwardController,
+  ],
   providers: [
     RaffleService,
     RaffleRepository,
@@ -21,7 +29,9 @@ import { S3Module } from '../s3/s3.module';
     SellerRepository,
     CategoryService,
     CategoryRepository,
+    AwardService,
+    AwardRepository,
   ],
-  exports: [SellerService, RaffleService, CategoryService],
+  exports: [SellerService, RaffleService, CategoryService, AwardService],
 })
 export class CatalogModule {}

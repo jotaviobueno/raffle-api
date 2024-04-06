@@ -8,3 +8,4 @@ export * from './raffle';
 export * from './category';
 export * from './role';
 export * from './user-role';
+export * from './award';

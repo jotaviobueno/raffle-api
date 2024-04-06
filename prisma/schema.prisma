@@ -85,6 +85,7 @@ model Seller {
   socialMidias SocialMidia[]
   orders       Order[]
   quotas       Quotas[]
+  awards       Award[]
 
   @@map("seller")
 }
@@ -299,17 +300,18 @@ model Quotas {
   @@map("quotas")
 }
 
-// Premio
 model Award {
   id       String @id @default(uuid())
   name     String
   raffleId String @map("raffle_id")
+  sellerId String @map("seller_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   raffle Raffle @relation(fields: [raffleId], references: [id])
+  seller Seller @relation(fields: [sellerId], references: [id])
 
   @@map("award")
 }
