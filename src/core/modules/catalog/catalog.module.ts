@@ -13,6 +13,9 @@ import { S3Module } from '../s3/s3.module';
 import { AwardController } from './controllers/award.controller';
 import { AwardService } from './services/award.service';
 import { AwardRepository } from './repository/award.repository';
+import { SocialMediaController } from './controllers/social-media.controller';
+import { SocialMediaService } from './services/social-media.service';
+import { SocialMedialRepository } from './repository/social-media.repository';
 
 @Module({
   imports: [forwardRef(() => UserModule), S3Module],
@@ -21,6 +24,7 @@ import { AwardRepository } from './repository/award.repository';
     ProductController,
     CategortyController,
     AwardController,
+    SocialMediaController,
   ],
   providers: [
     RaffleService,
@@ -31,7 +35,15 @@ import { AwardRepository } from './repository/award.repository';
     CategoryRepository,
     AwardService,
     AwardRepository,
+    SocialMediaService,
+    SocialMedialRepository,
   ],
-  exports: [SellerService, RaffleService, CategoryService, AwardService],
+  exports: [
+    SellerService,
+    RaffleService,
+    CategoryService,
+    AwardService,
+    SocialMediaService,
+  ],
 })
 export class CatalogModule {}
