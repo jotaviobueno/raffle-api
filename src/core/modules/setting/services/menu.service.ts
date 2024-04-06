@@ -47,6 +47,7 @@ export class MenuService
 
     const query = new QueryBuilder(queryParams)
       .where({ parentId: null })
+      .sort()
       .pagination()
       .handle();
 

@@ -12,3 +12,4 @@ export * from './category';
 export * from './role';
 export * from './user-role';
 export * from './award';
+export * from './social-media';

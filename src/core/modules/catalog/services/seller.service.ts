@@ -87,7 +87,7 @@ export class SellerService
 
     if (cache) return cache;
 
-    const query = new QueryBuilder(queryParams).pagination().handle();
+    const query = new QueryBuilder(queryParams).sort().pagination().handle();
 
     const sellers = await this.sellerRepository.findAll(query);
     const total = await this.sellerRepository.count();

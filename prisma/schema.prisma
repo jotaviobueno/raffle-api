@@ -82,15 +82,15 @@ model Seller {
   addresses    Address[]
   categories   Category[]
   raffles      Raffle[]
-  socialMidias SocialMidia[]
   orders       Order[]
   quotas       Quotas[]
   awards       Award[]
+  socialMedias SocialMedia[]
 
   @@map("seller")
 }
 
-model SocialMidia {
+model SocialMedia {
   id   String @id @default(uuid())
   name String
   href String
