@@ -9,9 +9,10 @@ import { CategortyController } from './controllers/category.controller';
 import { CategoryService } from './services/category.service';
 import { CategoryRepository } from './repository/category.repository';
 import { RaffleService } from './services/raffle.service';
+import { S3Module } from '../s3/s3.module';
 
 @Module({
-  imports: [forwardRef(() => UserModule)],
+  imports: [forwardRef(() => UserModule), S3Module],
   controllers: [SellerController, ProductController, CategortyController],
   providers: [
     RaffleService,

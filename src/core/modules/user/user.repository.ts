@@ -12,7 +12,7 @@ import {
 export class UserRepository extends RepositoryFactory<
   UserEntity | Omit<UserEntity, 'password'>,
   Omit<CreateUserDto, 'code'>,
-  UpdateUserDto
+  UpdateUserDto & { avatar?: string }
 > {
   constructor() {
     super('user');
@@ -116,7 +116,9 @@ export class UserRepository extends RepositoryFactory<
   update({
     id,
     ...data
-  }: UpdateUserDto & { id: string }): Promise<Omit<UserEntity, 'password'>> {
+  }: UpdateUserDto & { id: string; avatar?: string }): Promise<
+    Omit<UserEntity, 'password'>
+  > {
     return this.prismaService.user.update({
       where: { id },
       data,

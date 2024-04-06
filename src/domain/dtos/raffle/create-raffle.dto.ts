@@ -1,18 +1,25 @@
 import {
-  ArrayMinSize,
+  ArrayMaxSize,
   IsArray,
   IsBoolean,
+  IsDate,
+  IsInt,
   IsNotEmpty,
   IsNumber,
-  IsOptional,
   IsString,
   IsUUID,
+  Max,
+  Min,
 } from 'class-validator';
 
 export class CreateRaffleDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  title: string;
+
+  @IsString()
+  @IsNotEmpty()
+  metaTitle: string;
 
   @IsString()
   @IsNotEmpty()
@@ -24,34 +31,47 @@ export class CreateRaffleDto {
 
   @IsString()
   @IsNotEmpty()
-  metaTitle: string;
-
-  @IsString()
-  @IsNotEmpty()
   metaDescription: string;
 
   @IsArray()
-  @ArrayMinSize(1)
   @IsString({ each: true })
+  @IsNotEmpty()
+  @ArrayMaxSize(5)
   metaKeyword: string[];
 
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
+
   @IsBoolean()
-  @IsOptional()
+  @IsNotEmpty()
   isVisible: boolean;
 
   @IsBoolean()
-  @IsOptional()
+  @IsNotEmpty()
   isActive: boolean;
 
   @IsUUID()
   @IsNotEmpty()
   sellerId: string;
 
-  @IsUUID()
-  @IsOptional()
-  condominiumId?: string;
-
-  @IsNumber()
+  @IsInt()
   @IsNotEmpty()
-  price: number;
+  @Min(1)
+  minBuyQuotas: number;
+
+  @IsInt()
+  @IsNotEmpty()
+  @Min(1)
+  maxBuyQuotas: number;
+
+  @IsInt()
+  @IsNotEmpty()
+  @Min(1)
+  @Max(100_000_000)
+  totalQuotas: number;
+
+  @IsDate()
+  @IsNotEmpty()
+  drawDateAt: Date;
 }

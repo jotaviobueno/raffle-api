@@ -10,6 +10,7 @@ import { RaffleRepository } from '../repository/raffle.repository';
 import { QueryBuilder } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from './seller.service';
+import { S3Service } from '../../s3/s3.service';
 
 @Injectable()
 export class RaffleService
@@ -20,13 +21,26 @@ export class RaffleService
     private readonly sellerService: SellerService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    private readonly s3Service: S3Service,
   ) {}
 
-  async create(dto: CreateRaffleDto): Promise<RaffleEntity> {
+  async create({
+    files,
+    ...dto
+  }: CreateRaffleDto & {
+    files?: Express.Multer.File[];
+  }): Promise<RaffleEntity> {
     const seller = await this.sellerService.findById(dto.sellerId);
+
+    const images =
+      files &&
+      (await this.s3Service.manyFiles(
+        files.map((file) => ({ file, path: 'raffle' })),
+      ));
 
     const product = await this.raffleRepository.create({
       ...dto,
+      images,
       sellerId: seller.id,
     });
 
@@ -87,11 +101,23 @@ export class RaffleService
     return product;
   }
 
-  async update(dto: UpdateRaffleDto): Promise<RaffleEntity> {
+  async update({
+    files,
+    ...dto
+  }: UpdateRaffleDto & {
+    files?: Express.Multer.File[];
+  }): Promise<RaffleEntity> {
     const product = await this.findById(dto.id);
+
+    const images =
+      files &&
+      (await this.s3Service.manyFiles(
+        files.map((file) => ({ file, path: 'raffle' })),
+      ));
 
     const update = await this.raffleRepository.update({
       ...dto,
+      images,
       id: product.id,
     });
 

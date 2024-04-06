@@ -6,8 +6,8 @@ import { QueryBuilderEntity, SellerEntity } from 'src/domain/entities';
 @Injectable()
 export class SellerRepository extends RepositoryFactory<
   SellerEntity,
-  CreateSellerDto,
-  UpdateSellerDto
+  CreateSellerDto & { favicon: string; logo: string },
+  UpdateSellerDto & { favicon?: string; logo?: string }
 > {
   constructor() {
     super('seller');

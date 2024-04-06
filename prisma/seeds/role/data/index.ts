@@ -12,16 +12,8 @@ export const data = [
     code: 'PLAN_1',
   },
   {
-    name: 'Fornecedor',
-    code: 'SUPPLIER',
-  },
-  {
     name: 'Cliente',
     code: 'CUSTOMER',
-  },
-  {
-    name: 'Fornecedor',
-    code: 'SUPPLIER',
   },
   {
     name: 'Usuário',

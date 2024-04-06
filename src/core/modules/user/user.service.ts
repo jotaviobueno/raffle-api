@@ -14,6 +14,7 @@ import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from '../catalog/services/seller.service';
 import { UserRoleService } from '../role/services/user-role.service';
 import { ROLE_ENUM } from 'src/common/enums';
+import { S3Service } from '../s3/s3.service';
 
 @Injectable()
 export class UserService
@@ -30,6 +31,7 @@ export class UserService
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     private readonly userRoleService: UserRoleService,
+    private readonly s3Service: S3Service,
   ) {}
 
   async create({
@@ -156,10 +158,22 @@ export class UserService
     return user;
   }
 
-  async update(dto: UpdateUserDto): Promise<Omit<UserEntity, 'password'>> {
+  async update({
+    file,
+    ...dto
+  }: UpdateUserDto & { file?: Express.Multer.File }): Promise<
+    Omit<UserEntity, 'password'>
+  > {
     const user = await this.findById(dto.id);
 
-    const update = await this.userRepository.update({ ...dto, id: user.id });
+    const avatar =
+      file && (await this.s3Service.singleFile({ file, path: 'user/avatar' }));
+
+    const update = await this.userRepository.update({
+      ...dto,
+      id: user.id,
+      avatar,
+    });
 
     if (!update)
       throw new HttpException('Failed to update', HttpStatus.NOT_ACCEPTABLE);

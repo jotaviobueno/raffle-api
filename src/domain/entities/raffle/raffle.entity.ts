@@ -2,16 +2,23 @@ import { Raffle } from '@prisma/client';
 
 export class RaffleEntity implements Raffle {
   id: string;
-  name: string;
+  title: string;
+  metaTitle: string;
   shortDescription: string;
   description: string;
-  metaTitle: string;
+  images: string[];
   metaDescription: string;
   metaKeyword: string[];
   price: number;
   isVisible: boolean;
   isActive: boolean;
   sellerId: string;
+  minBuyQuotas: number;
+  maxBuyQuotas: number;
+  totalQuotas: number;
+  payeds: number;
+  freePercentage: number;
+  drawDateAt: Date;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;

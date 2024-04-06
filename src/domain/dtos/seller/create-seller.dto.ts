@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-  IsUrl,
-} from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class CreateSellerDto {
   @IsString()
@@ -14,19 +8,7 @@ export class CreateSellerDto {
   name: string;
 
   @IsUUID()
-  @IsNotEmpty()
   @ApiProperty()
+  @IsNotEmpty()
   userId: string;
-
-  @IsUrl()
-  @IsOptional()
-  imageUrl?: string;
-
-  @IsUrl()
-  @IsOptional()
-  logoUrl?: string;
-
-  @IsUrl()
-  @IsOptional()
-  faviconUrl?: string;
 }

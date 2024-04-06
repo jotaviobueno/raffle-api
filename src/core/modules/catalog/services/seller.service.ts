@@ -16,6 +16,7 @@ import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { QueryBuilder } from 'src/common/utils';
 import { UserService } from '../../user/user.service';
 import { SellerRepository } from '../repository/seller.repository';
+import { S3Service } from '../../s3/s3.service';
 
 @Injectable()
 export class SellerService
@@ -27,14 +28,39 @@ export class SellerService
     private readonly userService: UserService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    private readonly s3Service: S3Service,
   ) {}
 
-  async create(dto: CreateSellerDto): Promise<SellerEntity> {
+  async create({
+    files,
+    ...dto
+  }: CreateSellerDto & {
+    files: {
+      favicon: Express.Multer.File[];
+      logo: Express.Multer.File[];
+    };
+  }): Promise<SellerEntity> {
     const user = await this.userService.findById(dto.userId);
+
+    const logo =
+      files.logo[0] &&
+      (await this.s3Service.singleFile({
+        file: files.logo[0],
+        path: 'seller/logo',
+      }));
+
+    const favicon =
+      files.favicon[0] &&
+      (await this.s3Service.singleFile({
+        file: files.favicon[0],
+        path: 'seller/favicon',
+      }));
 
     const seller = await this.sellerRepository.create({
       ...dto,
       userId: user.id,
+      favicon,
+      logo,
     });
 
     return seller;
@@ -114,12 +140,36 @@ export class SellerService
     return { data: sellers, info };
   }
 
-  async update(dto: UpdateSellerDto): Promise<SellerEntity> {
+  async update({
+    files,
+    ...dto
+  }: UpdateSellerDto & {
+    files: {
+      favicon?: Express.Multer.File[];
+      logo?: Express.Multer.File[];
+    };
+  }): Promise<SellerEntity> {
     const seller = await this.findById(dto.id);
+
+    const logo =
+      files.logo[0] &&
+      (await this.s3Service.singleFile({
+        file: files.logo[0],
+        path: 'seller/logo',
+      }));
+
+    const favicon =
+      files.favicon[0] &&
+      (await this.s3Service.singleFile({
+        file: files.favicon[0],
+        path: 'seller/favicon',
+      }));
 
     const update = await this.sellerRepository.update({
       ...dto,
       id: seller.id,
+      logo,
+      favicon,
     });
 
     if (!update)
