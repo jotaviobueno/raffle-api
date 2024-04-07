@@ -32,34 +32,23 @@ export class SellerService
   ) {}
 
   async create({
-    files,
+    file,
     ...dto
   }: CreateSellerDto & {
-    files: {
-      favicon: Express.Multer.File[];
-      logo: Express.Multer.File[];
-    };
+    file?: Express.Multer.File;
   }): Promise<SellerEntity> {
     const user = await this.userService.findById(dto.userId);
 
     const logo =
-      files.logo[0] &&
+      file &&
       (await this.s3Service.singleFile({
-        file: files.logo[0],
+        file,
         path: 'seller/logo',
-      }));
-
-    const favicon =
-      files.favicon[0] &&
-      (await this.s3Service.singleFile({
-        file: files.favicon[0],
-        path: 'seller/favicon',
       }));
 
     const seller = await this.sellerRepository.create({
       ...dto,
       userId: user.id,
-      favicon,
       logo,
     });
 
@@ -122,6 +111,7 @@ export class SellerService
 
     const query = new QueryBuilder(queryParams)
       .where({ userId })
+      .sort()
       .pagination()
       .handle();
 
@@ -141,35 +131,24 @@ export class SellerService
   }
 
   async update({
-    files,
+    file,
     ...dto
   }: UpdateSellerDto & {
-    files: {
-      favicon?: Express.Multer.File[];
-      logo?: Express.Multer.File[];
-    };
+    file?: Express.Multer.File;
   }): Promise<SellerEntity> {
     const seller = await this.findById(dto.id);
 
     const logo =
-      files.logo[0] &&
+      file &&
       (await this.s3Service.singleFile({
-        file: files.logo[0],
+        file,
         path: 'seller/logo',
-      }));
-
-    const favicon =
-      files.favicon[0] &&
-      (await this.s3Service.singleFile({
-        file: files.favicon[0],
-        path: 'seller/favicon',
       }));
 
     const update = await this.sellerRepository.update({
       ...dto,
       id: seller.id,
       logo,
-      favicon,
     });
 
     if (!update)

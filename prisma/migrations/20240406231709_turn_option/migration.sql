@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "seller" ALTER COLUMN "favicon" DROP NOT NULL,
+ALTER COLUMN "logo" DROP NOT NULL;

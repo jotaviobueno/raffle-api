@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   ArrayMaxSize,
   IsArray,
@@ -73,5 +74,6 @@ export class CreateRaffleDto {
 
   @IsDate()
   @IsNotEmpty()
+  @Transform(({ value }) => new Date(value))
   drawDateAt: Date;
 }

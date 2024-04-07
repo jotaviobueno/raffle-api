@@ -4,8 +4,7 @@ export class SellerEntity implements Seller {
   id: string;
   name: string;
   userId: string;
-  logo: string;
-  favicon: string;
+  logo: string | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;

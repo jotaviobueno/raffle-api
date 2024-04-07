@@ -9,7 +9,7 @@ import {
   Query,
   UseInterceptors,
   UseGuards,
-  UploadedFiles,
+  UploadedFile,
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
@@ -25,7 +25,7 @@ import { SellerService } from '../services/seller.service';
 import { ROLE_ENUM } from 'src/common/enums';
 import { Roles } from '../../role/decorators';
 import { RoleGuard } from '../../role/guards';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('seller')
 @ApiTags('seller')
@@ -35,29 +35,21 @@ export class SellerController {
   constructor(private readonly sellerService: SellerService) {}
 
   @Post()
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'favicon', maxCount: 1 },
-      { name: 'logo', maxCount: 1 },
-    ]),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   create(
     @Body() createSellerDto: CreateSellerDto,
-    @UploadedFiles(
+    @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 1000000 }),
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg|svg)' }),
+          new MaxFileSizeValidator({ maxSize: 10_000 }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
         ],
-        fileIsRequired: true,
+        fileIsRequired: false,
       }),
     )
-    files: {
-      favicon: Express.Multer.File[];
-      logo: Express.Multer.File[];
-    },
+    file?: Express.Multer.File,
   ) {
-    return this.sellerService.create({ ...createSellerDto, files });
+    return this.sellerService.create({ ...createSellerDto, file });
   }
 
   @Get()
@@ -73,30 +65,22 @@ export class SellerController {
   }
 
   @Patch(':id')
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'favicon', maxCount: 1 },
-      { name: 'logo', maxCount: 1 },
-    ]),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   update(
     @Param('id') id: string,
     @Body() updateSellerDto: UpdateSellerDto,
-    @UploadedFiles(
+    @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 1000000 }),
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg|svg)' }),
+          new MaxFileSizeValidator({ maxSize: 10_000 }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
         ],
         fileIsRequired: false,
       }),
     )
-    files: {
-      favicon: Express.Multer.File[];
-      logo: Express.Multer.File[];
-    },
+    file?: Express.Multer.File,
   ) {
-    return this.sellerService.update({ ...updateSellerDto, id, files });
+    return this.sellerService.update({ ...updateSellerDto, id, file });
   }
 
   @Delete(':id')
