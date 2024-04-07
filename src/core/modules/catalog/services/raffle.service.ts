@@ -75,7 +75,7 @@ export class RaffleService
       .handle();
 
     const raffles = await this.raffleRepository.findAll(query);
-    const total = await this.raffleRepository.count();
+    const total = await this.raffleRepository.count(query.where);
 
     const info = {
       page: queryParams.page,

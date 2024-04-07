@@ -79,7 +79,7 @@ export class SellerService
     const query = new QueryBuilder(queryParams).sort().pagination().handle();
 
     const sellers = await this.sellerRepository.findAll(query);
-    const total = await this.sellerRepository.count();
+    const total = await this.sellerRepository.count(query.where);
 
     const info = {
       page: queryParams.page,
@@ -116,7 +116,7 @@ export class SellerService
       .handle();
 
     const sellers = await this.sellerRepository.findAll(query);
-    const total = await this.sellerRepository.count();
+    const total = await this.sellerRepository.count(query.where);
 
     const info = {
       page: queryParams.page,

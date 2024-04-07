@@ -58,7 +58,7 @@ export class SocialMediaService
       .handle();
 
     const socialMedias = await this.socialMediaRepository.findAll(query);
-    const total = await this.socialMediaRepository.count();
+    const total = await this.socialMediaRepository.count(query.where);
 
     const info = {
       page: queryParams.page,

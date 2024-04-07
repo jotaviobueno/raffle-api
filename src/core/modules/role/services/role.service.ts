@@ -45,7 +45,7 @@ export class RoleService
       .handle();
 
     const roles = await this.roleRepository.findAll(query);
-    const total = await this.roleRepository.count();
+    const total = await this.roleRepository.count(query.where);
 
     const info = {
       page: queryParams.page,

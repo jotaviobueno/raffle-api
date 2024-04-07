@@ -29,7 +29,7 @@ export class CurrencyService implements ServiceBase<CurrencyEntity> {
     const query = new QueryBuilder(queryParams).sort().pagination().handle();
 
     const currencies = await this.currencyRepository.findAll(query);
-    const total = await this.currencyRepository.count();
+    const total = await this.currencyRepository.count(query.where);
 
     const info = {
       page: queryParams.page,

@@ -29,7 +29,7 @@ export class StateService implements ServiceBase<StateEntity> {
     const query = new QueryBuilder(queryParams).sort().pagination().handle();
 
     const states = await this.stateRepository.findAll(query);
-    const total = await this.stateRepository.count();
+    const total = await this.stateRepository.count(query.where);
 
     const info = {
       page: queryParams.page,
@@ -74,7 +74,7 @@ export class StateService implements ServiceBase<StateEntity> {
       .handle();
 
     const states = await this.stateRepository.findAll(query);
-    const total = await this.stateRepository.count();
+    const total = await this.stateRepository.count(query.where);
 
     const info = {
       page: queryParams.page,

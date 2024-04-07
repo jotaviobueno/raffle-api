@@ -59,7 +59,7 @@ export class CategoryService
       .handle();
 
     const categories = await this.categoryRepository.findAll(query);
-    const total = await this.categoryRepository.count();
+    const total = await this.categoryRepository.count(query.where);
 
     const info = {
       page: queryParams.page,

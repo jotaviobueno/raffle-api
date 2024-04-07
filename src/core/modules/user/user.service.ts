@@ -95,7 +95,7 @@ export class UserService
     const query = new QueryBuilder(queryParams).sort().pagination().handle();
 
     const users = await this.userRepository.findAll(query);
-    const total = await this.userRepository.count();
+    const total = await this.userRepository.count(query.where);
 
     const info = {
       page: queryParams.page,

@@ -31,7 +31,7 @@ export class CountryService implements ServiceBase<CountryEntity> {
     const query = new QueryBuilder(queryParams).sort().pagination().handle();
 
     const countries = await this.countryRepository.findAll(query);
-    const total = await this.countryRepository.count();
+    const total = await this.countryRepository.count(query.where);
 
     const info = {
       page: queryParams.page,

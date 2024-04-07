@@ -64,7 +64,7 @@ export class AwardService
       .handle();
 
     const awards = await this.awardRepository.findAll(query);
-    const total = await this.awardRepository.count();
+    const total = await this.awardRepository.count(query.where);
 
     const info = {
       page: queryParams.page,

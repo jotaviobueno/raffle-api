@@ -66,7 +66,7 @@ export class PackService
       .handle();
 
     const packs = await this.packRepository.findAll(query);
-    const total = await this.packRepository.count();
+    const total = await this.packRepository.count(query.where);
 
     const info = {
       page: queryParams.page,

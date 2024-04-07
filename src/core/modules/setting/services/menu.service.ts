@@ -52,7 +52,7 @@ export class MenuService
       .handle();
 
     const menus = await this.menuRepository.findAll(query);
-    const total = await this.menuRepository.count();
+    const total = await this.menuRepository.count(query.where);
 
     const info = {
       page: queryParams.page,

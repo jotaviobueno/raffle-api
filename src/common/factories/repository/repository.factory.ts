@@ -27,8 +27,8 @@ export class RepositoryFactory<K, T = void, J = void> {
     });
   }
 
-  count(): Promise<number> {
-    return this.prismaService[this.model].count();
+  count(where: any): Promise<number> {
+    return this.prismaService[this.model].count({ where });
   }
 
   softDelete(id: string): Promise<K | null> {
