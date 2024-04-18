@@ -1,37 +1,23 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { data } from './data';
+import { DefaultArgs } from '@prisma/client/runtime/library';
 
-const prisma = new PrismaClient();
+export async function seedMenus(
+  tx: Omit<
+    PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
+    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
+  >,
+) {
+  for (const { subMenus, ...createMenuDto } of data) {
+    const menu = await tx.menu.create({ data: { ...createMenuDto } });
 
-async function main() {
-  return prisma.$transaction(
-    async (tx) => {
-      for (const { subMenus, ...createMenuDto } of data) {
-        const menu = await tx.menu.create({ data: { ...createMenuDto } });
+    if (subMenus && subMenus.length > 0) {
+      const createSubMenusDto = subMenus.map((dto) => ({
+        ...dto,
+        parentId: menu.id,
+      }));
 
-        if (subMenus && subMenus.length > 0) {
-          const createSubMenusDto = subMenus.map((dto) => ({
-            ...dto,
-            parentId: menu.id,
-          }));
-
-          await tx.menu.createMany({ data: createSubMenusDto });
-        }
-      }
-    },
-    {
-      maxWait: 20000, // default: 2000
-      timeout: 50000, // default: 5000
-    },
-  );
+      await tx.menu.createMany({ data: createSubMenusDto });
+    }
+  }
 }
-
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });

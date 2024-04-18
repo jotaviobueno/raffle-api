@@ -5,3 +5,13 @@ services:
     image: redis:alpine
     ports:
       - '6379:6379'
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+volumes:
+  db:
+    driver: local
