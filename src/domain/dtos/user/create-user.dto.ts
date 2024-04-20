@@ -40,7 +40,7 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
-  cpf?: string;
+  document?: string;
 
   @IsString()
   @IsOptional()

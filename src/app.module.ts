@@ -11,6 +11,7 @@ import { AuthModule } from './core/modules/auth/auth.module';
 import { SettingModule } from './core/modules/setting/setting.module';
 import { AddressModule } from './core/modules/address/address.module';
 import { CatalogModule } from './core/modules/catalog/catalog.module';
+import { AsaasModule } from './core/modules/asaas/asaas.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CatalogModule } from './core/modules/catalog/catalog.module';
     SettingModule,
     AddressModule,
     CatalogModule,
+    AsaasModule,
   ],
   providers: [
     {

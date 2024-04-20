@@ -13,5 +13,10 @@ export const environment = {
   AWS_S3_REGION: process.env.AWS_S3_REGION,
   AWS_S3_BUCKET: process.env.AWS_S3_BUCKET,
   //
+  NODE_ENV: process.env.NODE_ENV,
   VERSION: process.env.npm_package_version,
+  //
+  ASAAS_INTEREST: process.env.ASAAS_INTEREST,
+  ASAAS_FINE: process.env.ASAAS_FINE,
+  ASAAS_ACCESS_TOKEN: process.env.ASAAS_ACCESS_TOKEN,
 };

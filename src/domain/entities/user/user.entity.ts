@@ -8,7 +8,7 @@ export class UserEntity implements User {
   password: string | null;
   phone: string | null;
   avatar: string;
-  cpf: string | null;
+  document: string | null;
   rg: string | null;
   birthDate: Date | null;
   createdAt: Date;

@@ -19,9 +19,6 @@ import { SocialMedialRepository } from './repository/social-media.repository';
 import { RaffleCategoryRepository } from './repository/raffle-category.repository';
 import { RaffleCategoryService } from './services/raffle-category.service';
 import { RaffleCategoryController } from './controllers/raffle-category.controller';
-import { PackController } from './controllers/pack.controller';
-import { PackRepository } from './repository/pack.repository';
-import { PackService } from './services/pack.service';
 
 @Module({
   imports: [forwardRef(() => UserModule), S3Module],
@@ -32,7 +29,6 @@ import { PackService } from './services/pack.service';
     AwardController,
     SocialMediaController,
     RaffleCategoryController,
-    PackController,
   ],
   providers: [
     RaffleService,
@@ -47,8 +43,6 @@ import { PackService } from './services/pack.service';
     SocialMedialRepository,
     RaffleCategoryService,
     RaffleCategoryRepository,
-    PackRepository,
-    PackService,
   ],
   exports: [
     SellerService,
@@ -57,7 +51,6 @@ import { PackService } from './services/pack.service';
     AwardService,
     SocialMediaService,
     RaffleCategoryService,
-    PackService,
   ],
 })
 export class CatalogModule {}

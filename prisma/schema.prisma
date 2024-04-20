@@ -21,18 +21,18 @@ model User {
   password  String?
   phone     String?
   avatar    String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
-  cpf       String?
+  document  String?
   rg        String?
   birthDate DateTime? @map("birth_date") @db.Timestamp
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  addresses     Address[]
-  sellers       Seller[]
-  userRoles     UserRole[]
-  orders        Order[]
-  orderHistoies OrderHistory[]
+  addresses      Address[]
+  sellers        Seller[]
+  userRoles      UserRole[]
+  orders         Order[]
+  orderHistories OrderHistory[]
 
   @@map("user")
 }
@@ -78,14 +78,14 @@ model Seller {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  addresses    Address[]
-  categories   Category[]
-  raffles      Raffle[]
-  orders       Order[]
-  quotas       Quotas[]
-  awards       Award[]
-  socialMedias SocialMedia[]
-  packs        Pack[]
+  addresses            Address[]
+  categories           Category[]
+  raffles              Raffle[]
+  orders               Order[]
+  quotas               Quotas[]
+  awards               Award[]
+  socialMedias         SocialMedia[]
+  paymentMethodSellers PaymentMethodSeller[]
 
   @@map("seller")
 }
@@ -124,11 +124,11 @@ model Address {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  seller  Seller?  @relation(fields: [sellerId], references: [id])
-  user    User?    @relation(fields: [userId], references: [id])
-  state   State    @relation(fields: [stateId], references: [id])
-  country Country  @relation(fields: [countryId], references: [id])
-  payment Payment?
+  seller       Seller?       @relation(fields: [sellerId], references: [id])
+  user         User?         @relation(fields: [userId], references: [id])
+  state        State         @relation(fields: [stateId], references: [id])
+  country      Country       @relation(fields: [countryId], references: [id])
+  orderPayment OrderPayment?
 
   @@map("address")
 }
@@ -150,18 +150,6 @@ model Country {
   address Address[]
 
   @@map("country")
-}
-
-model Currency {
-  id     String @id @default(uuid())
-  code   String
-  symbol String
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  @@map("currency")
 }
 
 model State {
@@ -257,7 +245,6 @@ model Raffle {
 
   seller           Seller           @relation(fields: [sellerId], references: [id])
   raffleCategories RaffleCategory[]
-  packs            Pack[]
   awards           Award[]
   quotas           Quotas[]
   raffleCoupons    RaffleCoupon[]
@@ -265,38 +252,21 @@ model Raffle {
   @@map("raffle")
 }
 
-model Pack {
+model Quotas {
   id       String @id @default(uuid())
-  quantity Int
-  price    Float
+  number   Int
   raffleId String @map("raffle_id")
   sellerId String @map("seller_id")
+  orderId  String @map("order_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  raffle Raffle   @relation(fields: [raffleId], references: [id])
-  seller Seller   @relation(fields: [sellerId], references: [id])
-  quotas Quotas[]
-
-  @@map("pack")
-}
-
-model Quotas {
-  id       String  @id @default(uuid())
-  number   Int
-  raffleId String  @map("raffle_id")
-  packId   String? @map("pack_id")
-  sellerId String  @map("seller_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  pack   Pack?  @relation(fields: [packId], references: [id])
-  raffle Raffle @relation(fields: [raffleId], references: [id])
-  seller Seller @relation(fields: [sellerId], references: [id])
+  raffle    Raffle     @relation(fields: [raffleId], references: [id])
+  seller    Seller     @relation(fields: [sellerId], references: [id])
+  order     Order      @relation(fields: [orderId], references: [id])
+  orderItem OrderItem?
 
   @@map("quotas")
 }
@@ -343,18 +313,20 @@ model Order {
   userAgent     String  @map("user_agent")
   orderStatusId String  @map("order_status_id")
 
+  dueDate   DateTime? @db.Timestamp
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   seller         Seller         @relation(fields: [sellerId], references: [id])
   customer       User           @relation(fields: [customerId], references: [id])
-  payment        Payment?
+  orderPayment   OrderPayment?
   orderTotal     OrderTotal?
   orderCoupon    OrderCoupon?
   orderItems     OrderItem[]
   orderHistories OrderHistory[]
   orderStatus    OrderStatus    @relation(fields: [orderStatusId], references: [id])
+  quotas         Quotas[]
 
   @@map("order")
 }
@@ -399,6 +371,25 @@ model OrderCoupon {
   @@map("order_coupon")
 }
 
+model OrderBankSlip {
+  id String @id @default(uuid())
+
+  orderPaymentId      String @unique @map("order_payment_id")
+  ourNumber           String @map("our_number")
+  identificationField String @map("identification_field")
+  barCode             String @map("bar_code")
+  bankSlipUrl         String @map("bank_slip_url")
+
+  expirationAt DateTime  @map("expiration_at") @db.Timestamp
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamp
+
+  orderPayment OrderPayment @relation(fields: [orderPaymentId], references: [id])
+
+  @@map("order_bank_slip")
+}
+
 model Coupon {
   id               String  @id @default(uuid())
   name             String
@@ -433,7 +424,7 @@ model OrderStatus {
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   orderHistories OrderHistory[]
-  Order          Order[]
+  order          Order[]
 
   @@map("order_status")
 }
@@ -446,15 +437,15 @@ model OrderItem {
   total    Float
   tax      Float
 
-  //  adicionar a referencia entre a rifa e o item
-
-  orderId String @map("order_id")
+  orderId  String @map("order_id")
+  quotasId String @unique @map("quotas_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  order Order @relation(fields: [orderId], references: [id])
+  quotas Quotas @relation(fields: [quotasId], references: [id])
+  order  Order  @relation(fields: [orderId], references: [id])
 
   @@map("order_item")
 }
@@ -478,26 +469,80 @@ model OrderTotal {
   @@map("order_total")
 }
 
-model Payment {
-  id      String @id @default(uuid())
-  orderId String @unique
-  method  String
-
-  addressId String @unique @map("address_id")
+model PaymentMethodSeller {
+  id              String @id @default(uuid())
+  sellerId        String @map("seller_id")
+  paymentMethodId String @map("payment_method_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  order      Order       @relation(fields: [orderId], references: [id])
-  pix        Pix?
-  creditCard CreditCard?
-  address    Address     @relation(fields: [addressId], references: [id])
+  seller        Seller        @relation(fields: [sellerId], references: [id])
+  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
 
-  @@map("payment")
+  @@map("payment_method_seller")
 }
 
-model CreditCard {
+model PaymentMethod {
+  id                     String  @id @default(uuid())
+  code                   String
+  name                   String
+  instructions           String
+  isActive               Boolean @default(true) @map("is_active")
+  paymentGatewayConfigId String? @map("payment_gateway_config_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  paymentGatewayConfig PaymentGatewayConfig? @relation(fields: [paymentGatewayConfigId], references: [id])
+  paymentMethodSellers PaymentMethodSeller[]
+  orderPayments        OrderPayment[]
+
+  @@map("payment_method")
+}
+
+model PaymentGatewayConfig {
+  id     String @id @default(uuid())
+  code   String
+  name   String
+  config Json
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  paymentMethod PaymentMethod[]
+
+  @@map("payment_gateway_config")
+}
+
+model OrderPayment {
+  id      String @id @default(uuid())
+  orderId String @unique
+  method  String
+
+  paymentMethodId   String  @map("payment_method_id")
+  addressId         String  @unique @map("address_id")
+  paymentMethodCode String? @map("payment_method_code")
+  paymentMethodName String? @map("payment_method_name")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  order           Order            @relation(fields: [orderId], references: [id])
+  address         Address          @relation(fields: [addressId], references: [id])
+  orderBankSlip   OrderBankSlip?
+  orderCreditCard OrderCreditCard?
+  paymentMethod   PaymentMethod    @relation(fields: [paymentMethodId], references: [id])
+  orderPix        OrderPix?
+
+  @@map("order_payment")
+}
+
+model OrderCreditCard {
   id              String @id @default(uuid())
   brand           String
   number          String
@@ -508,20 +553,20 @@ model CreditCard {
   token           String
   status          String
 
-  paymentId String @unique @map("payment_id")
+  orderPaymentId String @unique @map("order_payment_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  payment Payment @relation(fields: [paymentId], references: [id])
+  orderPayment OrderPayment @relation(fields: [orderPaymentId], references: [id])
 
-  @@map("credit_card")
+  @@map("order_credit_card")
 }
 
-model Pix {
-  id        String @id @default(uuid())
-  paymentId String @unique @map("payment_id")
+model OrderPix {
+  id             String @id @default(uuid())
+  orderPaymentId String @unique @map("payment_id")
 
   copyPaste String @map("copy_paste")
   image     String
@@ -531,7 +576,7 @@ model Pix {
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
   expiratAt DateTime  @map("expirat_at") @db.Timestamp
 
-  payment Payment @relation(fields: [paymentId], references: [id])
+  orderPayment OrderPayment @relation(fields: [orderPaymentId], references: [id])
 
-  @@map("pix")
+  @@map("order_pix")
 }
