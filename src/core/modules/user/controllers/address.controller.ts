@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { AddressService } from './address.service';
+import { AddressService } from '../services/address.service';
 import { CreateAddressDto, UpdateAddressDto } from 'src/domain/dtos';
 import { ApiTags } from '@nestjs/swagger';
 

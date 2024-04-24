@@ -2,11 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import { CreateAddressDto, UpdateAddressDto } from 'src/domain/dtos';
 import { AddressEntity } from 'src/domain/entities';
-import { StateService } from '../setting/services/state.service';
-import { CountryService } from '../setting/services/country.service';
-import { UserService } from '../user/user.service';
-import { AddressRepository } from './address.repository';
-import { SellerService } from '../catalog/services/seller.service';
+import { StateService } from '../../setting/services/state.service';
+import { CountryService } from '../../setting/services/country.service';
+import { UserService } from './user.service';
+import { AddressRepository } from '../repositories/address.repository';
+import { SellerService } from '../../catalog/services/seller.service';
 
 @Injectable()
 export class AddressService

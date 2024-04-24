@@ -9,9 +9,11 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './core/modules/auth/guards';
 import { AuthModule } from './core/modules/auth/auth.module';
 import { SettingModule } from './core/modules/setting/setting.module';
-import { AddressModule } from './core/modules/address/address.module';
 import { CatalogModule } from './core/modules/catalog/catalog.module';
 import { AsaasModule } from './core/modules/asaas/asaas.module';
+import { CartModule } from './core/modules/cart/cart.module';
+import { OrderModule } from './core/modules/order/order.module';
+import { PaymentModule } from './core/modules/payment/payment.module';
 
 @Module({
   imports: [
@@ -23,9 +25,11 @@ import { AsaasModule } from './core/modules/asaas/asaas.module';
     RoleModule,
     AuthModule,
     SettingModule,
-    AddressModule,
     CatalogModule,
     AsaasModule,
+    CartModule,
+    OrderModule,
+    PaymentModule,
   ],
   providers: [
     {

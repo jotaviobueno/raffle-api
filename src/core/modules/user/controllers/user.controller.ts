@@ -15,8 +15,8 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto, QueryParamsDto, UpdateUserDto } from 'src/domain/dtos';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
-import { UserService } from './user.service';
-import { IsPublic } from '../auth/decorators';
+import { UserService } from '../services/user.service';
+import { IsPublic } from '../../auth/decorators';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 

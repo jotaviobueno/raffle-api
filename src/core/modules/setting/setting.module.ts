@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CountryController } from './controllers/country.controller';
 import { CountryService } from './services/country.service';
 import { CountryRepository } from './repositories/country.repository';
@@ -11,7 +11,7 @@ import { MenuController } from './controllers/menu.controller';
 import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [UserModule],
+  imports: [forwardRef(() => UserModule)],
   controllers: [CountryController, StateController, MenuController],
   providers: [
     CountryService,

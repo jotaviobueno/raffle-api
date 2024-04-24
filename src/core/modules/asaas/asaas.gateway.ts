@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PaymentGateway } from '../order/payment/payment.gateway';
+import { PaymentGateway } from '../payment/gateway/payment.gateway';
 import { format } from 'date-fns';
 import {
   AsaasCustomerEntity,

@@ -9,7 +9,7 @@ import { ServiceBase } from 'src/common/base';
 import { CreateUserRoleDto } from 'src/domain/dtos';
 import { UserRoleEntity } from 'src/domain/entities';
 import { UserRoleRepository } from '../repository/user-role.repository';
-import { UserService } from '../../user/user.service';
+import { UserService } from '../../user/services/user.service';
 import { RoleService } from './role.service';
 import { ROLE_ENUM } from 'src/common/enums';
 
