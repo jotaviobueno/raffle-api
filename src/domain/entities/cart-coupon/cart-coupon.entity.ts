@@ -1,9 +1,9 @@
-import { OrderCoupon } from '@prisma/client';
+import { CartCoupon } from '@prisma/client';
 
-export class OrderCouponEntity implements OrderCoupon {
+export class CartCouponEntity implements CartCoupon {
   id: string;
-  orderId: string;
   couponId: string;
+  cartId: string;
   code: string;
   discount: number;
   shipping: number;

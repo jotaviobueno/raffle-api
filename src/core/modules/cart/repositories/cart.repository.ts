@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { RepositoryFactory } from 'src/common/factories';
 import { CreateCartDto } from 'src/domain/dtos';
 import {
+  CartCouponEntity,
   CartEntity,
+  CartItemEntity,
   CartTotalEntity,
   QueryBuilderEntity,
 } from 'src/domain/entities';
@@ -39,9 +41,14 @@ export class CartRepository extends RepositoryFactory<
     });
   }
 
-  findById(
-    id: string,
-  ): Promise<(CartEntity & { cartTotal: CartTotalEntity }) | null> {
+  findById(id: string): Promise<
+    | (CartEntity & {
+        cartTotal: CartTotalEntity;
+        cartItems: CartItemEntity[];
+        cartCoupon?: CartCouponEntity;
+      })
+    | null
+  > {
     return this.prismaService.cart.findFirst({
       where: {
         id,
@@ -49,6 +56,8 @@ export class CartRepository extends RepositoryFactory<
       },
       include: {
         cartTotal: true,
+        cartItems: true,
+        cartCoupon: true,
       },
     });
   }

@@ -356,14 +356,14 @@ model OrderCoupon {
   couponId String @map("coupon_id")
 
   code     String
-  discount Float
+  discount Float  @default(0)
+  shipping Float  @default(0)
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  order Order @relation(fields: [orderId], references: [id])
-
+  order  Order  @relation(fields: [orderId], references: [id])
   coupon Coupon @relation(fields: [couponId], references: [id])
 
   @@map("order_coupon")
@@ -373,10 +373,11 @@ model CartCoupon {
   id String @id @default(uuid())
 
   couponId String @map("coupon_id")
-  cartId   String @map("cart_id")
+  cartId   String @unique @map("cart_id")
 
   code     String
-  discount Float
+  discount Float  @default(0)
+  shipping Float  @default(0)
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
@@ -444,8 +445,9 @@ model UtmSource {
 model Coupon {
   id               String @id @default(uuid())
   name             String
-  code             String
-  discount         Int    @default(0)
+  code             String @unique
+  discount         Float  @default(0)
+  shipping         Float  @default(0)
   usages           Int    @default(0)
   maxUsages        Int    @default(0) @map("max_usages")
   maxUsagesPerUser Int    @default(0) @map("max_usages_per_user")
@@ -645,7 +647,7 @@ model Cart {
   cartItems   CartItem[]
   cartTotal   CartTotal?
   cartPayment CartPayment?
-  cartCoupon  CartCoupon[]
+  cartCoupon  CartCoupon?
 
   @@map("cart")
 }

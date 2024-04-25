@@ -6,7 +6,6 @@ import {
   UpdateUtmCampaignDto,
 } from 'src/domain/dtos';
 import { FindAllResultEntity, UtmCampaignEntity } from 'src/domain/entities';
-
 import { QueryBuilder } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from '../../catalog/services/seller.service';
@@ -58,7 +57,7 @@ export class UtmCampaignService
         sellerId: sellerId && sellerId,
         name: name && { contains: name },
         isActive: isActive && isActive,
-        description: description && { contains: name },
+        description: description && { contains: description },
         to: to && { lte: to },
         from: from && { gte: from },
       })

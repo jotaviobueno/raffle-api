@@ -13,10 +13,19 @@ import { PaymentModule } from '../payment/payment.module';
 import { CartPaymentService } from './services/cart-payment.service';
 import { CartPaymentRepository } from './repositories/cart-payment.repository';
 import { CartPaymentController } from './controllers/cart-payment.controller';
+import { CartCouponController } from './controllers/cart-coupon.controller';
+import { CartCouponService } from './services/cart-coupon.service';
+import { CartCouponRepository } from './repositories/cart-coupon.repository';
+import { MarketingModule } from '../marketing/marketing.module';
 
 @Module({
-  imports: [CatalogModule, UserModule, PaymentModule],
-  controllers: [CartController, CartItemController, CartPaymentController],
+  imports: [CatalogModule, UserModule, PaymentModule, MarketingModule],
+  controllers: [
+    CartController,
+    CartItemController,
+    CartPaymentController,
+    CartCouponController,
+  ],
   providers: [
     CartService,
     CartRepository,
@@ -26,7 +35,15 @@ import { CartPaymentController } from './controllers/cart-payment.controller';
     CartTotalRepository,
     CartPaymentService,
     CartPaymentRepository,
+    CartCouponService,
+    CartCouponRepository,
   ],
-  exports: [CartService, CartItemService, CartTotalService, CartPaymentService],
+  exports: [
+    CartService,
+    CartItemService,
+    CartTotalService,
+    CartPaymentService,
+    CartCouponService,
+  ],
 })
 export class CartModule {}

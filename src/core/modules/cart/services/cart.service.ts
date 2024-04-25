@@ -2,7 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import { CreateCartDto, SearchCartDto } from 'src/domain/dtos';
 import {
+  CartCouponEntity,
   CartEntity,
+  CartItemEntity,
   CartTotalEntity,
   FindAllResultEntity,
 } from 'src/domain/entities';
@@ -42,9 +44,13 @@ export class CartService implements ServiceBase<CartEntity, CreateCartDto> {
     return cart;
   }
 
-  async findById(
-    id: string,
-  ): Promise<CartEntity & { cartTotal: CartTotalEntity }> {
+  async findById(id: string): Promise<
+    CartEntity & {
+      cartTotal: CartTotalEntity;
+      cartItems: CartItemEntity[];
+      cartCoupon?: CartCouponEntity;
+    }
+  > {
     const cart = await this.cartRepository.findById(id);
 
     if (!cart) throw new HttpException('cart not found', HttpStatus.NOT_FOUND);
