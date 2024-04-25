@@ -25,6 +25,7 @@ export class CartCouponRepository extends RepositoryFactory<
   findById(id: string): Promise<
     | (CartCouponEntity & {
         cart: CartEntity & { cartTotal: CartTotalEntity };
+        coupon: CouponEntity;
       })
     | null
   > {
@@ -39,6 +40,7 @@ export class CartCouponRepository extends RepositoryFactory<
             cartTotal: true,
           },
         },
+        coupon: true,
       },
     });
   }

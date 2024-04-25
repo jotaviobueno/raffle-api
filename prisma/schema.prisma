@@ -321,7 +321,7 @@ model Order {
   customer       User           @relation(fields: [customerId], references: [id])
   orderPayment   OrderPayment?
   orderTotal     OrderTotal?
-  orderCoupon    OrderCoupon?
+  orderCoupons   OrderCoupon[]
   orderItems     OrderItem[]
   orderHistories OrderHistory[]
   orderStatus    OrderStatus    @relation(fields: [orderStatusId], references: [id])
@@ -352,7 +352,7 @@ model OrderHistory {
 model OrderCoupon {
   id String @id @default(uuid())
 
-  orderId  String @unique @map("order_id")
+  orderId  String @map("order_id")
   couponId String @map("coupon_id")
 
   code     String
@@ -373,7 +373,7 @@ model CartCoupon {
   id String @id @default(uuid())
 
   couponId String @map("coupon_id")
-  cartId   String @unique @map("cart_id")
+  cartId   String @map("cart_id")
 
   code     String
   discount Float  @default(0)
@@ -449,8 +449,8 @@ model Coupon {
   discount         Float  @default(0)
   shipping         Float  @default(0)
   usages           Int    @default(0)
-  maxUsages        Int    @default(0) @map("max_usages")
-  maxUsagesPerUser Int    @default(0) @map("max_usages_per_user")
+  maxUsages        Int    @map("max_usages")
+  maxUsagesPerUser Int    @map("max_usages_per_user")
 
   utmCampaignId String @map("utm_campaign_id")
 
@@ -647,7 +647,7 @@ model Cart {
   cartItems   CartItem[]
   cartTotal   CartTotal?
   cartPayment CartPayment?
-  cartCoupon  CartCoupon?
+  cartCoupons CartCoupon[]
 
   @@map("cart")
 }

@@ -31,14 +31,14 @@ export class CreateCouponDto {
   shipping?: number;
 
   @IsNumber()
-  @IsOptional()
+  @IsNotEmpty()
   @ApiProperty({ type: Number, nullable: true })
-  maxUsages?: number;
+  maxUsages: number;
 
   @IsNumber()
-  @IsOptional()
+  @IsNotEmpty()
   @ApiProperty({ type: Number, nullable: true })
-  maxUsagesPerUser?: number;
+  maxUsagesPerUser: number;
 
   @IsUUID()
   @IsNotEmpty()

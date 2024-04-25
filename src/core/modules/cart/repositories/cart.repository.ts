@@ -27,16 +27,31 @@ export class CartRepository extends RepositoryFactory<
     });
   }
 
-  findAll(query: QueryBuilderEntity): Promise<CartEntity[]> {
+  findAll(query: QueryBuilderEntity): Promise<
+    (CartEntity & {
+      cartTotal: CartTotalEntity;
+      cartItems: CartItemEntity[];
+      cartCoupons: CartCouponEntity[];
+    })[]
+  > {
     return this.prismaService.cart.findMany({
       ...query,
       include: {
+        cartTotal: {
+          where: {
+            deletedAt: null,
+          },
+        },
         cartItems: {
           where: {
             deletedAt: null,
           },
         },
-        cartTotal: true,
+        cartCoupons: {
+          where: {
+            deletedAt: null,
+          },
+        },
       },
     });
   }
@@ -45,7 +60,7 @@ export class CartRepository extends RepositoryFactory<
     | (CartEntity & {
         cartTotal: CartTotalEntity;
         cartItems: CartItemEntity[];
-        cartCoupon?: CartCouponEntity;
+        cartCoupons: CartCouponEntity[];
       })
     | null
   > {
@@ -55,9 +70,21 @@ export class CartRepository extends RepositoryFactory<
         deletedAt: null,
       },
       include: {
-        cartTotal: true,
-        cartItems: true,
-        cartCoupon: true,
+        cartTotal: {
+          where: {
+            deletedAt: null,
+          },
+        },
+        cartItems: {
+          where: {
+            deletedAt: null,
+          },
+        },
+        cartCoupons: {
+          where: {
+            deletedAt: null,
+          },
+        },
       },
     });
   }

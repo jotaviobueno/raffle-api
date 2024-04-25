@@ -5,6 +5,7 @@ import {
   CartCouponEntity,
   CartEntity,
   CartTotalEntity,
+  CouponEntity,
 } from 'src/domain/entities';
 import { CartService } from './cart.service';
 import { CouponService } from '../../marketing/services/coupon.service';
@@ -31,13 +32,13 @@ export class CartCouponService
     if (cart.cartItems.length === 0)
       throw new HttpException('Empty cart.', HttpStatus.UNPROCESSABLE_ENTITY);
 
-    if (cart.cartCoupon)
+    if (cart.cartCoupons.length > 0)
       throw new HttpException(
         'You have already applied a coupon to this cart.',
         HttpStatus.CONFLICT,
       );
 
-    if (new Date() <= coupon.from)
+    if (coupon.from && new Date() <= coupon.from)
       throw new HttpException(
         `Coupon not valid, this coupon will be valid from ${format(
           coupon.from,
@@ -46,7 +47,7 @@ export class CartCouponService
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
 
-    if (new Date() >= coupon.to)
+    if (coupon.to && new Date() >= coupon.to)
       throw new HttpException(
         'Expired coupon.',
         HttpStatus.UNPROCESSABLE_ENTITY,
@@ -87,35 +88,46 @@ export class CartCouponService
       total: cart.cartTotal.total - coupon.discount,
     });
 
+    await this.couponService.update({
+      id: coupon.id,
+      usages: coupon.usages + 1,
+    });
+
     return cartCoupon;
   }
 
   async findById(id: string): Promise<
     CartCouponEntity & {
       cart: CartEntity & { cartTotal: CartTotalEntity };
+      coupon: CouponEntity;
     }
   > {
-    const coupon = await this.cartCouponRepository.findById(id);
+    const cartCoupon = await this.cartCouponRepository.findById(id);
 
-    if (!coupon)
+    if (!cartCoupon)
       throw new HttpException('Cart coupon not found', HttpStatus.NOT_FOUND);
 
-    return coupon;
+    return cartCoupon;
   }
 
   async remove(id: string): Promise<boolean> {
-    const coupon = await this.findById(id);
+    const cartCoupon = await this.findById(id);
 
-    const remove = await this.cartCouponRepository.softDelete(coupon.id);
+    const remove = await this.cartCouponRepository.softDelete(cartCoupon.id);
 
     if (!remove)
       throw new HttpException('Failed to remove', HttpStatus.NOT_ACCEPTABLE);
 
     await this.cartTotalService.update({
-      id: coupon.cart.cartTotal.id,
-      discount: coupon.cart.cartTotal.discount - coupon.discount,
-      shipping: coupon.cart.cartTotal.discount - coupon.shipping,
-      total: coupon.cart.cartTotal.total + coupon.discount,
+      id: cartCoupon.cart.cartTotal.id,
+      discount: cartCoupon.cart.cartTotal.discount - cartCoupon.discount,
+      shipping: cartCoupon.cart.cartTotal.discount - cartCoupon.shipping,
+      total: cartCoupon.cart.cartTotal.total + cartCoupon.discount,
+    });
+
+    await this.couponService.update({
+      id: cartCoupon.couponId,
+      usages: cartCoupon.coupon.usages - 1,
     });
 
     return true;

@@ -113,7 +113,9 @@ export class CouponService
     return coupon;
   }
 
-  async update(dto: UpdateCouponDto): Promise<CouponEntity> {
+  async update(
+    dto: UpdateCouponDto & { usages?: number },
+  ): Promise<CouponEntity> {
     const coupon = await this.findById(dto.id);
 
     if (dto.code) {

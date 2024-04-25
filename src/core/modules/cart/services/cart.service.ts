@@ -48,7 +48,7 @@ export class CartService implements ServiceBase<CartEntity, CreateCartDto> {
     CartEntity & {
       cartTotal: CartTotalEntity;
       cartItems: CartItemEntity[];
-      cartCoupon?: CartCouponEntity;
+      cartCoupons: CartCouponEntity[];
     }
   > {
     const cart = await this.cartRepository.findById(id);
