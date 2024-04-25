@@ -9,10 +9,18 @@ import { MenuService } from './services/menu.service';
 import { MenuRepository } from './repositories/menu.repository';
 import { MenuController } from './controllers/menu.controller';
 import { UserModule } from '../user/user.module';
+import { HealthController } from './controllers/health.controller';
+import { S3Service } from './services/s3.service';
+import { TerminusModule } from '@nestjs/terminus';
 
 @Module({
-  imports: [forwardRef(() => UserModule)],
-  controllers: [CountryController, StateController, MenuController],
+  imports: [forwardRef(() => UserModule), TerminusModule],
+  controllers: [
+    CountryController,
+    StateController,
+    MenuController,
+    HealthController,
+  ],
   providers: [
     CountryService,
     CountryRepository,
@@ -20,7 +28,8 @@ import { UserModule } from '../user/user.module';
     StateRepository,
     MenuService,
     MenuRepository,
+    S3Service,
   ],
-  exports: [CountryService, StateService, MenuService],
+  exports: [CountryService, StateService, MenuService, S3Service],
 })
 export class SettingModule {}

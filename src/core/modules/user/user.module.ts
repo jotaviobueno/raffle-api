@@ -3,7 +3,6 @@ import { UserController } from './controllers/user.controller';
 import { PrismaModule } from 'src/infra/database/prisma/prisma.module';
 import { RedisModule } from 'src/infra/redis/redis.module';
 import { UserRepository } from './repositories/user.repository';
-import { S3Module } from '../s3/s3.module';
 import { UserService } from './services/user.service';
 import { CatalogModule } from '../catalog/catalog.module';
 import { RoleModule } from '../role/role.module';
@@ -16,7 +15,7 @@ import { SettingModule } from '../setting/setting.module';
   imports: [
     PrismaModule,
     RedisModule,
-    S3Module,
+    SettingModule,
     RoleModule,
     SettingModule,
     forwardRef(() => CatalogModule),

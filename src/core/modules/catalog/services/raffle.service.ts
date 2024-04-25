@@ -6,11 +6,11 @@ import {
   UpdateRaffleDto,
 } from 'src/domain/dtos';
 import { FindAllResultEntity, RaffleEntity } from 'src/domain/entities';
-import { RaffleRepository } from '../repository/raffle.repository';
+import { RaffleRepository } from '../repositories/raffle.repository';
 import { QueryBuilder } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from './seller.service';
-import { S3Service } from '../../s3/s3.service';
+import { S3Service } from '../../setting/services/s3.service';
 
 @Injectable()
 export class RaffleService

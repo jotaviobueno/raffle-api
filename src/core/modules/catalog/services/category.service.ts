@@ -6,7 +6,7 @@ import {
   UpdateCategoryDto,
 } from 'src/domain/dtos';
 import { CategoryEntity, FindAllResultEntity } from 'src/domain/entities';
-import { CategoryRepository } from '../repository/category.repository';
+import { CategoryRepository } from '../repositories/category.repository';
 import { SellerService } from './seller.service';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { QueryBuilder } from 'src/common/utils';

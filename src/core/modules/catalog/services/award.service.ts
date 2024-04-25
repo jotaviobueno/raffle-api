@@ -6,7 +6,7 @@ import {
   UpdateAwardDto,
 } from 'src/domain/dtos';
 import { AwardEntity, FindAllResultEntity } from 'src/domain/entities';
-import { AwardRepository } from '../repository/award.repository';
+import { AwardRepository } from '../repositories/award.repository';
 import { SellerService } from './seller.service';
 import { RaffleService } from './raffle.service';
 import { QueryBuilder } from 'src/common/utils';

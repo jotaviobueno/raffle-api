@@ -4,7 +4,7 @@ import { ServiceBase } from 'src/common/base';
 import { QueryBuilder } from 'src/common/utils';
 import { CreateRoleDto, SearchRoleDto, UpdateRoleDto } from 'src/domain/dtos';
 import { FindAllResultEntity, RoleEntity } from 'src/domain/entities';
-import { RoleRepository } from '../repository/role.repository';
+import { RoleRepository } from '../repositories/role.repository';
 import { ROLE_ENUM } from 'src/common/enums';
 
 @Injectable()

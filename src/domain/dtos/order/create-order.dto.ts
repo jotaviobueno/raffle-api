@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
+// TODO: pensar melhor construir isso com base no cart, receber apenas o cartId e criar a order e as outras informações
 export class CreateOrderDto {
   @IsUUID()
   @IsNotEmpty()

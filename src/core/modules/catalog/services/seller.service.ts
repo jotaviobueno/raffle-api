@@ -15,8 +15,8 @@ import { FindAllResultEntity, SellerEntity } from 'src/domain/entities';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { QueryBuilder } from 'src/common/utils';
 import { UserService } from '../../user/services/user.service';
-import { SellerRepository } from '../repository/seller.repository';
-import { S3Service } from '../../s3/s3.service';
+import { SellerRepository } from '../repositories/seller.repository';
+import { S3Service } from '../../setting/services/s3.service';
 
 @Injectable()
 export class SellerService

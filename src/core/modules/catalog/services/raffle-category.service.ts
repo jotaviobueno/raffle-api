@@ -5,7 +5,7 @@ import {
   UpdateRaffleCategoryDto,
 } from 'src/domain/dtos';
 import { RaffleCategoryEntity } from 'src/domain/entities';
-import { RaffleCategoryRepository } from '../repository/raffle-category.repository';
+import { RaffleCategoryRepository } from '../repositories/raffle-category.repository';
 import { RaffleService } from './raffle.service';
 import { CategoryService } from './category.service';
 

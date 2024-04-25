@@ -6,7 +6,7 @@ import {
   UpdateSocialMediaDto,
 } from 'src/domain/dtos';
 import { FindAllResultEntity, SocialMediaEntity } from 'src/domain/entities';
-import { SocialMedialRepository } from '../repository/social-media.repository';
+import { SocialMedialRepository } from '../repositories/social-media.repository';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from './seller.service';
 import { QueryBuilder } from 'src/common/utils';

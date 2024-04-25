@@ -14,7 +14,7 @@ import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from '../../catalog/services/seller.service';
 import { UserRoleService } from '../../role/services/user-role.service';
 import { ROLE_ENUM } from 'src/common/enums';
-import { S3Service } from '../../s3/s3.service';
+import { S3Service } from '../../setting/services/s3.service';
 
 @Injectable()
 export class UserService
