@@ -83,10 +83,10 @@ model Seller {
   categories           Category[]
   raffles              Raffle[]
   orders               Order[]
-  quotas               Quotas[]
   awards               Award[]
   socialMedias         SocialMedia[]
   paymentMethodSellers PaymentMethodSeller[]
+  utmCampaigns         UtmCampaign[]
 
   @@map("seller")
 }
@@ -259,14 +259,12 @@ model Quotas {
   id       String @id @default(uuid())
   number   Int
   raffleId String @map("raffle_id")
-  sellerId String @map("seller_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   raffle     Raffle      @relation(fields: [raffleId], references: [id])
-  seller     Seller      @relation(fields: [sellerId], references: [id])
   orderItems OrderItem[]
 
   @@map("quotas")
@@ -413,6 +411,7 @@ model UtmCampaign {
   id          String  @id @default(uuid())
   name        String
   description String?
+  sellerId    String  @map("seller_id")
 
   from DateTime? @db.Timestamp
   to   DateTime? @db.Timestamp
@@ -423,6 +422,7 @@ model UtmCampaign {
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
+  seller  Seller   @relation(fields: [sellerId], references: [id])
   coupons Coupon[]
 
   @@map("utm_campaign")
@@ -706,4 +706,20 @@ model CartPayment {
   paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
 
   @@map("cart_payment")
+}
+
+model Log {
+  id       String  @id @default(uuid())
+  entity   String
+  action   String
+  query    Json?
+  oldValue Json?   @map("old_value")
+  newValue Json?   @map("new_value")
+  entityId String? @map("entity_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  @@map("log")
 }

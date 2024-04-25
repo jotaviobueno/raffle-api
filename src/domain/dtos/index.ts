@@ -20,3 +20,4 @@ export * from './cart-total';
 export * from './cart-payment';
 export * from './payment-method';
 export * from './payment-gateway-config';
+export * from './utm-campaign';
