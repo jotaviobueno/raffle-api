@@ -692,19 +692,3 @@ model CartPayment {
 
   @@map("cart_payment")
 }
-
-model Log {
-  id       String  @id @default(uuid())
-  entity   String
-  action   String
-  query    Json?
-  oldValue Json?   @map("old_value")
-  newValue Json?   @map("new_value")
-  entityId String? @map("entity_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  @@map("log")
-}
