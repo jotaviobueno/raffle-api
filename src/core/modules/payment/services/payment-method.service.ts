@@ -7,7 +7,6 @@ import {
 } from 'src/domain/dtos';
 import { FindAllResultEntity, PaymentMethodEntity } from 'src/domain/entities';
 import { PaymentMethodRepository } from '../repositories/payment-method.repository';
-import { PaymentGatewayConfigService } from './payment-gateway-config.service';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { QueryBuilder } from 'src/common/utils';
 
@@ -22,17 +21,11 @@ export class PaymentMethodService
 {
   constructor(
     private readonly paymentMethodRepository: PaymentMethodRepository,
-    private readonly paymentGatewayConfigService: PaymentGatewayConfigService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
   ) {}
 
   async create(dto: CreatePaymentMethodDto): Promise<PaymentMethodEntity> {
-    if (dto.paymentGatewayConfigId)
-      await this.paymentGatewayConfigService.findById(
-        dto.paymentGatewayConfigId,
-      );
-
     const paymentMethod = await this.paymentMethodRepository.create(dto);
 
     return paymentMethod;

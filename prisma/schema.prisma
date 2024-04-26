@@ -540,38 +540,21 @@ model PaymentMethodSeller {
 }
 
 model PaymentMethod {
-  id                     String  @id @default(uuid())
-  code                   String
-  name                   String
-  instructions           String
-  isActive               Boolean @default(true) @map("is_active")
-  paymentGatewayConfigId String? @map("payment_gateway_config_id")
+  id           String  @id @default(uuid())
+  code         String
+  name         String
+  instructions String
+  isActive     Boolean @default(true) @map("is_active")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  paymentGatewayConfig PaymentGatewayConfig? @relation(fields: [paymentGatewayConfigId], references: [id])
   paymentMethodSellers PaymentMethodSeller[]
   orderPayments        OrderPayment[]
   cartPayments         CartPayment[]
 
   @@map("payment_method")
-}
-
-model PaymentGatewayConfig {
-  id     String @id @default(uuid())
-  code   String
-  name   String
-  config Json
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  paymentMethod PaymentMethod[]
-
-  @@map("payment_gateway_config")
 }
 
 model OrderPayment {

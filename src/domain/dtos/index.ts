@@ -19,7 +19,6 @@ export * from './cart-item';
 export * from './cart-total';
 export * from './cart-payment';
 export * from './payment-method';
-export * from './payment-gateway-config';
 export * from './utm-campaign';
 export * from './coupon';
 export * from './cart-coupon';
