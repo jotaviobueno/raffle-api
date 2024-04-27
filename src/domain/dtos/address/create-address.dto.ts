@@ -47,6 +47,11 @@ export class CreateAddressDto {
   @ApiProperty()
   city: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  number: string;
+
   @IsUUID()
   @IsOptional()
   @ApiProperty({ nullable: true })

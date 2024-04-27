@@ -10,7 +10,7 @@ import {
 
 @Injectable()
 export class UserRepository extends RepositoryFactory<
-  UserEntity | Omit<UserEntity, 'password'>,
+  UserEntity | Omit<UserEntity, 'password' | 'asaasCustomerId'>,
   Omit<CreateUserDto, 'code'>,
   UpdateUserDto & { avatar?: string }
 > {
@@ -20,7 +20,7 @@ export class UserRepository extends RepositoryFactory<
 
   create(
     data: Omit<CreateUserDto, 'code'>,
-  ): Promise<UserEntity | Omit<UserEntity, 'password'>> {
+  ): Promise<UserEntity | Omit<UserEntity, 'password' | 'asaasCustomerId'>> {
     return this.prismaService.user.create({
       data,
       select: {
@@ -34,7 +34,6 @@ export class UserRepository extends RepositoryFactory<
         deletedAt: true,
         email: true,
         document: true,
-        rg: true,
         birthDate: true,
       },
     });
@@ -50,7 +49,7 @@ export class UserRepository extends RepositoryFactory<
   }
 
   findByIdAndPopulate(id: string): Promise<
-    | (Omit<UserEntity, 'password'> & {
+    | (Omit<UserEntity, 'password' | 'asaasCustomerId'> & {
         userRoles: (UserRoleEntity & {
           role: RoleEntity;
         })[];
@@ -73,7 +72,6 @@ export class UserRepository extends RepositoryFactory<
         deletedAt: true,
         email: true,
         document: true,
-        rg: true,
         birthDate: true,
         userRoles: {
           include: {
@@ -90,10 +88,15 @@ export class UserRepository extends RepositoryFactory<
         id,
         deletedAt: null,
       },
+      include: {
+        quotas: true,
+      },
     });
   }
 
-  findAll(query: QueryBuilderEntity): Promise<Omit<UserEntity, 'password'>[]> {
+  findAll(
+    query: QueryBuilderEntity,
+  ): Promise<Omit<UserEntity, 'password' | 'asaasCustomerId'>[]> {
     return this.prismaService.user.findMany({
       ...query,
       select: {
@@ -107,7 +110,6 @@ export class UserRepository extends RepositoryFactory<
         deletedAt: true,
         email: true,
         document: true,
-        rg: true,
         birthDate: true,
       },
     });
@@ -117,7 +119,7 @@ export class UserRepository extends RepositoryFactory<
     id,
     ...data
   }: UpdateUserDto & { id: string; avatar?: string }): Promise<
-    Omit<UserEntity, 'password'>
+    Omit<UserEntity, 'password' | 'asaasCustomerId'>
   > {
     return this.prismaService.user.update({
       where: { id },
@@ -133,7 +135,6 @@ export class UserRepository extends RepositoryFactory<
         deletedAt: true,
         email: true,
         document: true,
-        rg: true,
         birthDate: true,
       },
     });

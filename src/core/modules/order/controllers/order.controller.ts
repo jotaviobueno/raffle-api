@@ -1,9 +1,20 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
-import { CreateOrderDto } from 'src/domain/dtos';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseInterceptors,
+} from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { ApiTags } from '@nestjs/swagger';
-import { CurrentUser } from '../../user/decorators';
-import { UserEntity } from 'src/domain/entities';
+import { IsPublic } from '../../auth/decorators';
 import { OrderService } from '../services/order.service';
+import { CreateCheckoutDto, QueryParamsDto } from 'src/domain/dtos';
 
 @Controller('order')
 @ApiTags('order')
@@ -11,16 +22,32 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
-  create(
-    @Body() createOrderDto: CreateOrderDto,
-    @CurrentUser() user: UserEntity,
-    @Req() req: Request,
-  ) {
+  create(@Body() createCheckoutDto: CreateCheckoutDto, @Req() req: Request) {
     return this.orderService.create({
-      ...createOrderDto,
-      customerId: user.id,
+      ...createCheckoutDto,
       userAgent: req.headers['user-agent'],
-      ip: req.headers['x-forwarded-for'],
+      ip: req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'],
     });
+  }
+
+  @Post('asaas-postback')
+  @IsPublic()
+  @HttpCode(HttpStatus.OK)
+  asaasPostback(@Body() data) {
+    return this.orderService.asaasPostback(data);
+  }
+
+  @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(15)
+  @IsPublic()
+  findAll(@Query() queryParams: QueryParamsDto) {
+    return this.orderService.findAll(queryParams);
+  }
+
+  @Get(':id')
+  @IsPublic()
+  findById(@Param('id') id: string) {
+    return this.orderService.findById(id);
   }
 }

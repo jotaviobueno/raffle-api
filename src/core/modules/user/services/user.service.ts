@@ -20,7 +20,7 @@ import { S3Service } from '../../setting/services/s3.service';
 export class UserService
   implements
     ServiceBase<
-      UserEntity | Omit<UserEntity, 'password'>,
+      UserEntity | Omit<UserEntity, 'password' | 'asaasCustomerId'>,
       CreateUserDto,
       UpdateUserDto
     >
@@ -38,7 +38,7 @@ export class UserService
     sellerId,
     code,
     ...dto
-  }: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
+  }: CreateUserDto): Promise<Omit<UserEntity, 'password' | 'asaasCustomerId'>> {
     if (code != ROLE_ENUM.USER) {
       if (dto.password)
         throw new HttpException(
@@ -53,9 +53,13 @@ export class UserService
         );
     }
 
-    if (code === ROLE_ENUM.USER && !dto.password)
+    if (
+      (code === ROLE_ENUM.USER && !dto.password) ||
+      !dto.document ||
+      !dto.phone
+    )
       throw new HttpException(
-        'Not possible to create USER without password',
+        'Not possible to create USER without password, document or phone',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
 
@@ -83,7 +87,9 @@ export class UserService
 
   async findAll(
     queryParams: QueryParamsDto,
-  ): Promise<FindAllResultEntity<Omit<UserEntity, 'password'>>> {
+  ): Promise<
+    FindAllResultEntity<Omit<UserEntity, 'password' | 'asaasCustomerId'>>
+  > {
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache = await this.cacheManager.get<FindAllResultEntity<
@@ -113,7 +119,7 @@ export class UserService
   }
 
   async findByIdAndPopulate(id: string): Promise<
-    Omit<UserEntity, 'password'> & {
+    Omit<UserEntity, 'password' | 'asaasCustomerId'> & {
       userRoles: (UserRoleEntity & {
         role: RoleEntity;
       })[];
@@ -162,7 +168,7 @@ export class UserService
     file,
     ...dto
   }: UpdateUserDto & { file?: Express.Multer.File }): Promise<
-    Omit<UserEntity, 'password'>
+    Omit<UserEntity, 'password' | 'asaasCustomerId'>
   > {
     const user = await this.findById(dto.id);
 

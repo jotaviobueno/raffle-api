@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "order" ALTER COLUMN "ip" DROP NOT NULL,
+ALTER COLUMN "user_agent" DROP NOT NULL;

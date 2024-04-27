@@ -2,10 +2,21 @@ import { Module } from '@nestjs/common';
 import { OrderService } from './services/order.service';
 import { OrderRepository } from './repositories/order.repository';
 import { OrderController } from './controllers/order.controller';
+import { PaymentModule } from '../payment/payment.module';
+import { OrderStatusService } from './services/order-status.service';
+import { OrderStatusRepository } from './repositories/order-status.repository';
+import { OrderStatusController } from './controllers/order-status.controller';
+import { CartModule } from '../cart/cart.module';
 
 @Module({
-  controllers: [OrderController],
-  providers: [OrderService, OrderRepository],
-  exports: [OrderService],
+  imports: [PaymentModule, CartModule],
+  controllers: [OrderController, OrderStatusController],
+  providers: [
+    OrderService,
+    OrderRepository,
+    OrderStatusService,
+    OrderStatusRepository,
+  ],
+  exports: [OrderService, OrderStatusService],
 })
 export class OrderModule {}

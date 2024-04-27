@@ -7,7 +7,7 @@ import {
 } from 'src/domain/dtos';
 import { FindAllResultEntity, RaffleEntity } from 'src/domain/entities';
 import { RaffleRepository } from '../repositories/raffle.repository';
-import { QueryBuilder } from 'src/common/utils';
+import { QueryBuilder, smallestLargestNumberUtil } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from './seller.service';
 import { S3Service } from '../../setting/services/s3.service';
@@ -38,8 +38,11 @@ export class RaffleService
         files.map((file) => ({ file, path: 'raffle' })),
       ));
 
+    const initialFinal = smallestLargestNumberUtil(dto.digits);
+
     const raffle = await this.raffleRepository.create({
       ...dto,
+      ...initialFinal,
       images,
       sellerId: seller.id,
     });
@@ -115,8 +118,17 @@ export class RaffleService
         files.map((file) => ({ file, path: 'raffle' })),
       ));
 
+    if (dto.digits && dto.digits < raffle.digits)
+      throw new HttpException(
+        'you cannot upgrade to a lower value',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
+    const initialFinal = dto.digits && smallestLargestNumberUtil(dto.digits);
+
     const update = await this.raffleRepository.update({
       ...dto,
+      ...initialFinal,
       images,
       id: raffle.id,
     });

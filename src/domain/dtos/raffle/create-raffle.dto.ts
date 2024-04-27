@@ -76,4 +76,8 @@ export class CreateRaffleDto {
   @IsNotEmpty()
   @Transform(({ value }) => new Date(value))
   drawDateAt: Date;
+
+  @IsNotEmpty()
+  @IsInt()
+  digits: number;
 }

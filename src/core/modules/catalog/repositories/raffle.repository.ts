@@ -6,8 +6,8 @@ import { RaffleEntity, QueryBuilderEntity } from 'src/domain/entities';
 @Injectable()
 export class RaffleRepository extends RepositoryFactory<
   RaffleEntity,
-  CreateRaffleDto & { images?: string[] },
-  UpdateRaffleDto & { images?: string[] }
+  CreateRaffleDto & { images?: string[]; initial: number; final: number },
+  UpdateRaffleDto & { images?: string[]; initial?: number; final?: number }
 > {
   constructor() {
     super('raffle');

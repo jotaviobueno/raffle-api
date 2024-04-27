@@ -1,25 +1,80 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PaymentGateway } from '../payment/gateway/payment.gateway';
-import { format } from 'date-fns';
 import {
   AsaasCustomerEntity,
-  OrderBankSlipEntity,
-  OrderPixEntity,
   OrderWithRelationsEntity,
+  PaymentAsaasResponseEntity,
 } from 'src/domain/entities';
 import { AsaasService } from './asaas.service';
+import { CreateCheckoutDto } from 'src/domain/dtos';
 
 @Injectable()
-export class AsaasGateway extends PaymentGateway {
+export class AsaasGateway extends PaymentGateway<{
+  order: OrderWithRelationsEntity;
+  payment: PaymentAsaasResponseEntity;
+  data?: any;
+  customer: AsaasCustomerEntity;
+}> {
+  private code: 'asaas';
+  private config = {};
+
   constructor(private readonly asaasService: AsaasService) {
     super();
   }
 
-  public async process(order: OrderWithRelationsEntity): Promise<boolean> {
-    const customer = await this.asaasService.createCustomer({
-      name: `${order.customer.firstName} ${order.customer.lastName}`,
-      cpfCnpj: order.customer.document,
-    });
+  public getCode(): string {
+    return this.code;
+  }
+
+  public setConfig(config: any): void {
+    this.config = config;
+  }
+
+  public async process({
+    dto,
+    order,
+  }: {
+    order: OrderWithRelationsEntity;
+    dto: CreateCheckoutDto;
+  }): Promise<{
+    order: OrderWithRelationsEntity;
+    payment: PaymentAsaasResponseEntity;
+    data?: any;
+    customer: AsaasCustomerEntity;
+  }> {
+    this.asaasService.setConfig(this.config);
+
+    let customer: AsaasCustomerEntity;
+
+    if (!order.customer.asaasCustomerId)
+      customer = await this.asaasService.createCustomer({
+        addressNumber: order.orderPayment.address.number,
+        complement: order.orderPayment.address.complement,
+        cpfCnpj: order.customer.document.replace(/[\.-]/g, ''),
+        mobilePhone: order.customer.phone.replace(/[\D+55]/g, ''),
+        email: order.customer.email,
+        name: `${order.customer.firstName} ${order.customer.lastName}`,
+        province: order.orderPayment.address.neighborhood,
+        postalCode: order.orderPayment.address.postcode,
+        externalReference: order.customer.id,
+        notificationDisabled: true,
+        address: order.orderPayment.address.street,
+      });
+    else
+      customer = await this.asaasService.updateCustomer({
+        id: order.customer.asaasCustomerId,
+        addressNumber: order.orderPayment.address.number,
+        complement: order.orderPayment.address.complement,
+        cpfCnpj: order.customer.document.replace(/[\.-]/g, ''),
+        mobilePhone: order.customer.phone.replace(/[\D+55]/g, ''),
+        email: order.customer.email,
+        name: `${order.customer.firstName} ${order.customer.lastName}`,
+        province: order.orderPayment.address.neighborhood,
+        postalCode: order.orderPayment.address.postcode,
+        externalReference: order.customer.id,
+        notificationDisabled: true,
+        address: order.orderPayment.address.street,
+      });
 
     switch (order.orderPayment.paymentMethod.code) {
       case 'pix':
@@ -27,80 +82,60 @@ export class AsaasGateway extends PaymentGateway {
       case 'bank.slip':
         return this.processBankSlip(order, customer);
       case 'credit.card':
-        return this.processCreditCard(order, customer);
+        return this.processCreditCard(order, customer, dto);
     }
   }
 
   private async processPix(
     order: OrderWithRelationsEntity,
     customer: AsaasCustomerEntity,
-  ): Promise<boolean> {
+  ) {
     const payment = await this.asaasService.createPayment({
       customer,
       billingType: 'PIX',
       value: order.orderTotal.total,
-      dueDate: order.dueDate.toISOString().split('T')[0],
+      dueDate: order.dueDate,
+      discount: order.orderTotal.discount,
     });
 
     const pix = await this.asaasService.getPixById(payment.id);
 
-    const orderPix = new OrderPixEntity();
-    orderPix.copyPaste = pix.payload;
-    orderPix.image = pix.encodedImage;
-    orderPix.expiratAt = new Date(pix.expirationDate);
-
-    order.orderPayment.orderPix = orderPix;
-
-    order.dueDate = new Date(pix.expirationDate);
-
-    return true;
+    return { order, data: pix, payment, customer };
   }
 
   private async processBankSlip(
     order: OrderWithRelationsEntity,
     customer: AsaasCustomerEntity,
-  ): Promise<boolean> {
+  ) {
     const payment = await this.asaasService.createPayment({
       customer,
       billingType: 'BOLETO',
       value: order.orderTotal.total,
-      dueDate: order.dueDate.toISOString().split('T')[0],
+      dueDate: new Date(),
     });
 
     const bankSlip = await this.asaasService.getBankSlip(payment.id);
 
-    const orderBankSlip = new OrderBankSlipEntity();
-
-    orderBankSlip.bankSlipUrl = payment.bankSlipUrl;
-    orderBankSlip.ourNumber = payment.nossoNumero;
-    orderBankSlip.expirationAt = new Date(payment.dueDate);
-    orderBankSlip.identificationField = bankSlip.identificationField;
-    orderBankSlip.barCode = bankSlip.barCode;
-    orderBankSlip.orderPaymentId = order.id;
-
-    order.dueDate = new Date(payment.dueDate);
-
-    return true;
+    return { order, data: bankSlip, payment, customer };
   }
 
   private async processCreditCard(
     order: OrderWithRelationsEntity,
     customer: AsaasCustomerEntity,
-  ): Promise<boolean> {
+    dto: CreateCheckoutDto,
+  ) {
     try {
       const payment = await this.asaasService.createPayment({
         customer,
         billingType: 'CREDIT_CARD',
         value: order.orderTotal.total,
-        dueDate: format(new Date(), 'dd/MM/yyyy'),
+        dueDate: new Date(),
         creditCard: {
-          holderName: order.orderPayment.orderCreditCard.name,
-          number: order.orderPayment.orderCreditCard.number,
-          expiryMonth:
-            order.orderPayment.orderCreditCard.expirationMonth.toString(),
-          expiryYear:
-            order.orderPayment.orderCreditCard.expirationYear.toString(),
-          ccv: order.orderPayment.orderCreditCard.cvv.toString(),
+          holderName: dto.holder,
+          number: dto.number,
+          expiryMonth: dto.expirationMonth.toString(),
+          expiryYear: dto.expirationYear.toString(),
+          ccv: dto.cvv.toString(),
         },
         creditCardHolderInfo: {
           name: order.customer.firstName,
@@ -113,17 +148,11 @@ export class AsaasGateway extends PaymentGateway {
         },
       });
 
-      order.orderPayment.orderCreditCard.number =
-        payment.creditCard.creditCardNumber;
-      order.orderPayment.orderCreditCard.brand =
-        payment.creditCard.creditCardBrand;
-      order.orderPayment.orderCreditCard.token =
-        payment.creditCard.creditCardToken;
-      order.orderPayment.orderCreditCard.status = payment.status;
-    } catch (error) {
-      Logger.log('PROCESSS CREDIT-CARD ASAAS ERROR', error?.errors);
-    }
+      return { order, payment, customer };
+    } catch (e) {
+      Logger.log('PROCESSS CREDIT-CARD ASAAS ERROR', e);
 
-    return true;
+      throw e;
+    }
   }
 }

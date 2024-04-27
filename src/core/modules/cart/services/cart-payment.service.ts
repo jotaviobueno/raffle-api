@@ -25,12 +25,13 @@ export class CartPaymentService
       dto.paymentMethodId,
     );
 
-    const address = await this.addressService.findById(dto.paymentMethodId);
+    const address = await this.addressService.findById(dto.addressId);
 
     const cartPayment = await this.cartPaymentRepository.create({
       cartId: cart.id,
       paymentMethodId: paymentMethod.id,
       addressId: address.id,
+      method: paymentMethod.name,
     });
 
     return cartPayment;

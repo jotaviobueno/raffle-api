@@ -16,8 +16,12 @@ export class RaffleEntity implements Raffle {
   minBuyQuotas: number;
   maxBuyQuotas: number;
   totalQuotas: number;
-  payeds: number;
   freePercentage: number;
+  payeds: number;
+  digits: number;
+  initial: number;
+  final: number;
+  totalNumbers: number;
   drawDateAt: Date;
   createdAt: Date;
   updatedAt: Date;

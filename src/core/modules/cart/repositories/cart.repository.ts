@@ -6,6 +6,7 @@ import {
   CartEntity,
   CartItemEntity,
   CartTotalEntity,
+  CartWithRelationsEntity,
   QueryBuilderEntity,
 } from 'src/domain/entities';
 
@@ -18,10 +19,14 @@ export class CartRepository extends RepositoryFactory<
     super('cart');
   }
 
-  findByCustomerId(customerId: string): Promise<CartEntity | null> {
+  findByCustomerIdAndSellerId(
+    customerId: string,
+    sellerId: string,
+  ): Promise<CartEntity | null> {
     return this.prismaService.cart.findFirst({
       where: {
         customerId,
+        sellerId,
         deletedAt: null,
       },
     });
@@ -52,18 +57,32 @@ export class CartRepository extends RepositoryFactory<
             deletedAt: null,
           },
         },
+        cartPayment: {
+          include: {
+            address: true,
+            paymentMethod: true,
+          },
+        },
+        seller: true,
+        customer: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            document: true,
+            email: true,
+            createdAt: true,
+            updatedAt: true,
+            deletedAt: true,
+            avatar: true,
+          },
+        },
       },
     });
   }
 
-  findById(id: string): Promise<
-    | (CartEntity & {
-        cartTotal: CartTotalEntity;
-        cartItems: CartItemEntity[];
-        cartCoupons: CartCouponEntity[];
-      })
-    | null
-  > {
+  findById(id: string): Promise<CartWithRelationsEntity | null> {
     return this.prismaService.cart.findFirst({
       where: {
         id,
@@ -83,6 +102,27 @@ export class CartRepository extends RepositoryFactory<
         cartCoupons: {
           where: {
             deletedAt: null,
+          },
+        },
+        cartPayment: {
+          include: {
+            address: true,
+            paymentMethod: true,
+          },
+        },
+        seller: true,
+        customer: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            document: true,
+            email: true,
+            createdAt: true,
+            updatedAt: true,
+            deletedAt: true,
+            avatar: true,
           },
         },
       },

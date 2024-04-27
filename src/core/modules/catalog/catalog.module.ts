@@ -19,6 +19,9 @@ import { RaffleCategoryRepository } from './repositories/raffle-category.reposit
 import { RaffleCategoryService } from './services/raffle-category.service';
 import { RaffleCategoryController } from './controllers/raffle-category.controller';
 import { SettingModule } from '../setting/setting.module';
+import { QuotasService } from './services/quotas.service';
+import { QutoasRepository } from './repositories/quotas.repository';
+import { QuotasController } from './controllers/quotas.controller';
 
 @Module({
   imports: [forwardRef(() => UserModule), SettingModule],
@@ -29,6 +32,7 @@ import { SettingModule } from '../setting/setting.module';
     AwardController,
     SocialMediaController,
     RaffleCategoryController,
+    QuotasController,
   ],
   providers: [
     RaffleService,
@@ -43,6 +47,8 @@ import { SettingModule } from '../setting/setting.module';
     SocialMedialRepository,
     RaffleCategoryService,
     RaffleCategoryRepository,
+    QuotasService,
+    QutoasRepository,
   ],
   exports: [
     SellerService,
@@ -51,6 +57,7 @@ import { SettingModule } from '../setting/setting.module';
     AwardService,
     SocialMediaService,
     RaffleCategoryService,
+    QuotasService,
   ],
 })
 export class CatalogModule {}

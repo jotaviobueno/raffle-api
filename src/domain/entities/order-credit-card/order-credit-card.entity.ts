@@ -8,8 +8,8 @@ export class OrderCreditCardEntity implements OrderCreditCard {
   expirationMonth: number;
   expirationYear: number;
   cvv: number;
-  token: string;
-  status: string;
+  token: string | null;
+  status: string | null;
   orderPaymentId: string;
   createdAt: Date;
   updatedAt: Date;

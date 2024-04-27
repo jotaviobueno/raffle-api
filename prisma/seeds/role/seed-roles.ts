@@ -8,5 +8,16 @@ export async function seedRoles(
     '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
   >,
 ) {
-  await tx.role.createMany({ data });
+  for (const role of data) {
+    const roleAlreadyExist = await tx.role.findFirst({
+      where: {
+        code: role.code,
+        deletedAt: null,
+      },
+    });
+
+    if (roleAlreadyExist) return;
+
+    await tx.role.create({ data: { ...role, deletedAt: null } });
+  }
 }

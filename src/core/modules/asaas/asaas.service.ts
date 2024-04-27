@@ -1,17 +1,35 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import { environment } from 'src/config';
-import { CreateAsaasCustomerDto, CreateAsaasPaymentDto } from 'src/domain/dtos';
-import { AsaasCustomerEntity, AsaasPaymentEntity } from 'src/domain/entities';
+import {
+  CreateAsaasCustomerDto,
+  CreateAsaasPaymentDto,
+  UpdateAsaasCustomerDto,
+} from 'src/domain/dtos';
+import {
+  AsaasCustomerEntity,
+  PaymentAsaasResponseEntity,
+} from 'src/domain/entities';
 
 @Injectable()
 export class AsaasService {
+  private isProduction = environment.NODE_ENV === 'production';
+  private accessToken: string;
+  private interest = 0;
+  private fine = 0;
+
+  public setConfig(config: any): void {
+    this.accessToken = config.accessToken;
+    this.interest = config.interest || 0;
+    this.fine = config.fine || 0;
+  }
+
   setup() {
-    if (environment.NODE_ENV === 'production')
+    if (this.isProduction)
       return axios.create({
         headers: {
           'Content-Type': 'application/json',
-          access_token: environment.ASAAS_ACCESS_TOKEN,
+          access_token: this.accessToken,
         },
         baseURL: 'https://api.asaas.com/v3/',
         maxBodyLength: Infinity,
@@ -20,7 +38,7 @@ export class AsaasService {
     return axios.create({
       headers: {
         'Content-Type': 'application/json',
-        access_token: environment.ASAAS_ACCESS_TOKEN,
+        access_token: this.accessToken,
       },
       maxBodyLength: Infinity,
       baseURL: 'https://sandbox.asaas.com/api/v3/',
@@ -33,34 +51,53 @@ export class AsaasService {
     try {
       const { data } = await this.setup().post<AsaasCustomerEntity>(
         '/customers',
+        { ...customer },
+      );
+
+      return data;
+    } catch (e) {
+      Logger.debug('FAILED TO CREATE CUSTOMER (ASAAS)', e.response.data);
+      throw e;
+    }
+  }
+
+  public async updateCustomer({
+    id,
+    ...dto
+  }: UpdateAsaasCustomerDto): Promise<AsaasCustomerEntity> {
+    try {
+      const { data } = await this.setup().put<AsaasCustomerEntity>(
+        `/customers/${id}`,
         {
-          name: customer.name,
-          cpfCnpj: customer.cpfCnpj.replace(/\D/g, ''),
+          ...dto,
         },
       );
 
       return data;
     } catch (e) {
-      Logger.debug('FAILED TO CREATE CUSTOMER (ASAAS)', e.message);
+      Logger.debug('FAILED TO UPDATE CUSTOMER (ASAAS)', e.response.data);
       throw e;
     }
   }
 
   public async createPayment(
     dto: CreateAsaasPaymentDto,
-  ): Promise<AsaasPaymentEntity> {
+  ): Promise<PaymentAsaasResponseEntity> {
     try {
-      const { data } = await this.setup().post('/payments', {
-        customer: dto.customer.id,
-        billingType: dto.billingType,
-        value: dto.value,
-        dueDate: dto.dueDate,
-      });
+      const { data } = await this.setup().post<PaymentAsaasResponseEntity>(
+        '/payments',
+        {
+          customer: dto.customer.id,
+          billingType: dto.billingType,
+          value: dto.value,
+          dueDate: dto.dueDate,
+        },
+      );
 
       switch (dto.billingType) {
         case 'BOLETO':
-          data.interest = { value: environment.ASAAS_INTEREST };
-          data.fine = { value: environment.ASAAS_FINE };
+          data.interest = { value: +this.interest };
+          data.fine = { value: +this.fine };
         case 'CREDIT_CARD':
           if (dto.creditCardToken) {
             data.creditCardToken = dto.creditCardToken;
@@ -70,9 +107,11 @@ export class AsaasService {
           }
       }
 
+      console.log(data);
+
       return data;
     } catch (e) {
-      Logger.debug('FAILED TO CREATE PAYMENT (ASAAS)', e.message);
+      Logger.debug('FAILED TO CREATE PAYMENT (ASAAS)', e.response.data);
 
       throw e;
     }
@@ -84,7 +123,7 @@ export class AsaasService {
 
       return data;
     } catch (e) {
-      Logger.debug('FAILED TO GET PIX (ASAAS)', e.message);
+      Logger.debug('FAILED TO GET PIX (ASAAS)', e.response.data);
 
       throw e;
     }
@@ -96,7 +135,10 @@ export class AsaasService {
 
       return data;
     } catch (e) {
-      Logger.debug('FAILED TO GET STATUS BY PAYMENT ID (ASAAS)', e.message);
+      Logger.debug(
+        'FAILED TO GET STATUS BY PAYMENT ID (ASAAS)',
+        e.response.data,
+      );
 
       throw e;
     }
@@ -110,7 +152,7 @@ export class AsaasService {
 
       return data;
     } catch (e) {
-      Logger.debug('FAILED TO GET BANKSLIP (ASAAS)', e.message);
+      Logger.debug('FAILED TO GET BANKSLIP (ASAAS)', e.response.data);
 
       throw e;
     }

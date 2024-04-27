@@ -9,12 +9,15 @@ export async function seedMenus(
   >,
 ) {
   for (const { subMenus, ...createMenuDto } of data) {
-    const menu = await tx.menu.create({ data: { ...createMenuDto } });
+    const menu = await tx.menu.create({
+      data: { ...createMenuDto, deletedAt: null },
+    });
 
     if (subMenus && subMenus.length > 0) {
       const createSubMenusDto = subMenus.map((dto) => ({
         ...dto,
         parentId: menu.id,
+        deletedAt: null,
       }));
 
       await tx.menu.createMany({ data: createSubMenusDto });

@@ -4,7 +4,8 @@ export interface CreateAsaasPaymentDto {
   customer: AsaasCustomerEntity;
   billingType: string;
   value: number;
-  dueDate: string;
+  dueDate: Date;
+  discount?: number;
   creditCard?: CreateAsaasPaymentCreditCardDto;
   creditCardHolderInfo?: CreateAsaasPaymentCreditCardHolderInfoDto;
   creditCardToken?: string;

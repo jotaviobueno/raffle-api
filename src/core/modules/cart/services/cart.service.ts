@@ -2,10 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import { CreateCartDto, SearchCartDto } from 'src/domain/dtos';
 import {
-  CartCouponEntity,
   CartEntity,
-  CartItemEntity,
-  CartTotalEntity,
+  CartWithRelationsEntity,
   FindAllResultEntity,
 } from 'src/domain/entities';
 import { CartRepository } from '../repositories/cart.repository';
@@ -22,13 +20,15 @@ export class CartService implements ServiceBase<CartEntity, CreateCartDto> {
   ) {}
 
   async create(dto: CreateCartDto): Promise<CartEntity> {
-    const user = await this.userService.findById(dto.customerId);
+    const customer = await this.userService.findById(dto.customerId);
 
-    const userAlreadyHaveCart = await this.cartRepository.findByCustomerId(
-      user.id,
-    );
+    const customerAlreadyHaveCart =
+      await this.cartRepository.findByCustomerIdAndSellerId(
+        customer.id,
+        dto.sellerId,
+      );
 
-    if (userAlreadyHaveCart) return userAlreadyHaveCart;
+    if (customerAlreadyHaveCart) return customerAlreadyHaveCart;
 
     const cart = await this.cartRepository.create(dto);
 
@@ -44,13 +44,7 @@ export class CartService implements ServiceBase<CartEntity, CreateCartDto> {
     return cart;
   }
 
-  async findById(id: string): Promise<
-    CartEntity & {
-      cartTotal: CartTotalEntity;
-      cartItems: CartItemEntity[];
-      cartCoupons: CartCouponEntity[];
-    }
-  > {
+  async findById(id: string): Promise<CartWithRelationsEntity> {
     const cart = await this.cartRepository.findById(id);
 
     if (!cart) throw new HttpException('cart not found', HttpStatus.NOT_FOUND);

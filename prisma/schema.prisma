@@ -13,20 +13,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// TODO: CRIAR INVOICE É FINANCE
+// AO CRIAR UMA ORDER CRIAR UM INVOICE, QUANDO A ORDER FOR CONFIRMADA PELA GATEWAY CRIAR O FINANCE
+
 model User {
-  id        String    @id @default(uuid())
-  firstName String
-  lastName  String
-  email     String
-  password  String?
-  phone     String?
-  avatar    String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
-  document  String?
-  rg        String?
-  birthDate DateTime? @map("birth_date") @db.Timestamp
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  id              String    @id @default(uuid())
+  firstName       String
+  lastName        String
+  email           String
+  password        String?
+  phone           String?
+  avatar          String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
+  document        String?
+  birthDate       DateTime? @map("birth_date") @db.Timestamp
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamp
+  asaasCustomerId String?   @map("asaas_customer_id")
 
   addresses      Address[]
   sellers        Seller[]
@@ -34,6 +37,7 @@ model User {
   orders         Order[]
   orderHistories OrderHistory[]
   carts          Cart[]
+  quotas         Quotas[]
 
   @@map("user")
 }
@@ -87,6 +91,7 @@ model Seller {
   socialMedias         SocialMedia[]
   paymentMethodSellers PaymentMethodSeller[]
   utmCampaigns         UtmCampaign[]
+  carts                Cart[]
 
   @@map("seller")
 }
@@ -237,8 +242,13 @@ model Raffle {
   minBuyQuotas   Int   @map("min_buy_quotas")
   maxBuyQuotas   Int   @map("max_buy_quotas")
   totalQuotas    Int   @map("total_quotas")
-  payeds         Int   @default(0)
   freePercentage Float @default(100) @map("free_percentage")
+  payeds         Int   @default(0)
+
+  digits       Int
+  initial      Int
+  final        Int
+  totalNumbers Int @map("total_numbers")
 
   drawDateAt DateTime  @map("draw_date_at") @db.Timestamp
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp
@@ -251,21 +261,23 @@ model Raffle {
   quotas           Quotas[]
   raffleCoupons    RaffleCoupon[]
   cartItems        CartItem[]
+  orderItems       OrderItem[]
 
   @@map("raffle")
 }
 
 model Quotas {
-  id       String @id @default(uuid())
-  number   Int
-  raffleId String @map("raffle_id")
+  id         String @id @default(uuid())
+  number     Int
+  raffleId   String @map("raffle_id")
+  customerId String @map("customer_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  raffle     Raffle      @relation(fields: [raffleId], references: [id])
-  orderItems OrderItem[]
+  raffle   Raffle @relation(fields: [raffleId], references: [id])
+  customer User   @relation(fields: [customerId], references: [id])
 
   @@map("quotas")
 }
@@ -305,11 +317,10 @@ model Order {
   id            String  @id @default(uuid())
   sellerId      String  @map("seller_id")
   customerId    String  @map("customer_id")
-  invoiceNumber Int     @map("invoice_number")
-  invoicePrefix String  @map("invoice_prefix")
+  invoiceNumber Int?    @map("invoice_number")
   comment       String?
-  ip            String
-  userAgent     String  @map("user_agent")
+  ip            String?
+  userAgent     String? @map("user_agent")
   orderStatusId String  @map("order_status_id")
 
   dueDate   DateTime? @db.Timestamp
@@ -485,26 +496,6 @@ model OrderStatus {
   @@map("order_status")
 }
 
-model OrderItem {
-  id       String @id @default(uuid())
-  quantity Int
-  price    Float
-  total    Float
-  tax      Float
-
-  orderId  String @map("order_id")
-  quotasId String @unique @map("quotas_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  quotas Quotas @relation(fields: [quotasId], references: [id])
-  order  Order  @relation(fields: [orderId], references: [id])
-
-  @@map("order_item")
-}
-
 model OrderTotal {
   id      String @id @default(uuid())
   orderId String @unique @map("order_id")
@@ -540,11 +531,12 @@ model PaymentMethodSeller {
 }
 
 model PaymentMethod {
-  id           String  @id @default(uuid())
-  code         String
-  name         String
-  instructions String
-  isActive     Boolean @default(true) @map("is_active")
+  id                     String  @id @default(uuid())
+  code                   String
+  name                   String
+  instructions           String
+  isActive               Boolean @default(true) @map("is_active")
+  paymentGatewayConfigId String? @map("payment_gateway_config_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
@@ -553,8 +545,24 @@ model PaymentMethod {
   paymentMethodSellers PaymentMethodSeller[]
   orderPayments        OrderPayment[]
   cartPayments         CartPayment[]
+  paymentGatewayConfig PaymentGatewayConfig? @relation(fields: [paymentGatewayConfigId], references: [id])
 
   @@map("payment_method")
+}
+
+model PaymentGatewayConfig {
+  id     String @id @default(uuid())
+  code   String
+  name   String
+  config Json
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  paymentMethods PaymentMethod[]
+
+  @@map("payment_gateway_config")
 }
 
 model OrderPayment {
@@ -571,24 +579,24 @@ model OrderPayment {
 
   order           Order            @relation(fields: [orderId], references: [id])
   address         Address          @relation(fields: [addressId], references: [id])
+  paymentMethod   PaymentMethod    @relation(fields: [paymentMethodId], references: [id])
   orderBankSlip   OrderBankSlip?
   orderCreditCard OrderCreditCard?
-  paymentMethod   PaymentMethod    @relation(fields: [paymentMethodId], references: [id])
   orderPix        OrderPix?
 
   @@map("order_payment")
 }
 
 model OrderCreditCard {
-  id              String @id @default(uuid())
+  id              String  @id @default(uuid())
   brand           String
   number          String
   name            String
-  expirationMonth Int    @map("expiration_month")
-  expirationYear  Int    @map("expiration_year")
+  expirationMonth Int     @map("expiration_month")
+  expirationYear  Int     @map("expiration_year")
   cvv             Int
-  token           String
-  status          String
+  token           String?
+  status          String?
 
   orderPaymentId String @unique @map("order_payment_id")
 
@@ -620,6 +628,7 @@ model OrderPix {
 
 model Cart {
   id         String @id @default(uuid())
+  sellerId   String @map("seller_id")
   customerId String @map("customer_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
@@ -631,8 +640,29 @@ model Cart {
   cartTotal   CartTotal?
   cartPayment CartPayment?
   cartCoupons CartCoupon[]
+  seller      Seller       @relation(fields: [sellerId], references: [id])
 
   @@map("cart")
+}
+
+model OrderItem {
+  id       String @id @default(uuid())
+  quantity Int
+  price    Float
+  total    Float
+  tax      Float
+
+  raffleId String @map("raffle_id")
+  orderId  String @map("order_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  raffle    Raffle    @relation(fields: [raffleId], references: [id])
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("order_item")
 }
 
 model CartItem {

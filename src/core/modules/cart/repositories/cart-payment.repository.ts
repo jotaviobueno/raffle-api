@@ -6,7 +6,7 @@ import { CartPaymentEntity } from 'src/domain/entities';
 @Injectable()
 export class CartPaymentRepository extends RepositoryFactory<
   CartPaymentEntity,
-  CreateCartPaymentDto
+  CreateCartPaymentDto & { method: string }
 > {
   constructor() {
     super('cartPayment');

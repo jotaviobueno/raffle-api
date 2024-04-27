@@ -34,3 +34,5 @@ export * from './utm-campaign';
 export * from './coupon';
 export * from './cart-coupon';
 export * from './raffle-coupons';
+export * from './payment-gateway-config';
+export * from './quotas';

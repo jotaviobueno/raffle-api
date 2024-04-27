@@ -6,4 +6,9 @@ export class CreateCartDto {
   @IsNotEmpty()
   @ApiProperty()
   customerId: string;
+
+  @IsUUID()
+  @IsNotEmpty()
+  @ApiProperty()
+  sellerId: string;
 }
