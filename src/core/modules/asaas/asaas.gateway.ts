@@ -2,16 +2,16 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PaymentGateway } from '../payment/gateway/payment.gateway';
 import {
   AsaasCustomerEntity,
-  OrderWithRelationsEntity,
-  PaymentAsaasResponseEntity,
+  AsaasPaymentResponseEntity,
+  CartWithRelationsEntity,
 } from 'src/domain/entities';
 import { AsaasService } from './asaas.service';
 import { CreateCheckoutDto } from 'src/domain/dtos';
 
 @Injectable()
 export class AsaasGateway extends PaymentGateway<{
-  order: OrderWithRelationsEntity;
-  payment: PaymentAsaasResponseEntity;
+  cart: CartWithRelationsEntity;
+  payment: AsaasPaymentResponseEntity;
   data?: any;
   customer: AsaasCustomerEntity;
 }> {
@@ -30,15 +30,12 @@ export class AsaasGateway extends PaymentGateway<{
     this.config = config;
   }
 
-  public async process({
-    dto,
-    order,
-  }: {
-    order: OrderWithRelationsEntity;
+  public async process(data: {
+    cart: CartWithRelationsEntity;
     dto: CreateCheckoutDto;
   }): Promise<{
-    order: OrderWithRelationsEntity;
-    payment: PaymentAsaasResponseEntity;
+    cart: CartWithRelationsEntity;
+    payment: AsaasPaymentResponseEntity;
     data?: any;
     customer: AsaasCustomerEntity;
   }> {
@@ -46,109 +43,120 @@ export class AsaasGateway extends PaymentGateway<{
 
     let customer: AsaasCustomerEntity;
 
-    if (!order.customer.asaasCustomerId)
+    if (!data.cart.customer.asaasCustomerId)
       customer = await this.asaasService.createCustomer({
-        addressNumber: order.orderPayment.address.number,
-        complement: order.orderPayment.address.complement,
-        cpfCnpj: order.customer.document.replace(/[\.-]/g, ''),
-        mobilePhone: order.customer.phone.replace(/[\D+55]/g, ''),
-        email: order.customer.email,
-        name: `${order.customer.firstName} ${order.customer.lastName}`,
-        province: order.orderPayment.address.neighborhood,
-        postalCode: order.orderPayment.address.postcode,
-        externalReference: order.customer.id,
+        addressNumber: data.cart.cartPayment.address.number,
+        complement: data.cart.cartPayment.address.complement,
+        cpfCnpj: data.cart.customer.document.replace(/[\.-]/g, ''),
+        mobilePhone: data.cart.customer.phone.replace(/[\D+55]/g, ''),
+        email: data.cart.customer.email,
+        name: `${data.cart.customer.firstName} ${data.cart.customer.lastName}`,
+        province: data.cart.cartPayment.address.neighborhood,
+        postalCode: data.cart.cartPayment.address.postcode,
+        externalReference: data.cart.customer.id,
         notificationDisabled: true,
-        address: order.orderPayment.address.street,
+        address: data.cart.cartPayment.address.street,
       });
     else
       customer = await this.asaasService.updateCustomer({
-        id: order.customer.asaasCustomerId,
-        addressNumber: order.orderPayment.address.number,
-        complement: order.orderPayment.address.complement,
-        cpfCnpj: order.customer.document.replace(/[\.-]/g, ''),
-        mobilePhone: order.customer.phone.replace(/[\D+55]/g, ''),
-        email: order.customer.email,
-        name: `${order.customer.firstName} ${order.customer.lastName}`,
-        province: order.orderPayment.address.neighborhood,
-        postalCode: order.orderPayment.address.postcode,
-        externalReference: order.customer.id,
+        id: data.cart.customer.asaasCustomerId,
+        addressNumber: data.cart.cartPayment.address.number,
+        complement: data.cart.cartPayment.address.complement,
+        cpfCnpj: data.cart.customer.document.replace(/[\.-]/g, ''),
+        mobilePhone: data.cart.customer.phone.replace(/[\D+55]/g, ''),
+        email: data.cart.customer.email,
+        name: `${data.cart.customer.firstName} ${data.cart.customer.lastName}`,
+        province: data.cart.cartPayment.address.neighborhood,
+        postalCode: data.cart.cartPayment.address.postcode,
+        externalReference: data.cart.customer.id,
         notificationDisabled: true,
-        address: order.orderPayment.address.street,
+        address: data.cart.cartPayment.address.street,
       });
 
-    switch (order.orderPayment.paymentMethod.code) {
+    switch (data.cart.cartPayment.paymentMethod.code) {
       case 'pix':
-        return this.processPix(order, customer);
+        return this.processPix(data.cart, customer, data.dto);
       case 'bank.slip':
-        return this.processBankSlip(order, customer);
+        return this.processBankSlip(data.cart, customer, data.dto);
       case 'credit.card':
-        return this.processCreditCard(order, customer, dto);
+        return this.processCreditCard(data.cart, customer, data.dto);
     }
   }
 
   private async processPix(
-    order: OrderWithRelationsEntity,
+    cart: CartWithRelationsEntity,
     customer: AsaasCustomerEntity,
+    dto: CreateCheckoutDto,
   ) {
     const payment = await this.asaasService.createPayment({
-      customer,
+      customer: customer.id,
       billingType: 'PIX',
-      value: order.orderTotal.total,
-      dueDate: order.dueDate,
-      discount: order.orderTotal.discount,
+      value: cart.cartTotal.total,
+      dueDate: new Date(),
+      discount: cart.cartTotal.discount,
+      remoteIp: dto.ip ? dto.ip : '',
     });
 
     const pix = await this.asaasService.getPixById(payment.id);
 
-    return { order, data: pix, payment, customer };
+    return { cart, data: pix, payment, customer };
   }
 
   private async processBankSlip(
-    order: OrderWithRelationsEntity,
+    cart: CartWithRelationsEntity,
     customer: AsaasCustomerEntity,
+    dto: CreateCheckoutDto,
   ) {
     const payment = await this.asaasService.createPayment({
-      customer,
+      customer: customer.id,
       billingType: 'BOLETO',
-      value: order.orderTotal.total,
+      value: cart.cartTotal.total,
       dueDate: new Date(),
+      remoteIp: dto.ip ? dto.ip : '',
     });
 
     const bankSlip = await this.asaasService.getBankSlip(payment.id);
 
-    return { order, data: bankSlip, payment, customer };
+    return { cart, data: bankSlip, payment, customer };
   }
 
   private async processCreditCard(
-    order: OrderWithRelationsEntity,
+    cart: CartWithRelationsEntity,
     customer: AsaasCustomerEntity,
     dto: CreateCheckoutDto,
   ) {
     try {
       const payment = await this.asaasService.createPayment({
-        customer,
+        customer: customer.id,
         billingType: 'CREDIT_CARD',
-        value: order.orderTotal.total,
+        value: cart.cartTotal.total,
         dueDate: new Date(),
         creditCard: {
           holderName: dto.holder,
-          number: dto.number,
-          expiryMonth: dto.expirationMonth.toString(),
+          number: dto.number.replace(/\s/g, ''),
+          expiryMonth:
+            dto.expirationMonth < 9
+              ? `0${dto.expirationMonth.toString()}`
+              : dto.expirationMonth.toString(),
           expiryYear: dto.expirationYear.toString(),
           ccv: dto.cvv.toString(),
         },
         creditCardHolderInfo: {
-          name: order.customer.firstName,
-          email: order.customer.email,
-          cpfCnpj: order.customer.document,
-          postalCode: order.orderPayment.address.postcode,
-          addressNumber: order.orderPayment.address.number,
-          addressComplement: order.orderPayment.address.street,
-          phone: order.customer.phone,
+          name: dto.holder,
+          email: cart.customer.email,
+          cpfCnpj: cart.customer.document.replace(/[\.-]/g, ''),
+          mobilePhone: cart.customer.phone.replace(/[\D+55]/g, ''),
+          postalCode: cart.cartPayment.address.postcode,
+          addressNumber: cart.cartPayment.address.number,
+          addressComplement: cart.cartPayment.address.street,
+          phone: cart.customer.phone.replace(/[\D+55]/g, ''),
         },
+        remoteIp: dto.ip ? dto.ip : '',
       });
 
-      return { order, payment, customer };
+      console.log(payment);
+
+      return { cart, payment, customer };
     } catch (e) {
       Logger.log('PROCESSS CREDIT-CARD ASAAS ERROR', e);
 

@@ -16,21 +16,39 @@ import {
   UpdateAwardDto,
 } from 'src/domain/dtos';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiNotAcceptableResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { IsPublic } from '../../auth/decorators';
 import { RoleGuard } from '../../role/guards';
 import { Roles } from '../../role/decorators';
 import { ROLE_ENUM } from 'src/common/enums';
 import { AwardService } from '../services/award.service';
+import { AwardEntity } from 'src/domain/entities';
+import { ApiOkFindAllResult } from 'src/common/decorators';
 
 @Controller('award')
 @ApiTags('award')
 @UseGuards(RoleGuard)
 @Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
+@ApiBearerAuth('defaultBearerAuth')
 export class AwardController {
   constructor(private readonly awardService: AwardService) {}
 
   @Post()
+  @ApiCreatedResponse({ type: AwardEntity })
+  @ApiBody({ type: CreateAwardDto })
+  @ApiBadRequestResponse()
+  @ApiNotFoundResponse()
+  @ApiUnauthorizedResponse()
   create(@Body() createAwardDto: CreateAwardDto) {
     return this.awardService.create(createAwardDto);
   }
@@ -39,21 +57,35 @@ export class AwardController {
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
   @IsPublic()
+  @ApiOkFindAllResult(AwardEntity)
   findAll(@Query() queryParams: SearchAwardDto) {
     return this.awardService.findAll(queryParams);
   }
 
   @Get(':id')
+  @ApiOkResponse({ type: AwardEntity })
+  @ApiNotFoundResponse()
+  @ApiUnauthorizedResponse()
   findById(@Param('id') id: string) {
     return this.awardService.findById(id);
   }
 
   @Patch(':id')
+  @ApiOkResponse({ type: AwardEntity })
+  @ApiBody({ type: UpdateAwardDto })
+  @ApiNotFoundResponse()
+  @ApiNotAcceptableResponse()
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
   update(@Param('id') id: string, @Body() updateAwardDto: UpdateAwardDto) {
     return this.awardService.update({ ...updateAwardDto, id });
   }
 
   @Delete(':id')
+  @ApiOkResponse({ type: Boolean })
+  @ApiNotFoundResponse()
+  @ApiNotAcceptableResponse()
+  @ApiUnauthorizedResponse()
   remove(@Param('id') id: string) {
     return this.awardService.remove(id);
   }

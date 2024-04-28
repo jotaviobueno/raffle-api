@@ -15,7 +15,6 @@ import { OrderRepository } from '../repositories/order.repository';
 import { CartService } from '../../cart/services/cart.service';
 import { PaymentService } from '../../payment/services/payment.service';
 import { OrderStatusService } from './order-status.service';
-import { ORDER_STATUS_ENUM } from 'src/common/enums';
 import { PrismaService } from 'src/infra/database/prisma/prisma.service';
 import {
   QueryBuilder,
@@ -40,22 +39,101 @@ export class OrderService
     private readonly cacheManager: Cache,
   ) {}
 
-  async create(
-    dto: CreateCheckoutDto & {
-      userAgent: string;
-      ip: string;
-    },
-  ): Promise<OrderWithRelationsEntity> {
+  async create(dto: CreateCheckoutDto): Promise<OrderWithRelationsEntity> {
     const cart = await this.cartService.findById(dto.cartId);
-
-    const orderStatus = await this.orderStatusService.findByName(
-      ORDER_STATUS_ENUM.PAYMENT_CREATED,
-    );
 
     return this.prismaService.$transaction(
       async (tx) => {
+        let query = {};
+
+        const response = await this.paymentService.process({ dto, cart });
+
+        switch (cart.cartPayment.paymentMethod.code) {
+          case 'pix':
+            query = {
+              customer: {
+                update: {
+                  asaasCustomerId: response.customer.id,
+                },
+              },
+              orderPayment: {
+                create: {
+                  addressId: cart.cartPayment.addressId,
+                  method: cart.cartPayment.method,
+                  paymentMethodId: cart.cartPayment.paymentMethodId,
+                  invoiceUrl: response.payment.invoiceUrl,
+                  orderPix: {
+                    create: {
+                      copyPaste: response.data.payload,
+                      image: response.data.encodedImage,
+                      expiratAt: new Date(response.data.expirationDate),
+                    },
+                  },
+                },
+              },
+            };
+            break;
+          case 'credit.card':
+            query = {
+              customer: {
+                update: {
+                  asaasCustomerId: response.customer.id,
+                },
+              },
+              orderPayment: {
+                create: {
+                  addressId: cart.cartPayment.addressId,
+                  method: cart.cartPayment.method,
+                  invoiceUrl: response.payment.invoiceUrl,
+                  paymentMethodId: cart.cartPayment.paymentMethodId,
+                  orderCreditCard: {
+                    create: {
+                      number: prettyCardNumber(dto.number),
+                      brand: creditCardType(dto.number)[0].niceType,
+                      status: response.payment.status,
+                      cvv: dto.cvv,
+                      name: dto.holder,
+                      expirationMonth: dto.expirationMonth,
+                      token: response.payment.creditCardToken,
+                      expirationYear: dto.expirationYear,
+                    },
+                  },
+                },
+              },
+            };
+            break;
+          case 'bank.slip':
+            query = {
+              customer: {
+                update: {
+                  asaasCustomerId: response.customer.id,
+                },
+              },
+              orderPayment: {
+                create: {
+                  addressId: cart.cartPayment.addressId,
+                  method: cart.cartPayment.method,
+                  paymentMethodId: cart.cartPayment.paymentMethodId,
+                  invoiceUrl: response.payment.invoiceUrl,
+                  orderBankSlip: {
+                    create: {
+                      bankSlipUrl: response.payment.bankSlipUrl,
+                      ourNumber: response.payment.nossoNumero,
+                      expirationAt: new Date(response.payment.dueDate),
+                      identificationField: response?.data?.identificationField,
+                      barCode: response.data.barCode,
+                    },
+                  },
+                },
+              },
+            };
+            break;
+        }
+
         const order = await tx.order.create({
           data: {
+            ...query,
+            invoiceNumber: +response.payment.invoiceNumber,
             dueDate: new Date(),
             ip: dto.ip,
             userAgent: dto.userAgent,
@@ -72,17 +150,6 @@ export class OrderService
                 shipping: cart.cartTotal.shipping,
                 subtotal: cart.cartTotal.subtotal,
                 total: cart.cartTotal.total,
-              },
-            },
-            orderHistories: {
-              create: {
-                customerId: cart.customerId,
-                orderStatusId: orderStatus.id,
-              },
-            },
-            orderStatus: {
-              connect: {
-                id: orderStatus.id,
               },
             },
             orderCoupons: {
@@ -106,115 +173,13 @@ export class OrderService
                 })),
               },
             },
-            orderPayment: {
-              create: {
-                addressId: cart.cartPayment.addressId,
-                method: cart.cartPayment.method,
-                paymentMethodId: cart.cartPayment.paymentMethodId,
-              },
-            },
           },
           include: {
             ...orderQueryWithRelations,
           },
         });
 
-        const response = await this.paymentService.process({ dto, order });
-
-        switch (order.orderPayment.paymentMethod.code) {
-          case 'pix':
-            return tx.order.update({
-              where: {
-                id: order.id,
-              },
-              data: {
-                invoiceNumber: +response.payment.invoiceNumber,
-                customer: {
-                  update: {
-                    asaasCustomerId: response.customer.id,
-                  },
-                },
-                orderPayment: {
-                  update: {
-                    orderPix: {
-                      create: {
-                        copyPaste: response.data.payload,
-                        image: response.data.encodedImage,
-                        expiratAt: new Date(response.data.expirationDate),
-                      },
-                    },
-                  },
-                },
-              },
-              include: {
-                ...orderQueryWithRelations,
-              },
-            });
-          case 'credit.card':
-            return tx.order.update({
-              where: {
-                id: order.id,
-              },
-              data: {
-                invoiceNumber: +response.payment.invoiceNumber,
-                customer: {
-                  update: {
-                    asaasCustomerId: response.customer.id,
-                  },
-                },
-                orderPayment: {
-                  update: {
-                    orderCreditCard: {
-                      create: {
-                        number: prettyCardNumber(dto.number),
-                        brand: creditCardType(dto.number)[0].niceType,
-                        status: response.payment.status,
-                        cvv: dto.cvv,
-                        name: dto.holder,
-                        expirationMonth: dto.expirationMonth,
-                        expirationYear: dto.expirationYear,
-                      },
-                    },
-                  },
-                },
-              },
-              include: {
-                ...orderQueryWithRelations,
-              },
-            });
-          case 'bank.slip':
-            return tx.order.update({
-              where: {
-                id: order.id,
-              },
-              data: {
-                invoiceNumber: +response.payment.invoiceNumber,
-                customer: {
-                  update: {
-                    asaasCustomerId: response.customer.id,
-                  },
-                },
-                orderPayment: {
-                  update: {
-                    orderBankSlip: {
-                      create: {
-                        bankSlipUrl: response.payment.bankSlipUrl,
-                        ourNumber: response.payment.nossoNumero,
-                        expirationAt: new Date(response.payment.dueDate),
-                        identificationField: response.data.identificationField,
-                        barCode: response.data.barCode,
-                      },
-                    },
-                  },
-                },
-              },
-              include: {
-                ...orderQueryWithRelations,
-              },
-            });
-        }
-
-        // resetar o cart
+        return order;
       },
       {
         maxWait: 20000, // default: 2000
@@ -224,6 +189,7 @@ export class OrderService
   }
 
   async asaasPostback(data: AsaasWebhookEventDto) {
+    console.log(data);
     let query = {};
 
     const order = await this.findByInvoiceNumber(+data.payment.invoiceNumber);
@@ -249,6 +215,7 @@ export class OrderService
                   update: {
                     data: {
                       status: data.payment.status,
+                      token: data.payment.creditCard.creditCardToken,
                     },
                   },
                 },
@@ -299,11 +266,15 @@ export class OrderService
                 orderStatusId: orderStatus.id,
               },
             },
+            orderPayment: {
+              update: {
+                gatewayPamentId: data.payment.id,
+                receiptUrl: data.payment.transactionReceiptUrl,
+              },
+            },
             ...query,
           },
         });
-
-        // TODO: PUXAR AS INFORMAÇÕES DA RAFFLE E CRIAR AS COTAS DO CLIENTES
       },
       {
         maxWait: 20000, // default: 2000

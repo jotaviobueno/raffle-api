@@ -22,19 +22,19 @@ export class CreateUtmCampaignDto {
 
   @IsString()
   @IsOptional()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   description?: string;
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
   @IsOptional()
-  @ApiProperty({ type: () => Date, nullable: true })
+  @ApiProperty({ type: Date, nullable: true })
   from?: Date;
 
   @IsDate()
   @Transform(({ value }) => new Date(value))
   @IsOptional()
-  @ApiProperty({ type: () => Date, nullable: true })
+  @ApiProperty({ type: Date, nullable: true })
   to?: Date;
 
   @IsBoolean()

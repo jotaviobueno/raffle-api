@@ -1,1 +1,1 @@
-export * from './customer.entity';
+export * from './asaas-customer.entity';

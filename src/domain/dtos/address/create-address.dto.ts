@@ -9,12 +9,12 @@ export class CreateAddressDto {
 
   @IsString()
   @IsOptional()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   reference?: string;
 
   @IsString()
   @IsOptional()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   complement?: string;
 
   @IsString()
@@ -34,7 +34,7 @@ export class CreateAddressDto {
 
   @IsUUID()
   @IsOptional()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   userId?: string;
 
   @IsString()
@@ -54,6 +54,6 @@ export class CreateAddressDto {
 
   @IsUUID()
   @IsOptional()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   sellerId?: string;
 }

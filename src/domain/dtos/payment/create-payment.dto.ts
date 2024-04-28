@@ -1,23 +1,26 @@
-import { AsaasCustomerEntity } from 'src/domain/entities';
-
 export interface CreateAsaasPaymentDto {
-  customer: AsaasCustomerEntity;
+  customer: string;
   billingType: string;
   value: number;
   dueDate: Date;
+  description?: string;
+  externalReference?: string;
+  installmentCount?: number;
+  installmentValue?: number;
   discount?: number;
+  postalService?: boolean;
   creditCard?: CreateAsaasPaymentCreditCardDto;
   creditCardHolderInfo?: CreateAsaasPaymentCreditCardHolderInfoDto;
   creditCardToken?: string;
-  remoteIp?: string;
+  remoteIp: string;
 }
 
 export interface CreateAsaasPaymentCreditCardDto {
-  holderName?: string;
-  number?: string;
-  expiryMonth?: string;
-  expiryYear?: string;
-  ccv?: string;
+  holderName: string;
+  number: string;
+  expiryMonth: string;
+  expiryYear: string;
+  ccv: string;
 }
 
 export interface CreateAsaasPaymentCreditCardHolderInfoDto {

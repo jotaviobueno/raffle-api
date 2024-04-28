@@ -321,9 +321,9 @@ model Order {
   comment       String?
   ip            String?
   userAgent     String? @map("user_agent")
-  orderStatusId String  @map("order_status_id")
+  orderStatusId String? @map("order_status_id")
 
-  dueDate   DateTime? @db.Timestamp
+  dueDate   DateTime? @map("due_date") @db.Timestamp
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
@@ -335,7 +335,7 @@ model Order {
   orderCoupons   OrderCoupon[]
   orderItems     OrderItem[]
   orderHistories OrderHistory[]
-  orderStatus    OrderStatus    @relation(fields: [orderStatusId], references: [id])
+  orderStatus    OrderStatus?   @relation(fields: [orderStatusId], references: [id])
 
   @@map("order")
 }
@@ -567,11 +567,14 @@ model PaymentGatewayConfig {
 
 model OrderPayment {
   id      String @id @default(uuid())
-  orderId String @unique
+  orderId String @unique @map("order_id")
   method  String
 
-  paymentMethodId String @map("payment_method_id")
-  addressId       String @map("address_id")
+  paymentMethodId String  @map("payment_method_id")
+  addressId       String  @map("address_id")
+  gatewayPamentId String? @map("gateway_payment_id")
+  receiptUrl      String? @map("receipt_url")
+  invoiceUrl      String  @map("invoice_url")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp

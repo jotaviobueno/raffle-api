@@ -19,6 +19,6 @@ export class CreatePaymentMethodDto {
 
   @IsOptional()
   @IsBoolean()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   isActive?: boolean;
 }

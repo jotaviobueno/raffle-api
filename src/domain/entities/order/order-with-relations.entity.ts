@@ -1,33 +1,33 @@
-import { AddressEntity } from '../address';
-import { OrderBankSlipEntity } from '../order-bank-slip';
-import { OrderCouponEntity } from '../order-coupon';
-import { OrderCreditCardEntity } from '../order-credit-card';
-import { OrderHistoryEntity } from '../order-history';
-import { OrderItemEntity } from '../order-item';
+import { OrderCouponWithRelationsEntity } from '../order-coupon';
+import { OrderHistoryWithRelationsEntity } from '../order-history';
+import { OrderItemWithRelationsEntity } from '../order-item';
 import { OrderStatusEntity } from '../order-status';
 import { OrderTotalEntity } from '../order-total';
-import { PaymentMethodEntity } from '../payment-method';
-import { OrderPixEntity } from '../order-pix';
 import { SellerEntity } from '../seller';
 import { UserEntity } from '../user';
-import { CouponEntity } from '../coupon';
-import { RaffleEntity } from '../raffle';
+import { OrderEntity } from './order.entity';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { OrderPaymentWithRelations } from '../order-payment';
 
-export class OrderWithRelationsEntity {
-  id: string;
-  sellerId: string;
-  customerId: string;
-  invoiceNumber: number | null;
-  comment: string | null;
-  ip: string | null;
-  userAgent: string | null;
-  dueDate: Date | null;
-  orderStatusId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
-  //
+export class OrderWithRelationsEntity extends OrderEntity {
+  @ApiProperty({ type: SellerEntity })
   seller: SellerEntity;
+
+  @ApiProperty({
+    type: PickType(UserEntity, [
+      'id',
+      'firstName',
+      'lastName',
+      'phone',
+      'document',
+      'email',
+      'avatar',
+      'asaasCustomerId',
+      'createdAt',
+      'updatedAt',
+      'deletedAt',
+    ]),
+  })
   customer: Pick<
     UserEntity,
     | 'id'
@@ -42,17 +42,23 @@ export class OrderWithRelationsEntity {
     | 'updatedAt'
     | 'deletedAt'
   >;
-  orderPayment?: {
-    paymentMethod: PaymentMethodEntity;
-    address: AddressEntity;
-    orderBankSlip?: OrderBankSlipEntity;
-    orderCreditCard?: OrderCreditCardEntity;
-    orderPix?: OrderPixEntity;
-  };
+
+  @ApiProperty({ type: OrderPaymentWithRelations, nullable: true })
+  orderPayment?: OrderPaymentWithRelations;
+
+  @ApiProperty({ type: OrderTotalEntity, nullable: true })
   orderTotal?: OrderTotalEntity;
-  orderCoupons?: (OrderCouponEntity & { coupon: CouponEntity })[];
-  orderItems: (OrderItemEntity & { raffle: RaffleEntity })[];
-  orderHistories: (OrderHistoryEntity & { orderStatus: OrderStatusEntity })[];
+
+  @ApiProperty({ type: [OrderCouponWithRelationsEntity] })
+  orderCoupons: OrderCouponWithRelationsEntity[];
+
+  @ApiProperty({ type: [OrderItemWithRelationsEntity] })
+  orderItems: OrderItemWithRelationsEntity[];
+
+  @ApiProperty({ type: [OrderHistoryWithRelationsEntity] })
+  orderHistories: OrderHistoryWithRelationsEntity[];
+
+  @ApiProperty({ type: OrderStatusEntity })
   orderStatus: OrderStatusEntity;
 }
 

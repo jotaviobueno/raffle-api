@@ -5,7 +5,7 @@ export class CreateCartItemDto {
   @IsInt()
   @IsNotEmpty()
   @Min(1)
-  @ApiProperty({ type: () => Number })
+  @ApiProperty({ type: Number })
   quantity: number;
 
   @IsUUID()

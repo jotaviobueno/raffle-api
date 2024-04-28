@@ -8,7 +8,7 @@ import {
 } from 'src/domain/dtos';
 import {
   AsaasCustomerEntity,
-  PaymentAsaasResponseEntity,
+  AsaasPaymentResponseEntity,
 } from 'src/domain/entities';
 
 @Injectable()
@@ -82,32 +82,17 @@ export class AsaasService {
 
   public async createPayment(
     dto: CreateAsaasPaymentDto,
-  ): Promise<PaymentAsaasResponseEntity> {
+  ): Promise<AsaasPaymentResponseEntity> {
     try {
-      const { data } = await this.setup().post<PaymentAsaasResponseEntity>(
-        '/payments',
+      const { data } = await this.setup().post<AsaasPaymentResponseEntity>(
+        '/payments/',
         {
-          customer: dto.customer.id,
+          customer: dto.customer,
           billingType: dto.billingType,
           value: dto.value,
           dueDate: dto.dueDate,
         },
       );
-
-      switch (dto.billingType) {
-        case 'BOLETO':
-          data.interest = { value: +this.interest };
-          data.fine = { value: +this.fine };
-        case 'CREDIT_CARD':
-          if (dto.creditCardToken) {
-            data.creditCardToken = dto.creditCardToken;
-          } else {
-            data.creditCard = dto.creditCard;
-            data.creditCardHolderInfo = dto.creditCardHolderInfo;
-          }
-      }
-
-      console.log(data);
 
       return data;
     } catch (e) {

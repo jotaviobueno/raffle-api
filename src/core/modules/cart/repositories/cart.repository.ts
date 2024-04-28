@@ -8,6 +8,7 @@ import {
   CartTotalEntity,
   CartWithRelationsEntity,
   QueryBuilderEntity,
+  cartQueryWithRelations,
 } from 'src/domain/entities';
 
 @Injectable()
@@ -89,42 +90,7 @@ export class CartRepository extends RepositoryFactory<
         deletedAt: null,
       },
       include: {
-        cartTotal: {
-          where: {
-            deletedAt: null,
-          },
-        },
-        cartItems: {
-          where: {
-            deletedAt: null,
-          },
-        },
-        cartCoupons: {
-          where: {
-            deletedAt: null,
-          },
-        },
-        cartPayment: {
-          include: {
-            address: true,
-            paymentMethod: true,
-          },
-        },
-        seller: true,
-        customer: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            phone: true,
-            document: true,
-            email: true,
-            createdAt: true,
-            updatedAt: true,
-            deletedAt: true,
-            avatar: true,
-          },
-        },
+        ...cartQueryWithRelations,
       },
     });
   }

@@ -30,7 +30,7 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   password?: string;
 
   @IsPhoneNumber()
@@ -40,22 +40,22 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
+  @ApiProperty({ nullable: true, required: false })
   document?: string;
-
-  @IsString()
-  @IsOptional()
-  rg?: string;
 
   @IsDate()
   @IsOptional()
   @Transform(({ value }) => new Date(value))
+  @ApiProperty({ nullable: true, type: Date })
   birthDate?: Date;
 
   @IsEnum(PUBLIC_ROLE_ENUM)
   @IsNotEmpty()
+  @ApiProperty({ nullable: true, enum: PUBLIC_ROLE_ENUM })
   code: keyof typeof PUBLIC_ROLE_ENUM;
 
   @IsUUID()
   @IsOptional()
+  @ApiProperty({ nullable: true, required: false })
   sellerId?: string;
 }

@@ -10,7 +10,15 @@ import { AuthService } from './auth.service';
 import { CurrentUser } from '../user/decorators';
 import { IsPublic } from './decorators';
 import { CreateAuthDto } from 'src/domain/dtos';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+  OmitType,
+} from '@nestjs/swagger';
 import { UserEntity } from 'src/domain/entities';
 
 @Controller('auth')
@@ -21,11 +29,17 @@ export class AuthController {
   @Post()
   @IsPublic()
   @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: CreateAuthDto })
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
   create(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.create(createAuthDto);
   }
 
   @Get('/who-am-i')
+  @ApiBearerAuth('defaultBearerAuth')
+  @ApiOkResponse({ type: OmitType(UserEntity, ['password']) })
+  @ApiUnauthorizedResponse()
   whoAmI(@CurrentUser() user: Omit<UserEntity, 'password'>) {
     return user;
   }

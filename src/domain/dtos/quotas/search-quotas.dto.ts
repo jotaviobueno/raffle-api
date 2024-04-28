@@ -5,12 +5,12 @@ import { ApiProperty } from '@nestjs/swagger';
 export class SearchQuotasDto extends QueryParamsDto {
   @IsOptional()
   @IsUUID()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   raffleId?: string;
 
   @IsOptional()
   @IsUUID()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   customerId?: string;
 
   @IsInt()

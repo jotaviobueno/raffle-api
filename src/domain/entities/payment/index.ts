@@ -1,1 +1,1 @@
-export * from './payment-asaas-response.entity';
+export * from './asaas-payment-response.entity';

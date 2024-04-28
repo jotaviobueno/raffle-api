@@ -1,9 +1,6 @@
-import {
-  CreateAsaasPaymentCreditCardDto,
-  CreateAsaasPaymentCreditCardHolderInfoDto,
-} from 'src/domain/dtos';
+import { CreateAsaasPaymentCreditCardHolderInfoDto } from 'src/domain/dtos';
 
-export class PaymentAsaasResponseEntity {
+export class AsaasPaymentResponseEntity {
   object: string;
   id: string;
   dateCreated: string;
@@ -45,6 +42,10 @@ export class PaymentAsaasResponseEntity {
   anticipable: boolean;
   refunds: any;
   creditCardToken?: string;
-  creditCard?: CreateAsaasPaymentCreditCardDto;
+  creditCard?: {
+    creditCardNumber: string;
+    creditCardBrand: string;
+    creditCardToken: string;
+  };
   creditCardHolderInfo?: CreateAsaasPaymentCreditCardHolderInfoDto;
 }

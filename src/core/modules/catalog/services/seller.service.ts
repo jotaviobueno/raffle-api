@@ -9,6 +9,7 @@ import { ServiceBase } from 'src/common/base';
 import {
   CreateSellerDto,
   QueryParamsDto,
+  SearchSellerDto,
   UpdateSellerDto,
 } from 'src/domain/dtos';
 import { FindAllResultEntity, SellerEntity } from 'src/domain/entities';
@@ -64,9 +65,10 @@ export class SellerService
     return seller;
   }
 
-  async findAll(
-    queryParams: QueryParamsDto,
-  ): Promise<FindAllResultEntity<SellerEntity>> {
+  async findAll({
+    name,
+    ...queryParams
+  }: SearchSellerDto): Promise<FindAllResultEntity<SellerEntity>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =
@@ -76,7 +78,11 @@ export class SellerService
 
     if (cache) return cache;
 
-    const query = new QueryBuilder(queryParams).sort().pagination().handle();
+    const query = new QueryBuilder(queryParams)
+      .where({ name: name && { contains: name } })
+      .sort()
+      .pagination()
+      .handle();
 
     const sellers = await this.sellerRepository.findAll(query);
     const total = await this.sellerRepository.count(query.where);

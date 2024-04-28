@@ -11,12 +11,12 @@ import { QueryParamsDto } from '../shared';
 export class SearchCouponDto extends QueryParamsDto {
   @IsString()
   @IsOptional()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   name?: string;
 
   @IsString()
   @IsOptional()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   code?: string;
 
   @IsBoolean()
@@ -26,7 +26,7 @@ export class SearchCouponDto extends QueryParamsDto {
 
   @IsUUID()
   @IsOptional()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   utmCampaignId?: string;
 
   @IsDate()

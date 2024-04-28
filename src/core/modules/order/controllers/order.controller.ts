@@ -11,10 +11,21 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { IsPublic } from '../../auth/decorators';
 import { OrderService } from '../services/order.service';
 import { CreateCheckoutDto, QueryParamsDto } from 'src/domain/dtos';
+import { OrderEntity, OrderWithRelationsEntity } from 'src/domain/entities';
+import { ApiOkFindAllResult } from 'src/common/decorators';
 
 @Controller('order')
 @ApiTags('order')
@@ -22,6 +33,12 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
+  @ApiCreatedResponse({ type: OrderWithRelationsEntity })
+  @ApiBody({ type: CreateCheckoutDto })
+  @ApiInternalServerErrorResponse()
+  @ApiBadRequestResponse()
+  @ApiUnauthorizedResponse()
+  @ApiNotFoundResponse()
   create(@Body() createCheckoutDto: CreateCheckoutDto, @Req() req: Request) {
     return this.orderService.create({
       ...createCheckoutDto,
@@ -41,12 +58,15 @@ export class OrderController {
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
   @IsPublic()
+  @ApiOkFindAllResult(OrderEntity)
   findAll(@Query() queryParams: QueryParamsDto) {
     return this.orderService.findAll(queryParams);
   }
 
   @Get(':id')
   @IsPublic()
+  @ApiOkResponse({ type: OrderWithRelationsEntity })
+  @ApiNotFoundResponse()
   findById(@Param('id') id: string) {
     return this.orderService.findById(id);
   }

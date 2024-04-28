@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsCreditCard,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -13,13 +14,12 @@ export class CreateCheckoutDto {
   @ApiProperty()
   cartId: string;
 
-  @ApiProperty({ nullable: true })
-  // @IsCreditCard()
-  @IsString()
+  @ApiProperty({ nullable: true, required: false })
+  @IsCreditCard()
   @IsOptional()
   number?: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   @IsString()
   @IsOptional()
   holder?: string;
@@ -38,4 +38,8 @@ export class CreateCheckoutDto {
   @IsNumber()
   @IsOptional()
   cvv?: number;
+
+  userAgent: string;
+
+  ip: string;
 }

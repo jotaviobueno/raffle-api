@@ -12,17 +12,17 @@ import { Transform } from 'class-transformer';
 export class SearchUtmCampaignDto extends QueryParamsDto {
   @IsUUID()
   @IsOptional()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   sellerId?: string;
 
   @IsString()
   @IsOptional()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   name?: string;
 
   @IsString()
   @IsOptional()
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ nullable: true, required: false })
   description?: string;
 
   @IsDate()
