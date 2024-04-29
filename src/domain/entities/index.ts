@@ -36,3 +36,5 @@ export * from './cart-coupon';
 export * from './raffle-coupons';
 export * from './payment-gateway-config';
 export * from './quotas';
+export * from './finance';
+export * from './winner';

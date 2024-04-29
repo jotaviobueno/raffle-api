@@ -13,6 +13,7 @@ import { CartModule } from './core/modules/cart/cart.module';
 import { OrderModule } from './core/modules/order/order.module';
 import { PaymentModule } from './core/modules/payment/payment.module';
 import { MarketingModule } from './core/modules/marketing/marketing.module';
+import { FinanceModule } from './core/modules/finance/finance.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { MarketingModule } from './core/modules/marketing/marketing.module';
     OrderModule,
     PaymentModule,
     MarketingModule,
+    FinanceModule,
   ],
   providers: [
     {

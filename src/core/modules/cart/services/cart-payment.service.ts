@@ -37,17 +37,12 @@ export class CartPaymentService
       method: paymentMethod.name,
     });
 
-    const fee = asaasCalculateFeeUtil(
-      paymentMethod,
-      cart.cartTotal.total,
-      cart.cartTotal.discount,
-    );
+    const fee = asaasCalculateFeeUtil(paymentMethod, cart.cartTotal.total);
 
-    // TODO: PROBLEMA AQUI
     await this.cartTotalService.update({
       id: cart.cartTotal.id,
-      fee: fee.fee,
-      total: fee.total,
+      fee,
+      total: cart.cartTotal.total + fee,
     });
 
     return cartPayment;

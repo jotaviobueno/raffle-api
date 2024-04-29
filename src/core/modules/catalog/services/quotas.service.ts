@@ -7,7 +7,6 @@ import { QueryBuilder, randomNumberWithRangeUtil } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { QutoasRepository } from '../repositories/quotas.repository';
 import { UserService } from '../../user/services/user.service';
-import { PrismaService } from 'src/infra/database/prisma/prisma.service';
 
 @Injectable()
 export class QuotasService
@@ -19,7 +18,6 @@ export class QuotasService
     private readonly raffleService: RaffleService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    private readonly prismaService: PrismaService,
   ) {}
 
   async create(dto: CreateQuotasDto): Promise<QutoasEntity> {
@@ -38,11 +36,6 @@ export class QuotasService
     });
 
     return quotas;
-  }
-
-  // TODO: REMOVER ISSO DEPOIS
-  async clear() {
-    return this.prismaService.quotas.deleteMany({ where: {} });
   }
 
   async findAll({
@@ -86,6 +79,21 @@ export class QuotasService
     });
 
     return { data: quotas, info };
+  }
+
+  async findByNumberAndRaffleId(
+    number: string,
+    raffleId: string,
+  ): Promise<QutoasEntity> {
+    const quotas = await this.qutoasRepository.findByNumberAndRaffleId(
+      number,
+      raffleId,
+    );
+
+    if (!quotas)
+      throw new HttpException('Quotas not found', HttpStatus.NOT_FOUND);
+
+    return quotas;
   }
 
   async findById(id: string): Promise<QutoasEntity> {

@@ -3,8 +3,7 @@ import { PaymentMethodEntity } from 'src/domain/entities';
 export function asaasCalculateFeeUtil(
   paymentMethod: PaymentMethodEntity,
   value: number,
-  discount: number,
-): { total: number; fee: number } {
+): number {
   let fee = 0;
 
   switch (paymentMethod.code) {
@@ -19,5 +18,5 @@ export function asaasCalculateFeeUtil(
       break;
   }
 
-  return { total: value + fee - discount, fee };
+  return fee;
 }

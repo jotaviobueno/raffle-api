@@ -67,12 +67,6 @@ export class CartItemService
       total: dto.quantity * raffle.price,
     });
 
-    console.log({
-      id: cart.cartTotal.id,
-      total: dto.quantity * raffle.price + cart.cartTotal.total,
-      subtotal: dto.quantity * raffle.price + cart.cartTotal.subtotal,
-    });
-
     await this.cartTotalService.update({
       id: cart.cartTotal.id,
       total: dto.quantity * raffle.price + cart.cartTotal.total,

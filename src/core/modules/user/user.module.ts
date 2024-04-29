@@ -1,6 +1,5 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { UserController } from './controllers/user.controller';
-import { PrismaModule } from 'src/infra/database/prisma/prisma.module';
 import { RedisModule } from 'src/infra/redis/redis.module';
 import { UserRepository } from './repositories/user.repository';
 import { UserService } from './services/user.service';
@@ -13,7 +12,6 @@ import { SettingModule } from '../setting/setting.module';
 
 @Module({
   imports: [
-    PrismaModule,
     RedisModule,
     SettingModule,
     RoleModule,

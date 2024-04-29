@@ -25,3 +25,5 @@ export * from './cart-coupon';
 export * from './order-status';
 export * from './asaas-webhook-event';
 export * from './quotas';
+export * from './finance';
+export * from './winner';

@@ -35,6 +35,7 @@ model User {
   carts          Cart[]
   quotas         Quotas[]
   finances       Finance[]
+  winners        Winner[]
 
   @@map("user")
 }
@@ -259,6 +260,7 @@ model Raffle {
   raffleCoupons    RaffleCoupon[]
   cartItems        CartItem[]
   orderItems       OrderItem[]
+  winners          Winner[]
 
   @@map("raffle")
 }
@@ -735,9 +737,31 @@ model Finance {
   customerId String @map("customer_id")
   sellerId   String @map("seller_id")
 
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
   customer User   @relation(fields: [customerId], references: [id])
   order    Order? @relation(fields: [orderId], references: [id])
   seller   Seller @relation(fields: [sellerId], references: [id])
 
   @@map("finance")
 }
+
+model Winner {
+  id         String @id @default(uuid())
+  number     String
+  raffleId   String @map("raffle_id")
+  customerId String @map("customer_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  raffle   Raffle @relation(fields: [raffleId], references: [id])
+  customer User   @relation(fields: [customerId], references: [id])
+
+  @@map("winner")
+}
+
+// TODO: CRIAR INVOICE

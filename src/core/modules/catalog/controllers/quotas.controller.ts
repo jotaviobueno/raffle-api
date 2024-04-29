@@ -46,12 +46,6 @@ export class QuotasController {
     return this.quotasService.create(createQuotasDto);
   }
 
-  @Get('/clear')
-  @IsPublic()
-  clear() {
-    return this.quotasService.clear();
-  }
-
   @Get()
   @IsPublic()
   @ApiOkFindAllResult(QutoasEntity)
