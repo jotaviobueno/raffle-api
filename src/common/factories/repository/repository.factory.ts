@@ -16,6 +16,14 @@ export class RepositoryFactory<K, T = void, J = void> {
     });
   }
 
+  upsert({ id, ...data }: T & { id?: string }): Promise<K> {
+    return this.prismaService[this.model].upsert({
+      create: { ...data },
+      update: { ...data },
+      where: { id },
+    });
+  }
+
   update({ id, ...data }: J & { id: string }): Promise<K | null> {
     return this.prismaService[this.model].update({
       where: {

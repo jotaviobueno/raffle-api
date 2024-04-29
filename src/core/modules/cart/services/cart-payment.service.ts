@@ -16,9 +16,9 @@ export class CartPaymentService
   constructor(
     private readonly paymentMethodService: PaymentMethodService,
     private readonly addressService: AddressService,
-    private readonly cartPaymentRepository: CartPaymentRepository,
     private readonly cartService: CartService,
     private readonly cartTotalService: CartTotalService,
+    private readonly cartPaymentRepository: CartPaymentRepository,
   ) {}
 
   async create(dto: CreateCartPaymentDto): Promise<CartPaymentEntity> {
@@ -30,7 +30,13 @@ export class CartPaymentService
 
     const address = await this.addressService.findById(dto.addressId);
 
-    const cartPayment = await this.cartPaymentRepository.create({
+    const cartAlreadyHavePaymentMethod =
+      await this.cartPaymentRepository.findByCartId(cart.id);
+
+    const cartPayment = await this.cartPaymentRepository.upsert({
+      id: cartAlreadyHavePaymentMethod?.id
+        ? cartAlreadyHavePaymentMethod?.id
+        : '',
       cartId: cart.id,
       paymentMethodId: paymentMethod.id,
       addressId: address.id,

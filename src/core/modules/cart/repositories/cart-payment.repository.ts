@@ -11,4 +11,10 @@ export class CartPaymentRepository extends RepositoryFactory<
   constructor() {
     super('cartPayment');
   }
+
+  findByCartId(cartId: string): Promise<CartPaymentEntity | null> {
+    return this.prismaService.cartPayment.findFirst({
+      where: { cartId, deletedAt: null },
+    });
+  }
 }
