@@ -101,12 +101,7 @@ export class AsaasService {
     try {
       const { data } = await this.setup().post<AsaasPaymentResponseEntity>(
         '/payments/',
-        {
-          customer: dto.customer,
-          billingType: dto.billingType,
-          value: dto.value,
-          dueDate: dto.dueDate,
-        },
+        dto,
       );
 
       return data;
