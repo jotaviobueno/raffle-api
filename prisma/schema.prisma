@@ -91,6 +91,7 @@ model Seller {
   utmCampaigns         UtmCampaign[]
   carts                Cart[]
   finances             Finance[]
+  mail                 Mail?
 
   @@map("seller")
 }
@@ -764,4 +765,24 @@ model Winner {
   @@map("winner")
 }
 
-// TODO: CRIAR INVOICE
+model Mail {
+  id                 String  @id @default(uuid())
+  host               String
+  port               String
+  user               String
+  pass               String
+  fromEmail          String  @map("from_email")
+  fromName           String  @map("from_name")
+  secure             Boolean @default(false)
+  rejectUnauthorized Boolean @default(false)
+
+  sellerId String @unique @map("seller_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  seller Seller @relation(fields: [sellerId], references: [id])
+
+  @@map("mail")
+}

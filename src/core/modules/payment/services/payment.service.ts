@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AsaasGateway } from '../../asaas/asaas.gateway';
+import { AsaasGateway } from '../../asaas/gateway/asaas.gateway';
 import { CartWithRelationsEntity } from 'src/domain/entities';
 import { PaymentMethodService } from './payment-method.service';
 import { CreateCheckoutDto } from 'src/domain/dtos';

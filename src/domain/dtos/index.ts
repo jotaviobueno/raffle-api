@@ -27,3 +27,4 @@ export * from './asaas-webhook-event';
 export * from './quotas';
 export * from './finance';
 export * from './winner';
+export * from './mail';
