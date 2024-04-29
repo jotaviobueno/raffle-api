@@ -20,7 +20,7 @@ import { S3Service } from '../../setting/services/s3.service';
 export class UserService
   implements
     ServiceBase<
-      UserEntity | Omit<UserEntity, 'password' | 'asaasCustomerId'>,
+      UserEntity | Omit<UserEntity, 'password'>,
       CreateUserDto,
       UpdateUserDto
     >
@@ -38,7 +38,7 @@ export class UserService
     sellerId,
     code,
     ...dto
-  }: CreateUserDto): Promise<Omit<UserEntity, 'password' | 'asaasCustomerId'>> {
+  }: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
     if (code != ROLE_ENUM.USER) {
       if (dto.password)
         throw new HttpException(
@@ -87,9 +87,7 @@ export class UserService
 
   async findAll(
     queryParams: QueryParamsDto,
-  ): Promise<
-    FindAllResultEntity<Omit<UserEntity, 'password' | 'asaasCustomerId'>>
-  > {
+  ): Promise<FindAllResultEntity<Omit<UserEntity, 'password'>>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache = await this.cacheManager.get<FindAllResultEntity<
@@ -119,7 +117,7 @@ export class UserService
   }
 
   async findByIdAndPopulate(id: string): Promise<
-    Omit<UserEntity, 'password' | 'asaasCustomerId'> & {
+    Omit<UserEntity, 'password'> & {
       userRoles: (UserRoleEntity & {
         role: RoleEntity;
       })[];
@@ -168,7 +166,7 @@ export class UserService
     file,
     ...dto
   }: UpdateUserDto & { file?: Express.Multer.File }): Promise<
-    Omit<UserEntity, 'password' | 'asaasCustomerId'>
+    Omit<UserEntity, 'password'>
   > {
     const user = await this.findById(dto.id);
 

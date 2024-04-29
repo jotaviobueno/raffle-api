@@ -27,6 +27,37 @@ export class CartItemService
 
     const raffle = await this.raffleService.findById(dto.raffleId);
 
+    if (
+      ((raffle.payeds + dto.quantity) / raffle.final) * 100 >
+      raffle.totalNumbers
+    )
+      throw new HttpException(
+        'You need to decrease your order quantity',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
+    if (
+      new Date() > raffle.drawDateAt ||
+      raffle.progressPercentage >= 100 ||
+      raffle.payeds >= raffle.totalNumbers
+    )
+      throw new HttpException(
+        'Raffle has already been completed',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
+    if (dto.quantity < raffle.minBuyQuotas)
+      throw new HttpException(
+        'Minimum purchase exceeded',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
+    if (dto.quantity > raffle.maxBuyQuotas)
+      throw new HttpException(
+        'Maximum purchase exceeded',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
     const cartItem = await this.cartItemRepository.create({
       cartId: cart.id,
       raffleId: raffle.id,
@@ -36,10 +67,16 @@ export class CartItemService
       total: dto.quantity * raffle.price,
     });
 
+    console.log({
+      id: cart.cartTotal.id,
+      total: dto.quantity * raffle.price + cart.cartTotal.total,
+      subtotal: dto.quantity * raffle.price + cart.cartTotal.subtotal,
+    });
+
     await this.cartTotalService.update({
       id: cart.cartTotal.id,
       total: dto.quantity * raffle.price + cart.cartTotal.total,
-      subtotal: dto.quantity * raffle.price + cart.cartTotal.total,
+      subtotal: dto.quantity * raffle.price + cart.cartTotal.subtotal,
     });
 
     return cartItem;

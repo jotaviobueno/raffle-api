@@ -1,5 +1,5 @@
 import { CartCouponEntity } from '../cart-coupon';
-import { CartItemEntity } from '../cart-item';
+import { CartItemWithRelationsEntity } from '../cart-item';
 import { CartTotalEntity } from '../cart-total';
 import { UserEntity } from '../user';
 import { SellerEntity } from '../seller';
@@ -12,13 +12,11 @@ export class CartWithRelationsEntity extends CartEntity {
     type: PickType(UserEntity, [
       'id',
       'firstName',
-      'asaasCustomerId',
       'lastName',
       'phone',
       'document',
       'email',
       'avatar',
-      'asaasCustomerId',
       'createdAt',
       'updatedAt',
       'deletedAt',
@@ -27,7 +25,6 @@ export class CartWithRelationsEntity extends CartEntity {
   customer: Pick<
     UserEntity,
     | 'id'
-    | 'asaasCustomerId'
     | 'firstName'
     | 'lastName'
     | 'phone'
@@ -42,8 +39,8 @@ export class CartWithRelationsEntity extends CartEntity {
   @ApiProperty({ type: CartTotalEntity, nullable: true })
   cartTotal?: CartTotalEntity;
 
-  @ApiProperty({ type: [CartItemEntity] })
-  cartItems: CartItemEntity[];
+  @ApiProperty({ type: [CartItemWithRelationsEntity] })
+  cartItems: CartItemWithRelationsEntity[];
 
   @ApiProperty({ type: [CartCouponEntity] })
   cartCoupons: CartCouponEntity[];
@@ -65,6 +62,9 @@ export const cartQueryWithRelations = {
     where: {
       deletedAt: null,
     },
+    include: {
+      raffle: true,
+    },
   },
   cartCoupons: {
     where: {
@@ -85,7 +85,6 @@ export const cartQueryWithRelations = {
       lastName: true,
       phone: true,
       document: true,
-      asaasCustomerId: true,
       email: true,
       createdAt: true,
       updatedAt: true,

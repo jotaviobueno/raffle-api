@@ -21,6 +21,9 @@ export class OrderTotalEntity implements OrderTotal {
   shipping: number;
 
   @ApiProperty({ type: Number })
+  fee: number;
+
+  @ApiProperty({ type: Number })
   total: number;
 
   @ApiProperty({ type: Date })

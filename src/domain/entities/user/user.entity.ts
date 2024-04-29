@@ -15,7 +15,6 @@ export class UserEntity implements User {
   email: string;
 
   password: string | null;
-  asaasCustomerId: string | null;
 
   @ApiProperty({ nullable: true })
   phone: string | null;

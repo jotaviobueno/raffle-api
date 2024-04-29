@@ -26,9 +26,6 @@ export class OrderCreditCardEntity implements OrderCreditCard {
   @ApiProperty({ nullable: true })
   token: string | null;
 
-  @ApiProperty({ nullable: true })
-  status: string | null;
-
   @ApiProperty()
   orderPaymentId: string;
 

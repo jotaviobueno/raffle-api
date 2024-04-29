@@ -6,6 +6,8 @@ import { PaymentMethodService } from '../../payment/services/payment-method.serv
 import { AddressService } from '../../user/services/address.service';
 import { CartPaymentRepository } from '../repositories/cart-payment.repository';
 import { CartService } from './cart.service';
+import { CartTotalService } from './cart-total.service';
+import { asaasCalculateFeeUtil } from 'src/common/utils';
 
 @Injectable()
 export class CartPaymentService
@@ -16,6 +18,7 @@ export class CartPaymentService
     private readonly addressService: AddressService,
     private readonly cartPaymentRepository: CartPaymentRepository,
     private readonly cartService: CartService,
+    private readonly cartTotalService: CartTotalService,
   ) {}
 
   async create(dto: CreateCartPaymentDto): Promise<CartPaymentEntity> {
@@ -32,6 +35,19 @@ export class CartPaymentService
       paymentMethodId: paymentMethod.id,
       addressId: address.id,
       method: paymentMethod.name,
+    });
+
+    const fee = asaasCalculateFeeUtil(
+      paymentMethod,
+      cart.cartTotal.total,
+      cart.cartTotal.discount,
+    );
+
+    // TODO: PROBLEMA AQUI
+    await this.cartTotalService.update({
+      id: cart.cartTotal.id,
+      fee: fee.fee,
+      total: fee.total,
     });
 
     return cartPayment;

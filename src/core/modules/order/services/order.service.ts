@@ -42,6 +42,33 @@ export class OrderService
   async create(dto: CreateCheckoutDto): Promise<OrderWithRelationsEntity> {
     const cart = await this.cartService.findById(dto.cartId);
 
+    if (!cart.cartPayment)
+      throw new HttpException(
+        'Cart payment do not exist',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
+    for (const item of cart.cartItems) {
+      if (
+        ((item.raffle.payeds + item.quantity) / item.raffle.final) * 100 >
+        item.raffle.totalNumbers
+      )
+        throw new HttpException(
+          'You need to decrease your order quantity',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+
+      if (
+        new Date() > item.raffle.drawDateAt ||
+        item.raffle.progressPercentage >= 100 ||
+        item.raffle.payeds >= item.raffle.totalNumbers
+      )
+        throw new HttpException(
+          'Raffle has already been completed',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+    }
+
     return this.prismaService.$transaction(
       async (tx) => {
         let query = {};
@@ -51,11 +78,6 @@ export class OrderService
         switch (cart.cartPayment.paymentMethod.code) {
           case 'pix':
             query = {
-              customer: {
-                update: {
-                  asaasCustomerId: response.customer.id,
-                },
-              },
               orderPayment: {
                 create: {
                   addressId: cart.cartPayment.addressId,
@@ -75,14 +97,10 @@ export class OrderService
             break;
           case 'credit.card':
             query = {
-              customer: {
-                update: {
-                  asaasCustomerId: response.customer.id,
-                },
-              },
               orderPayment: {
                 create: {
                   addressId: cart.cartPayment.addressId,
+                  status: response.payment.status,
                   method: cart.cartPayment.method,
                   invoiceUrl: response.payment.invoiceUrl,
                   paymentMethodId: cart.cartPayment.paymentMethodId,
@@ -90,7 +108,6 @@ export class OrderService
                     create: {
                       number: prettyCardNumber(dto.number),
                       brand: creditCardType(dto.number)[0].niceType,
-                      status: response.payment.status,
                       cvv: dto.cvv,
                       name: dto.holder,
                       expirationMonth: dto.expirationMonth,
@@ -104,11 +121,6 @@ export class OrderService
             break;
           case 'bank.slip':
             query = {
-              customer: {
-                update: {
-                  asaasCustomerId: response.customer.id,
-                },
-              },
               orderPayment: {
                 create: {
                   addressId: cart.cartPayment.addressId,
@@ -137,7 +149,11 @@ export class OrderService
             dueDate: new Date(),
             ip: dto.ip,
             userAgent: dto.userAgent,
-            customer: { connect: { id: cart.customer.id } },
+            customer: {
+              connect: {
+                id: cart.customer.id,
+              },
+            },
             seller: {
               connect: {
                 id: cart.seller.id,
@@ -150,6 +166,7 @@ export class OrderService
                 shipping: cart.cartTotal.shipping,
                 subtotal: cart.cartTotal.subtotal,
                 total: cart.cartTotal.total,
+                fee: cart.cartTotal.fee,
               },
             },
             orderCoupons: {
@@ -179,6 +196,42 @@ export class OrderService
           },
         });
 
+        const cartItemsIds = cart.cartItems.map((cartItem) => cartItem.id);
+        const cartCouponsIds = cart.cartCoupons.map(
+          (cartCoupon) => cartCoupon.id,
+        );
+
+        await tx.cart.update({
+          where: {
+            id: cart.id,
+          },
+          data: {
+            cartItems: {
+              deleteMany: {
+                id: { in: cartItemsIds },
+              },
+            },
+            cartTotal: {
+              update: {
+                subtotal: 0,
+                total: 0,
+                fee: 0,
+                discount: 0,
+                discountManual: 0,
+                shipping: 0,
+              },
+            },
+            cartCoupons: {
+              deleteMany: {
+                id: { in: cartCouponsIds },
+              },
+            },
+            cartPayment: {
+              delete: true,
+            },
+          },
+        });
+
         return order;
       },
       {
@@ -189,7 +242,6 @@ export class OrderService
   }
 
   async asaasPostback(data: AsaasWebhookEventDto) {
-    console.log(data);
     let query = {};
 
     const order = await this.findByInvoiceNumber(+data.payment.invoiceNumber);
@@ -211,11 +263,15 @@ export class OrderService
           query = {
             orderPayment: {
               update: {
-                orderCreditCard: {
-                  update: {
-                    data: {
-                      status: data.payment.status,
-                      token: data.payment.creditCard.creditCardToken,
+                data: {
+                  status: data?.payment?.status,
+                  gatewayPamentId: data.payment.id,
+                  receiptUrl: data.payment.transactionReceiptUrl,
+                  orderCreditCard: {
+                    update: {
+                      data: {
+                        token: data.payment.creditCard.creditCardToken,
+                      },
                     },
                   },
                 },
@@ -224,24 +280,54 @@ export class OrderService
           };
 
         if (data.event === 'PAYMENT_CONFIRMED') {
-          const createQuotesDto = order.orderItems.flatMap((orderItem) => {
-            return Array.from({ length: orderItem.quantity }).map(() => ({
-              raffleId: orderItem.raffleId,
-              number: randomNumberWithRangeUtil(
-                orderItem.raffle.initial,
-                orderItem.raffle.final,
-              ),
-              deletedAt: null,
-            }));
-          });
+          const dtos = await Promise.all(
+            order.orderItems.map(async (orderItem) => {
+              await tx.raffle.update({
+                where: { id: orderItem.raffleId },
+                data: {
+                  progressPercentage:
+                    ((orderItem.raffle.payeds + orderItem.quantity) /
+                      orderItem.raffle.final) *
+                    100,
+                  payeds: {
+                    increment: orderItem.quantity,
+                  },
+                },
+              });
+
+              return Array.from({ length: orderItem.quantity }).map(() => {
+                return {
+                  raffleId: orderItem.raffleId,
+                  number: randomNumberWithRangeUtil(
+                    orderItem.raffle.initial,
+                    orderItem.raffle.final,
+                    orderItem.raffle.digits,
+                  ),
+                  deletedAt: null,
+                };
+              });
+            }),
+          );
 
           query = {
             ...query,
+            finance: {
+              upsert: {
+                create: {
+                  customerId: order.customer.id,
+                  sellerId: order.seller.id,
+                },
+                update: {
+                  customerId: order.customer.id,
+                  sellerId: order.seller.id,
+                },
+              },
+            },
             customer: {
               update: {
                 quotas: {
                   createMany: {
-                    data: createQuotesDto,
+                    data: dtos.flat(),
                     skipDuplicates: true,
                   },
                 },
@@ -268,8 +354,11 @@ export class OrderService
             },
             orderPayment: {
               update: {
-                gatewayPamentId: data.payment.id,
-                receiptUrl: data.payment.transactionReceiptUrl,
+                data: {
+                  status: data.payment.status,
+                  gatewayPamentId: data.payment.id,
+                  receiptUrl: data.payment.transactionReceiptUrl,
+                },
               },
             },
             ...query,

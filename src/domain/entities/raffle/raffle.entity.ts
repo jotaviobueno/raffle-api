@@ -45,10 +45,7 @@ export class RaffleEntity implements Raffle {
   maxBuyQuotas: number;
 
   @ApiProperty({ type: Number })
-  totalQuotas: number;
-
-  @ApiProperty({ type: Number })
-  freePercentage: number;
+  progressPercentage: number;
 
   @ApiProperty({ type: Number })
   payeds: number;

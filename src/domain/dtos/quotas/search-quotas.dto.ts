@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsUUID } from 'class-validator';
+import { IsNumberString, IsOptional, IsUUID } from 'class-validator';
 import { QueryParamsDto } from '../shared';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -13,8 +13,8 @@ export class SearchQuotasDto extends QueryParamsDto {
   @ApiProperty({ nullable: true, required: false })
   customerId?: string;
 
-  @IsInt()
+  @IsNumberString({ no_symbols: true })
   @IsOptional()
-  @ApiProperty({ type: Number, nullable: true })
-  number?: number;
+  @ApiProperty({ nullable: true })
+  number?: string;
 }

@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreatePaymentMethodDto {
   @IsString()
@@ -11,6 +17,11 @@ export class CreatePaymentMethodDto {
   @IsNotEmpty()
   @ApiProperty()
   name: string;
+
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty({ type: Number, nullable: true })
+  fee?: number;
 
   @IsString()
   @IsNotEmpty()

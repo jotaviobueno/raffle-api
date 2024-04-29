@@ -1,4 +1,8 @@
-import { ORDER_STATUS_ENUM } from 'src/common/enums';
+import {
+  ASAAS_BILING_TYPE_ENUM,
+  ASAAS_CHARGE_BACK_ENUM,
+  ORDER_STATUS_ENUM,
+} from 'src/common/enums';
 
 export class AsaasWebhookEventDto {
   id: string;
@@ -20,7 +24,7 @@ export class AsaasWebhookEventDto {
     nossoNumero: any;
     description: string;
     externalReference: string;
-    billingType: string;
+    billingType: keyof typeof ASAAS_BILING_TYPE_ENUM;
     status: string;
     pixTransaction: any;
     confirmedDate: string;
@@ -49,7 +53,7 @@ export class AsaasWebhookEventDto {
       value: number;
       dueDateLimitDays: number;
       limitedDate: any;
-      type: string;
+      type: 'FIXED' | 'PERCENTAGE';
     };
     fine: {
       value: number;
@@ -62,14 +66,20 @@ export class AsaasWebhookEventDto {
     split: Array<{
       walletId: string;
       fixedValue?: number;
-      status: string;
+      status: 'PENDING' | 'AWAITING_CREDIT' | 'CANCELLED' | 'DONE' | 'REFUSED';
       refusalReason: any;
       percentualValue?: number;
     }>;
     chargeback: {
-      status: string;
-      reason: string;
+      status: 'REQUESTED' | 'IN_DISPUTE' | 'DISPUTE_LOST' | 'REVERSED' | 'DONE';
+      reason: keyof typeof ASAAS_CHARGE_BACK_ENUM;
     };
-    refunds: any;
+    refunds?: {
+      dateCreated: Date;
+      status: 'PENDING' | 'CANCELLED' | 'DONE';
+      value: number;
+      description: string;
+      transactionReceiptUrl: string;
+    };
   };
 }

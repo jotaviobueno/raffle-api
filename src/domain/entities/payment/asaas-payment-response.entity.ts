@@ -1,3 +1,4 @@
+import { ASAAS_PAYMENT_STATUS_ENUM } from 'src/common/enums';
 import { CreateAsaasPaymentCreditCardHolderInfoDto } from 'src/domain/dtos';
 
 export class AsaasPaymentResponseEntity {
@@ -12,7 +13,7 @@ export class AsaasPaymentResponseEntity {
   billingType: string;
   canBePaidAfterDueDate: boolean;
   pixTransaction: any;
-  status: string;
+  status: keyof typeof ASAAS_PAYMENT_STATUS_ENUM;
   description: string;
   externalReference: string;
   originalValue: any;

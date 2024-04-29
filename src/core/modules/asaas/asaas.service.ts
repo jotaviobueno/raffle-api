@@ -61,6 +61,21 @@ export class AsaasService {
     }
   }
 
+  public async preAuthorization(
+    paymentId: string,
+  ): Promise<AsaasPaymentResponseEntity> {
+    try {
+      const { data } = await this.setup().post<AsaasPaymentResponseEntity>(
+        `/payments/${paymentId}/captureAuthorized`,
+      );
+
+      return data;
+    } catch (e) {
+      Logger.debug('FAILED PRE-AUTHORIZE PAYMENT (ASAAS)', e.response.data);
+      throw e;
+    }
+  }
+
   public async updateCustomer({
     id,
     ...dto

@@ -15,6 +15,12 @@ export class PaymentMethodEntity implements PaymentMethod {
   instructions: string;
 
   @ApiProperty({ type: Number })
+  fee: number;
+
+  @ApiProperty({ type: Number })
+  feePercentage: number;
+
+  @ApiProperty({ type: Number })
   isActive: boolean;
 
   @ApiProperty({ nullable: true })

@@ -10,7 +10,6 @@ import {
   IsNumber,
   IsString,
   IsUUID,
-  Max,
   Min,
 } from 'class-validator';
 
@@ -78,13 +77,6 @@ export class CreateRaffleDto {
   @Min(1)
   @ApiProperty({ type: Number })
   maxBuyQuotas: number;
-
-  @IsInt()
-  @IsNotEmpty()
-  @Min(1)
-  @Max(100_000_000)
-  @ApiProperty({ type: Number })
-  totalQuotas: number;
 
   @IsDate()
   @IsNotEmpty()

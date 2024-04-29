@@ -5,8 +5,8 @@ export class QutoasEntity implements Quotas {
   @ApiProperty()
   id: string;
 
-  @ApiProperty({ type: Number })
-  number: number;
+  @ApiProperty()
+  number: string;
 
   @ApiProperty()
   raffleId: string;

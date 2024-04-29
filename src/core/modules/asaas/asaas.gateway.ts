@@ -41,37 +41,19 @@ export class AsaasGateway extends PaymentGateway<{
   }> {
     this.asaasService.setConfig(this.config);
 
-    let customer: AsaasCustomerEntity;
-
-    if (!data.cart.customer.asaasCustomerId)
-      customer = await this.asaasService.createCustomer({
-        addressNumber: data.cart.cartPayment.address.number,
-        complement: data.cart.cartPayment.address.complement,
-        cpfCnpj: data.cart.customer.document.replace(/[\.-]/g, ''),
-        mobilePhone: data.cart.customer.phone.replace(/[\D+55]/g, ''),
-        email: data.cart.customer.email,
-        name: `${data.cart.customer.firstName} ${data.cart.customer.lastName}`,
-        province: data.cart.cartPayment.address.neighborhood,
-        postalCode: data.cart.cartPayment.address.postcode,
-        externalReference: data.cart.customer.id,
-        notificationDisabled: true,
-        address: data.cart.cartPayment.address.street,
-      });
-    else
-      customer = await this.asaasService.updateCustomer({
-        id: data.cart.customer.asaasCustomerId,
-        addressNumber: data.cart.cartPayment.address.number,
-        complement: data.cart.cartPayment.address.complement,
-        cpfCnpj: data.cart.customer.document.replace(/[\.-]/g, ''),
-        mobilePhone: data.cart.customer.phone.replace(/[\D+55]/g, ''),
-        email: data.cart.customer.email,
-        name: `${data.cart.customer.firstName} ${data.cart.customer.lastName}`,
-        province: data.cart.cartPayment.address.neighborhood,
-        postalCode: data.cart.cartPayment.address.postcode,
-        externalReference: data.cart.customer.id,
-        notificationDisabled: true,
-        address: data.cart.cartPayment.address.street,
-      });
+    const customer = await this.asaasService.createCustomer({
+      addressNumber: data.cart.cartPayment.address.number,
+      complement: data.cart.cartPayment.address.complement,
+      cpfCnpj: data.cart.customer.document.replace(/[\.-]/g, ''),
+      mobilePhone: data.cart.customer.phone.replace(/[\D+55]/g, ''),
+      email: data.cart.customer.email,
+      name: `${data.cart.customer.firstName} ${data.cart.customer.lastName}`,
+      province: data.cart.cartPayment.address.neighborhood,
+      postalCode: data.cart.cartPayment.address.postcode,
+      externalReference: data.cart.customer.id,
+      notificationDisabled: true,
+      address: data.cart.cartPayment.address.street,
+    });
 
     switch (data.cart.cartPayment.paymentMethod.code) {
       case 'pix':
@@ -154,7 +136,8 @@ export class AsaasGateway extends PaymentGateway<{
         remoteIp: dto.ip ? dto.ip : '',
       });
 
-      console.log(payment);
+      if (payment.status === 'AUTHORIZED')
+        await this.asaasService.preAuthorization(payment.id);
 
       return { cart, payment, customer };
     } catch (e) {

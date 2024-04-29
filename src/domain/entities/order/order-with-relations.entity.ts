@@ -22,7 +22,6 @@ export class OrderWithRelationsEntity extends OrderEntity {
       'document',
       'email',
       'avatar',
-      'asaasCustomerId',
       'createdAt',
       'updatedAt',
       'deletedAt',
@@ -37,7 +36,6 @@ export class OrderWithRelationsEntity extends OrderEntity {
     | 'document'
     | 'email'
     | 'avatar'
-    | 'asaasCustomerId'
     | 'createdAt'
     | 'updatedAt'
     | 'deletedAt'
@@ -70,7 +68,6 @@ export const orderQueryWithRelations = {
       lastName: true,
       phone: true,
       document: true,
-      asaasCustomerId: true,
       email: true,
       createdAt: true,
       updatedAt: true,

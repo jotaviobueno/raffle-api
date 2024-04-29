@@ -13,23 +13,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// TODO: CRIAR INVOICE É FINANCE
-// AO CRIAR UMA ORDER CRIAR UM INVOICE, QUANDO A ORDER FOR CONFIRMADA PELA GATEWAY CRIAR O FINANCE
-
 model User {
-  id              String    @id @default(uuid())
-  firstName       String
-  lastName        String
-  email           String
-  password        String?
-  phone           String?
-  avatar          String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
-  document        String?
-  birthDate       DateTime? @map("birth_date") @db.Timestamp
-  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt       DateTime? @map("deleted_at") @db.Timestamp
-  asaasCustomerId String?   @map("asaas_customer_id")
+  id        String    @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String
+  password  String?
+  phone     String?
+  avatar    String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
+  document  String?
+  birthDate DateTime? @map("birth_date") @db.Timestamp
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   addresses      Address[]
   sellers        Seller[]
@@ -38,6 +34,7 @@ model User {
   orderHistories OrderHistory[]
   carts          Cart[]
   quotas         Quotas[]
+  finances       Finance[]
 
   @@map("user")
 }
@@ -92,6 +89,7 @@ model Seller {
   paymentMethodSellers PaymentMethodSeller[]
   utmCampaigns         UtmCampaign[]
   carts                Cart[]
+  finances             Finance[]
 
   @@map("seller")
 }
@@ -239,11 +237,10 @@ model Raffle {
   isActive         Boolean  @default(true) @map("is_active")
   sellerId         String   @map("seller_id")
 
-  minBuyQuotas   Int   @map("min_buy_quotas")
-  maxBuyQuotas   Int   @map("max_buy_quotas")
-  totalQuotas    Int   @map("total_quotas")
-  freePercentage Float @default(100) @map("free_percentage")
-  payeds         Int   @default(0)
+  minBuyQuotas       Int   @map("min_buy_quotas")
+  maxBuyQuotas       Int   @map("max_buy_quotas")
+  progressPercentage Float @default(0) @map("progress_percentage")
+  payeds             Int   @default(0)
 
   digits       Int
   initial      Int
@@ -268,7 +265,7 @@ model Raffle {
 
 model Quotas {
   id         String @id @default(uuid())
-  number     Int
+  number     String
   raffleId   String @map("raffle_id")
   customerId String @map("customer_id")
 
@@ -336,6 +333,7 @@ model Order {
   orderItems     OrderItem[]
   orderHistories OrderHistory[]
   orderStatus    OrderStatus?   @relation(fields: [orderStatusId], references: [id])
+  finance        Finance?
 
   @@map("order")
 }
@@ -501,9 +499,10 @@ model OrderTotal {
   orderId String @unique @map("order_id")
 
   subtotal       Float
-  discount       Float
-  discountManual Float @map("discount_manual")
-  shipping       Float
+  discount       Float @default(0)
+  discountManual Float @default(0) @map("discount_manual")
+  shipping       Float @default(0)
+  fee            Float @default(0)
   total          Float
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
@@ -538,6 +537,9 @@ model PaymentMethod {
   isActive               Boolean @default(true) @map("is_active")
   paymentGatewayConfigId String? @map("payment_gateway_config_id")
 
+  fee           Float @default(0)
+  feePercentage Float @default(0) @map("fee_percentage")
+
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
@@ -566,9 +568,10 @@ model PaymentGatewayConfig {
 }
 
 model OrderPayment {
-  id      String @id @default(uuid())
-  orderId String @unique @map("order_id")
+  id      String  @id @default(uuid())
+  orderId String  @unique @map("order_id")
   method  String
+  status  String?
 
   paymentMethodId String  @map("payment_method_id")
   addressId       String  @map("address_id")
@@ -599,7 +602,6 @@ model OrderCreditCard {
   expirationYear  Int     @map("expiration_year")
   cvv             Int
   token           String?
-  status          String?
 
   orderPaymentId String @unique @map("order_payment_id")
 
@@ -691,9 +693,10 @@ model CartTotal {
   id String @id @default(uuid())
 
   subtotal       Float
-  discount       Float
-  discountManual Float @map("discount_manual")
-  shipping       Float
+  discount       Float @default(0)
+  discountManual Float @default(0) @map("discount_manual")
+  shipping       Float @default(0)
+  fee            Float @default(0)
   total          Float
 
   cartId String @unique @map("cart_id")
@@ -724,4 +727,17 @@ model CartPayment {
   paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
 
   @@map("cart_payment")
+}
+
+model Finance {
+  id         String @id @default(uuid())
+  orderId    String @unique @map("order_id")
+  customerId String @map("customer_id")
+  sellerId   String @map("seller_id")
+
+  customer User   @relation(fields: [customerId], references: [id])
+  order    Order? @relation(fields: [orderId], references: [id])
+  seller   Seller @relation(fields: [sellerId], references: [id])
+
+  @@map("finance")
 }

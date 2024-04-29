@@ -20,17 +20,18 @@ export async function seedPaymentMethod(
   });
 
   if (configExist) asaasPaymentGatewayConfig = configExist;
-  asaasPaymentGatewayConfig = await tx.paymentGatewayConfig.create({
-    data: {
-      code: 'asaas',
-      name: 'Asaas',
-      config: {
-        accessToken: environment.ASAAS_ACCESS_TOKEN,
-        fine: environment.ASAAS_FINE,
-        interest: environment.ASAAS_INTEREST,
+  else
+    asaasPaymentGatewayConfig = await tx.paymentGatewayConfig.create({
+      data: {
+        code: 'asaas',
+        name: 'Asaas',
+        config: {
+          accessToken: environment.ASAAS_ACCESS_TOKEN,
+          fine: environment.ASAAS_FINE,
+          interest: environment.ASAAS_INTEREST,
+        },
       },
-    },
-  });
+    });
 
   for (const paymentMethod of data) {
     const paymentMethodAlreadyExist = await tx.paymentMethod.findFirst({
