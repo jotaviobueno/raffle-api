@@ -64,6 +64,7 @@ export class OrderController {
 
   @Get(':id')
   @ApiOkResponse({ type: OrderWithRelationsEntity })
+  @IsPublic()
   @ApiNotFoundResponse()
   findById(@Param('id') id: string) {
     return this.orderService.findById(id);
