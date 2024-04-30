@@ -30,8 +30,8 @@ import {
 import { IsPublic } from '../../auth/decorators';
 import { CategoryService } from '../services/category.service';
 import { RoleGuard } from '../../role/guards';
-import { Roles } from '../../role/decorators';
-import { ROLE_ENUM } from 'src/common/enums';
+import { Permissions, Roles } from '../../role/decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { CategoryEntity } from 'src/domain/entities';
 import { ApiOkFindAllResult } from 'src/common/decorators';
 
@@ -44,6 +44,7 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
+  @Permissions(PERMISSION_ENUM.CAN_CREATE_CATEGORY)
   @ApiCreatedResponse({ type: CategoryEntity })
   @ApiUnauthorizedResponse()
   @ApiBody({ type: CreateCategoryDto })
@@ -63,6 +64,7 @@ export class CategoryController {
   }
 
   @Get(':id')
+  @IsPublic()
   @ApiOkResponse({ type: CategoryEntity })
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
@@ -71,6 +73,7 @@ export class CategoryController {
   }
 
   @Patch(':id')
+  @Permissions(PERMISSION_ENUM.CAN_UPDATE_CATEGORY)
   @ApiOkResponse({ type: CategoryEntity })
   @ApiBody({ type: UpdateCategoryDto })
   @ApiNotFoundResponse()
@@ -85,6 +88,7 @@ export class CategoryController {
   }
 
   @Delete(':id')
+  @Permissions(PERMISSION_ENUM.CAN_DELETE_CATEGORY)
   @ApiOkResponse({ type: Boolean })
   @ApiNotFoundResponse()
   @ApiNotAcceptableResponse()

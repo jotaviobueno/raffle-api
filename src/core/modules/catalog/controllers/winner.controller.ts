@@ -24,8 +24,8 @@ import {
 } from '@nestjs/swagger';
 import { IsPublic } from '../../auth/decorators';
 import { RoleGuard } from '../../role/guards';
-import { Roles } from '../../role/decorators';
-import { ROLE_ENUM } from 'src/common/enums';
+import { Permissions, Roles } from '../../role/decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { WinnerEntity } from 'src/domain/entities';
 import { ApiOkFindAllResult } from 'src/common/decorators';
 import { WinnerService } from '../services/winner.service';
@@ -39,6 +39,7 @@ export class WinnerController {
   constructor(private readonly winnerService: WinnerService) {}
 
   @Post()
+  @Permissions(PERMISSION_ENUM.CAN_CREATE_WINNER)
   @ApiCreatedResponse({ type: WinnerEntity })
   @ApiBody({ type: CreateWinnerDto })
   @ApiBadRequestResponse()
@@ -58,6 +59,7 @@ export class WinnerController {
   }
 
   @Get(':id')
+  @IsPublic()
   @ApiOkResponse({ type: WinnerEntity })
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
@@ -66,6 +68,7 @@ export class WinnerController {
   }
 
   @Delete(':id')
+  @Permissions(PERMISSION_ENUM.CAN_DELETE_WINNER)
   @ApiOkResponse({ type: Boolean })
   @ApiNotFoundResponse()
   @ApiNotAcceptableResponse()

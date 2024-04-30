@@ -14,6 +14,7 @@ export class StateController {
   @Get()
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
+  @IsPublic()
   findAll(@Query() queryParams: QueryParamsDto) {
     return this.countryService.findAll(queryParams);
   }

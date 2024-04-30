@@ -3,9 +3,8 @@ import { RepositoryFactory } from 'src/common/factories';
 import { CreateUserDto, UpdateUserDto } from 'src/domain/dtos';
 import {
   QueryBuilderEntity,
-  RoleEntity,
   UserEntity,
-  UserRoleEntity,
+  UserWithRelationsEntity,
 } from 'src/domain/entities';
 
 @Injectable()
@@ -48,14 +47,7 @@ export class UserRepository extends RepositoryFactory<
     });
   }
 
-  findByIdAndPopulate(id: string): Promise<
-    | (Omit<UserEntity, 'password'> & {
-        userRoles: (UserRoleEntity & {
-          role: RoleEntity;
-        })[];
-      })
-    | null
-  > {
+  findByIdAndPopulate(id: string): Promise<UserWithRelationsEntity | null> {
     return this.prismaService.user.findFirst({
       where: {
         id,
@@ -75,7 +67,15 @@ export class UserRepository extends RepositoryFactory<
         birthDate: true,
         userRoles: {
           include: {
-            role: true,
+            role: {
+              include: {
+                rolePermissions: {
+                  include: {
+                    permission: true,
+                  },
+                },
+              },
+            },
           },
         },
       },

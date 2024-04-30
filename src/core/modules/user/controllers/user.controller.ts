@@ -12,6 +12,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto, QueryParamsDto, UpdateUserDto } from 'src/domain/dtos';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
@@ -19,9 +20,14 @@ import { UserService } from '../services/user.service';
 import { IsPublic } from '../../auth/decorators';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Permissions, Roles } from '../../role/decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
+import { RoleGuard } from '../../role/guards';
 
 @Controller('user')
 @ApiTags('user')
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
+@UseGuards(RoleGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -32,6 +38,7 @@ export class UserController {
   }
 
   @Get()
+  @Permissions(PERMISSION_ENUM.CAN_READ_USER)
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
   findAll(@Query() queryParams: QueryParamsDto) {
@@ -39,24 +46,13 @@ export class UserController {
   }
 
   @Get(':id')
+  @Permissions(PERMISSION_ENUM.CAN_READ_USER)
   findById(@Param('id') id: string) {
     return this.userService.findById(id);
   }
 
-  @Get(':id/seller')
-  @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
-  findAllSellerByUserId(
-    @Query() queryParams: QueryParamsDto,
-    @Param('id') id: string,
-  ) {
-    return this.userService.findAllSellerByUserId({
-      ...queryParams,
-      userId: id,
-    });
-  }
-
   @Patch(':id')
+  @Permissions(PERMISSION_ENUM.CAN_UPDATE_USER)
   @UseInterceptors(FileInterceptor('file'))
   update(
     @Param('id') id: string,
@@ -76,6 +72,7 @@ export class UserController {
   }
 
   @Delete(':id')
+  @Permissions(PERMISSION_ENUM.CAN_DELETE_USER)
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
   }

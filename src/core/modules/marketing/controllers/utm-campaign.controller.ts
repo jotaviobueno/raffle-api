@@ -27,10 +27,9 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { IsPublic } from '../../auth/decorators';
 import { RoleGuard } from '../../role/guards';
-import { Roles } from '../../role/decorators';
-import { ROLE_ENUM } from 'src/common/enums';
+import { Permissions, Roles } from '../../role/decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { UtmCampaignService } from '../services/utm-campaign.service';
 import { UtmCampaignEntity } from 'src/domain/entities';
 import { ApiOkFindAllResult } from 'src/common/decorators';
@@ -44,6 +43,7 @@ export class UtmCampaignController {
   constructor(private readonly utmCampaignService: UtmCampaignService) {}
 
   @Post()
+  @Permissions(PERMISSION_ENUM.CAN_CREATE_UTM_CAMPAIGN)
   @ApiCreatedResponse({ type: UtmCampaignEntity })
   @ApiNotFoundResponse()
   @ApiBadRequestResponse()
@@ -54,15 +54,16 @@ export class UtmCampaignController {
   }
 
   @Get()
+  @Permissions(PERMISSION_ENUM.CAN_READ_UTM_CAMPAIGN)
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
-  @IsPublic()
   @ApiOkFindAllResult(UtmCampaignEntity)
   findAll(@Query() queryParams: SearchUtmCampaignDto) {
     return this.utmCampaignService.findAll(queryParams);
   }
 
   @Get(':id')
+  @Permissions(PERMISSION_ENUM.CAN_READ_UTM_CAMPAIGN)
   @ApiOkResponse({ type: UtmCampaignEntity })
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
@@ -71,6 +72,7 @@ export class UtmCampaignController {
   }
 
   @Patch(':id')
+  @Permissions(PERMISSION_ENUM.CAN_UPDATE_UTM_CAMPAIGN)
   @ApiOkResponse({ type: UtmCampaignEntity })
   @ApiNotFoundResponse()
   @ApiBadRequestResponse()
@@ -85,6 +87,7 @@ export class UtmCampaignController {
   }
 
   @Delete(':id')
+  @Permissions(PERMISSION_ENUM.CAN_DELETE_UTM_CAMPAIGN)
   @ApiOkResponse({ type: Boolean })
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()

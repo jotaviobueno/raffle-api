@@ -29,8 +29,8 @@ import {
 } from '@nestjs/swagger';
 import { IsPublic } from '../../auth/decorators';
 import { RoleGuard } from '../../role/guards';
-import { Roles } from '../../role/decorators';
-import { ROLE_ENUM } from 'src/common/enums';
+import { Permissions, Roles } from '../../role/decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { OrderStatusService } from '../services/order-status.service';
 import { OrderStatusEntity } from 'src/domain/entities';
 import { ApiOkFindAllResult } from 'src/common/decorators';
@@ -44,6 +44,7 @@ export class OrderStatusController {
   constructor(private readonly orderStatusService: OrderStatusService) {}
 
   @Post()
+  @Permissions(PERMISSION_ENUM.CAN_CREATE_ORDER_STATUS)
   @ApiCreatedResponse({ type: OrderStatusEntity })
   @ApiUnauthorizedResponse()
   @ApiBadRequestResponse()
@@ -65,11 +66,13 @@ export class OrderStatusController {
   @ApiOkResponse({ type: OrderStatusEntity })
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
+  @IsPublic()
   findById(@Param('id') id: string) {
     return this.orderStatusService.findById(id);
   }
 
   @Patch(':id')
+  @Permissions(PERMISSION_ENUM.CAN_UPDATE_ORDER_STATUS)
   @ApiOkResponse({ type: OrderStatusEntity })
   @ApiUnauthorizedResponse()
   @ApiBadRequestResponse()
@@ -84,6 +87,7 @@ export class OrderStatusController {
   }
 
   @Delete(':id')
+  @Permissions(PERMISSION_ENUM.CAN_DELETE_ORDER_STATUS)
   @ApiOkResponse({ type: Boolean })
   @ApiUnauthorizedResponse()
   @ApiNotAcceptableResponse()

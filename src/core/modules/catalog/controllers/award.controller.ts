@@ -29,8 +29,8 @@ import {
 } from '@nestjs/swagger';
 import { IsPublic } from '../../auth/decorators';
 import { RoleGuard } from '../../role/guards';
-import { Roles } from '../../role/decorators';
-import { ROLE_ENUM } from 'src/common/enums';
+import { Permissions, Roles } from '../../role/decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { AwardService } from '../services/award.service';
 import { AwardEntity } from 'src/domain/entities';
 import { ApiOkFindAllResult } from 'src/common/decorators';
@@ -44,6 +44,7 @@ export class AwardController {
   constructor(private readonly awardService: AwardService) {}
 
   @Post()
+  @Permissions(PERMISSION_ENUM.CAN_CREATE_AWARD)
   @ApiCreatedResponse({ type: AwardEntity })
   @ApiBody({ type: CreateAwardDto })
   @ApiBadRequestResponse()
@@ -65,12 +66,14 @@ export class AwardController {
   @Get(':id')
   @ApiOkResponse({ type: AwardEntity })
   @ApiNotFoundResponse()
+  @IsPublic()
   @ApiUnauthorizedResponse()
   findById(@Param('id') id: string) {
     return this.awardService.findById(id);
   }
 
   @Patch(':id')
+  @Permissions(PERMISSION_ENUM.CAN_UPDATE_AWARD)
   @ApiOkResponse({ type: AwardEntity })
   @ApiBody({ type: UpdateAwardDto })
   @ApiNotFoundResponse()
@@ -86,6 +89,7 @@ export class AwardController {
   @ApiNotFoundResponse()
   @ApiNotAcceptableResponse()
   @ApiUnauthorizedResponse()
+  @Permissions(PERMISSION_ENUM.CAN_DELETE_AWARD)
   remove(@Param('id') id: string) {
     return this.awardService.remove(id);
   }

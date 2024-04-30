@@ -21,8 +21,8 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { RoleGuard } from '../../role/guards';
-import { Roles } from '../../role/decorators';
-import { ROLE_ENUM } from 'src/common/enums';
+import { Permissions, Roles } from '../../role/decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { RaffleCategoryService } from '../services/raffle-category.service';
 import { RaffleCategoryEntity } from 'src/domain/entities';
 
@@ -35,6 +35,7 @@ export class RaffleCategoryController {
   constructor(private readonly raffleCategoryService: RaffleCategoryService) {}
 
   @Post()
+  @Permissions(PERMISSION_ENUM.CAN_CREATE_RAFFLE_CATEGORY)
   @ApiCreatedResponse({ type: RaffleCategoryEntity })
   @ApiBody({ type: CreateRaffleCategoryDto })
   @ApiNotFoundResponse()
@@ -46,6 +47,7 @@ export class RaffleCategoryController {
   }
 
   @Patch(':id')
+  @Permissions(PERMISSION_ENUM.CAN_UPDATE_RAFFLE_CATEGORY)
   @ApiOkResponse({ type: RaffleCategoryEntity })
   @ApiBody({ type: UpdateCategoryDto })
   @ApiNotFoundResponse()
@@ -61,6 +63,7 @@ export class RaffleCategoryController {
   }
 
   @Delete(':id')
+  @Permissions(PERMISSION_ENUM.CAN_DELETE_RAFFLE_CATEGORY)
   @ApiOkResponse({ type: Boolean })
   @ApiNotFoundResponse()
   @ApiNotAcceptableResponse()

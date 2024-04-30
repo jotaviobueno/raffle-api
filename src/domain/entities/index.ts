@@ -38,3 +38,4 @@ export * from './payment-gateway-config';
 export * from './quotas';
 export * from './finance';
 export * from './winner';
+export * from './role-permission';

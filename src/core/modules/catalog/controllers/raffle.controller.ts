@@ -35,8 +35,8 @@ import {
 } from '@nestjs/swagger';
 import { RaffleService } from '../services/raffle.service';
 import { IsPublic } from '../../auth/decorators';
-import { Roles } from '../../role/decorators';
-import { ROLE_ENUM } from 'src/common/enums';
+import { Permissions, Roles } from '../../role/decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { RoleGuard } from '../../role/guards';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { RaffleEntity } from 'src/domain/entities';
@@ -51,6 +51,7 @@ export class ProductController {
   constructor(private readonly raffleService: RaffleService) {}
 
   @Post()
+  @Permissions(PERMISSION_ENUM.CAN_CREATE_RAFFLE)
   @UseInterceptors(FilesInterceptor('files'))
   @ApiConsumes('multipart/form-data')
   @ApiCreatedResponse({ type: RaffleEntity })
@@ -109,6 +110,7 @@ export class ProductController {
   }
 
   @Patch(':id')
+  @Permissions(PERMISSION_ENUM.CAN_UPDATE_RAFFLE)
   @UseInterceptors(FilesInterceptor('files'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -151,6 +153,7 @@ export class ProductController {
   }
 
   @Delete(':id')
+  @Permissions(PERMISSION_ENUM.CAN_DELETE_RAFFLE)
   @ApiOkResponse({ type: Boolean })
   @ApiNotFoundResponse()
   @ApiNotAcceptableResponse()

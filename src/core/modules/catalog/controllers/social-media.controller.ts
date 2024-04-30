@@ -28,8 +28,8 @@ import {
 } from '@nestjs/swagger';
 import { IsPublic } from '../../auth/decorators';
 import { RoleGuard } from '../../role/guards';
-import { Roles } from '../../role/decorators';
-import { ROLE_ENUM } from 'src/common/enums';
+import { Permissions, Roles } from '../../role/decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { SocialMediaService } from '../services/social-media.service';
 import { SocialMediaEntity } from 'src/domain/entities';
 import { ApiOkFindAllResult } from 'src/common/decorators';
@@ -43,6 +43,7 @@ export class SocialMediaController {
   constructor(private readonly socialMediaService: SocialMediaService) {}
 
   @Post()
+  @Permissions(PERMISSION_ENUM.CAN_CREATE_SOCIAL_MEDIA)
   @ApiOkResponse({ type: SocialMediaEntity })
   @ApiBody({ type: CreateSocialMediaDto })
   @ApiNotFoundResponse()
@@ -62,6 +63,7 @@ export class SocialMediaController {
   }
 
   @Get(':id')
+  @IsPublic()
   @ApiOkResponse({ type: SocialMediaEntity })
   @ApiUnauthorizedResponse()
   @ApiNotFoundResponse()
@@ -70,6 +72,7 @@ export class SocialMediaController {
   }
 
   @Patch(':id')
+  @Permissions(PERMISSION_ENUM.CAN_UPDATE_SOCIAL_MEDIA)
   @ApiOkResponse({ type: SocialMediaEntity })
   @ApiBody({ type: UpdateSocialMediaDto })
   @ApiNotFoundResponse()
@@ -84,6 +87,7 @@ export class SocialMediaController {
   }
 
   @Delete(':id')
+  @Permissions(PERMISSION_ENUM.CAN_DELETE_SOCIAL_MEDIA)
   @ApiOkResponse({ type: Boolean })
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
