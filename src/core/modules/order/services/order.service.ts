@@ -42,6 +42,15 @@ export class OrderService
   async create(dto: CreateCheckoutDto): Promise<OrderWithRelationsEntity> {
     const cart = await this.cartService.findById(dto.cartId);
 
+    if (cart.cartItems.length === 0)
+      throw new HttpException('Empty cart.', HttpStatus.UNPROCESSABLE_ENTITY);
+
+    if (!cart.cartTotal)
+      throw new HttpException(
+        'Cart total do not exist',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
     if (!cart.cartPayment)
       throw new HttpException(
         'Cart payment do not exist',
@@ -50,21 +59,22 @@ export class OrderService
 
     for (const item of cart.cartItems) {
       if (
-        ((item.raffle.payeds + item.quantity) / item.raffle.final) * 100 >
-        item.raffle.totalNumbers
-      )
-        throw new HttpException(
-          'You need to decrease your order quantity',
-          HttpStatus.UNPROCESSABLE_ENTITY,
-        );
-
-      if (
         new Date() > item.raffle.drawDateAt ||
         item.raffle.progressPercentage >= 100 ||
         item.raffle.payeds >= item.raffle.totalNumbers
       )
         throw new HttpException(
           'Raffle has already been completed',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+
+      if (
+        ((item.raffle.payeds + item.quantity) / item.raffle.totalNumbers) *
+          100 >
+        100
+      )
+        throw new HttpException(
+          'You need to decrease your order quantity',
           HttpStatus.UNPROCESSABLE_ENTITY,
         );
     }
@@ -259,7 +269,7 @@ export class OrderService
 
         if (orderAlreadyUpdated) return;
 
-        if (order.orderPayment.orderCreditCard)
+        if (order?.orderPayment?.orderCreditCard)
           query = {
             orderPayment: {
               update: {
@@ -287,7 +297,7 @@ export class OrderService
                 data: {
                   progressPercentage:
                     ((orderItem.raffle.payeds + orderItem.quantity) /
-                      orderItem.raffle.final) *
+                      orderItem.raffle.totalNumbers) *
                     100,
                   payeds: {
                     increment: orderItem.quantity,
