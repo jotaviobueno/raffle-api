@@ -34,8 +34,8 @@ import {
 } from '@nestjs/swagger';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { SellerService } from '../services/seller.service';
-import { ROLE_ENUM } from 'src/common/enums';
-import { Roles } from '../../role/decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
+import { Permissions, Roles } from '../../role/decorators';
 import { RoleGuard } from '../../role/guards';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SellerEntity } from '../../../../domain/entities';
@@ -50,6 +50,7 @@ export class SellerController {
   constructor(private readonly sellerService: SellerService) {}
 
   @Post()
+  @Permissions(PERMISSION_ENUM.CAN_CREATE_SELLER)
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
   @ApiCreatedResponse({ type: SellerEntity })
@@ -92,12 +93,14 @@ export class SellerController {
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
   @ApiUnauthorizedResponse()
+  @Permissions(PERMISSION_ENUM.CAN_READ_SELLER)
   @ApiOkFindAllResult(SellerEntity)
   findAll(@Query() queryParams: SearchSellerDto) {
     return this.sellerService.findAll(queryParams);
   }
 
   @Get(':id')
+  @Permissions(PERMISSION_ENUM.CAN_READ_SELLER)
   @ApiUnauthorizedResponse()
   @ApiNotFoundResponse()
   @ApiOkResponse({ type: SellerEntity })
@@ -106,6 +109,7 @@ export class SellerController {
   }
 
   @Patch(':id')
+  @Permissions(PERMISSION_ENUM.CAN_UPDATE_SELLER)
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
   @ApiCreatedResponse({ type: SellerEntity })
@@ -147,6 +151,7 @@ export class SellerController {
   }
 
   @Delete(':id')
+  @Permissions(PERMISSION_ENUM.CAN_DELETE_SELLER)
   @ApiOkResponse({ type: Boolean })
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()

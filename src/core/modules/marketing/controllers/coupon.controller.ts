@@ -30,8 +30,8 @@ import {
 } from '@nestjs/swagger';
 import { IsPublic } from '../../auth/decorators';
 import { RoleGuard } from '../../role/guards';
-import { Roles } from '../../role/decorators';
-import { ROLE_ENUM } from 'src/common/enums';
+import { Permissions, Roles } from '../../role/decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { CouponService } from '../services/coupon.service';
 import { CouponEntity } from 'src/domain/entities';
 import { ApiOkFindAllResult } from 'src/common/decorators';
@@ -45,6 +45,7 @@ export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
   @Post()
+  @Permissions(PERMISSION_ENUM.CAN_CREATE_COUPON)
   @ApiCreatedResponse({ type: CouponEntity })
   @ApiUnauthorizedResponse()
   @ApiNotFoundResponse()
@@ -65,6 +66,7 @@ export class CouponController {
   }
 
   @Get(':id')
+  @IsPublic()
   @ApiOkResponse({ type: CouponEntity })
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
@@ -73,6 +75,7 @@ export class CouponController {
   }
 
   @Patch(':id')
+  @Permissions(PERMISSION_ENUM.CAN_UPDATE_COUPON)
   @ApiCreatedResponse({ type: UpdateCouponDto })
   @ApiUnauthorizedResponse()
   @ApiNotFoundResponse()
@@ -84,6 +87,7 @@ export class CouponController {
   }
 
   @Delete(':id')
+  @Permissions(PERMISSION_ENUM.CAN_DELETE_COUPON)
   @ApiOkResponse({ type: Boolean })
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()

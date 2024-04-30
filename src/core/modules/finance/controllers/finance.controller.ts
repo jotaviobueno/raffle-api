@@ -15,10 +15,9 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { IsPublic } from '../../auth/decorators';
 import { RoleGuard } from '../../role/guards';
-import { Roles } from '../../role/decorators';
-import { ROLE_ENUM } from 'src/common/enums';
+import { Permissions, Roles } from '../../role/decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { FinanceEntity } from 'src/domain/entities';
 import { ApiOkFindAllResult } from 'src/common/decorators';
 import { FinanceService } from '../services/finance.service';
@@ -32,9 +31,9 @@ export class FinanceController {
   constructor(private readonly financeService: FinanceService) {}
 
   @Get()
+  @Permissions(PERMISSION_ENUM.CAN_READ_FINANCE)
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
-  @IsPublic()
   @ApiOkFindAllResult(FinanceEntity)
   findAll(@Query() queryParams: SearchAwardDto) {
     return this.financeService.findAll(queryParams);
@@ -44,6 +43,7 @@ export class FinanceController {
   @ApiOkResponse({ type: FinanceEntity })
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
+  @Permissions(PERMISSION_ENUM.CAN_READ_FINANCE)
   findById(@Param('id') id: string) {
     return this.financeService.findById(id);
   }

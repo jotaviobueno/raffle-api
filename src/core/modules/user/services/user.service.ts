@@ -3,10 +3,8 @@ import { ServiceBase } from 'src/common/base';
 import { CreateUserDto, QueryParamsDto, UpdateUserDto } from 'src/domain/dtos';
 import {
   FindAllResultEntity,
-  RoleEntity,
-  SellerEntity,
   UserEntity,
-  UserRoleEntity,
+  UserWithRelationsEntity,
 } from 'src/domain/entities';
 import { UserRepository } from '../repositories/user.repository';
 import { QueryBuilder, hash } from 'src/common/utils';
@@ -116,13 +114,7 @@ export class UserService
     return { data: users, info };
   }
 
-  async findByIdAndPopulate(id: string): Promise<
-    Omit<UserEntity, 'password'> & {
-      userRoles: (UserRoleEntity & {
-        role: RoleEntity;
-      })[];
-    }
-  > {
+  async findByIdAndPopulate(id: string): Promise<UserWithRelationsEntity> {
     const user = await this.userRepository.findByIdAndPopulate(id);
 
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -136,22 +128,6 @@ export class UserService
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 
     return user;
-  }
-
-  async findAllSellerByUserId({
-    userId,
-    ...queryParams
-  }: QueryParamsDto & { userId: string }): Promise<
-    FindAllResultEntity<SellerEntity>
-  > {
-    const user = await this.findById(userId);
-
-    const sellers = await this.sellerService.findAllSellerByUserId({
-      ...queryParams,
-      userId: user.id,
-    });
-
-    return sellers;
   }
 
   async findByEmail(email: string): Promise<UserEntity> {

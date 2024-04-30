@@ -14,11 +14,13 @@ export class CountryController {
   @Get()
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
+  @IsPublic()
   findAll(@Query() queryParams: QueryParamsDto) {
     return this.countryService.findAll(queryParams);
   }
 
   @Get(':id/states')
+  @IsPublic()
   findAllCountryId(
     @Param('id') id: string,
     @Query() queryParams: QueryParamsDto,

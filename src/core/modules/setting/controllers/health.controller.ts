@@ -7,6 +7,7 @@ import {
 } from '@nestjs/terminus';
 import { environment } from 'src/config';
 import { PrismaService } from 'src/infra/database/prisma/prisma.service';
+import { IsPublic } from '../../auth/decorators';
 
 @Controller('health')
 @ApiTags('health')
@@ -19,6 +20,7 @@ export class HealthController {
 
   @Get('ping')
   @HealthCheck()
+  @IsPublic()
   healthCheck() {
     return {
       status: 'pong',
@@ -28,6 +30,7 @@ export class HealthController {
 
   @Get('prisma')
   @HealthCheck()
+  @IsPublic()
   async checkReadiness() {
     return this.healthCheckService.check([
       async () => this.database.pingCheck('prisma', this.prismaService),

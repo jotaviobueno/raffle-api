@@ -11,6 +11,7 @@ import {
   IsUUID,
 } from 'class-validator';
 import { PUBLIC_ROLE_ENUM } from 'src/common/enums';
+import { IsCpfCnpj } from 'src/common/validators';
 
 export class CreateUserDto {
   @IsString()
@@ -38,7 +39,7 @@ export class CreateUserDto {
   @ApiProperty()
   phone?: string;
 
-  @IsString()
+  @IsCpfCnpj()
   @IsOptional()
   @ApiProperty({ nullable: true, required: false })
   document?: string;

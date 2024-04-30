@@ -67,6 +67,7 @@ export class SellerService
 
   async findAll({
     name,
+    userId,
     ...queryParams
   }: SearchSellerDto): Promise<FindAllResultEntity<SellerEntity>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
@@ -79,7 +80,10 @@ export class SellerService
     if (cache) return cache;
 
     const query = new QueryBuilder(queryParams)
-      .where({ name: name && { contains: name } })
+      .where({
+        name: name && { contains: name },
+        userId: userId && userId,
+      })
       .sort()
       .pagination()
       .handle();

@@ -15,8 +15,8 @@ import { SearchRoleDto } from 'src/domain/dtos/role/search-role.dto';
 import { RoleService } from '../services/role.service';
 import { RoleGuard } from '../guards';
 import { IsPublic } from '../../auth/decorators';
-import { Roles } from '../decorators';
-import { ROLE_ENUM } from 'src/common/enums';
+import { Permissions, Roles } from '../decorators';
+import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 
 @Controller('role')
 @ApiTags('role')
@@ -34,11 +34,13 @@ export class RoleController {
   }
 
   @Get(':id')
+  @IsPublic()
   findById(@Param('id') id: string) {
     return this.roleRepository.findById(id);
   }
 
   @Patch(':id')
+  @Permissions(PERMISSION_ENUM.CAN_UPDATE_ROLE)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.roleRepository.update({ ...updateUserDto, id });
   }
