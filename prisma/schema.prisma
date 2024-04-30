@@ -783,7 +783,6 @@ model Finance {
   @@map("finance")
 }
 
-// TODO: FAZER
 model FinanceTotal {
   id String @id @default(uuid())
 
