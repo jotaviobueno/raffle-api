@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import { CreateCartPaymentDto } from 'src/domain/dtos';
 import { CartPaymentEntity } from 'src/domain/entities';
@@ -23,6 +23,9 @@ export class CartPaymentService
 
   async create(dto: CreateCartPaymentDto): Promise<CartPaymentEntity> {
     const cart = await this.cartService.findById(dto.cartId);
+
+    if (cart.cartItems.length === 0)
+      throw new HttpException('Empty cart.', HttpStatus.UNPROCESSABLE_ENTITY);
 
     const paymentMethod = await this.paymentMethodService.findById(
       dto.paymentMethodId,
