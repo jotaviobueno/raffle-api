@@ -28,15 +28,6 @@ export class CartItemService
     const raffle = await this.raffleService.findById(dto.raffleId);
 
     if (
-      ((raffle.payeds + dto.quantity) / raffle.final) * 100 >
-      raffle.totalNumbers
-    )
-      throw new HttpException(
-        'You need to decrease your order quantity',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-
-    if (
       new Date() > raffle.drawDateAt ||
       raffle.progressPercentage >= 100 ||
       raffle.payeds >= raffle.totalNumbers
@@ -55,6 +46,14 @@ export class CartItemService
     if (dto.quantity > raffle.maxBuyQuotas)
       throw new HttpException(
         'Maximum purchase exceeded',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
+    console.log(((raffle.payeds + dto.quantity) / raffle.totalNumbers) * 100);
+
+    if (((raffle.payeds + dto.quantity) / raffle.totalNumbers) * 100 > 100)
+      throw new HttpException(
+        'You need to decrease your order quantity',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
 

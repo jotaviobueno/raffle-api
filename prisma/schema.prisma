@@ -770,11 +770,32 @@ model Finance {
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  customer User   @relation(fields: [customerId], references: [id])
-  order    Order? @relation(fields: [orderId], references: [id])
-  seller   Seller @relation(fields: [sellerId], references: [id])
+  customer     User          @relation(fields: [customerId], references: [id])
+  order        Order?        @relation(fields: [orderId], references: [id])
+  seller       Seller        @relation(fields: [sellerId], references: [id])
+  financeTotal FinanceTotal?
 
   @@map("finance")
+}
+
+model FinanceTotal {
+  id String @id @default(uuid())
+
+  subtotal       Float
+  discount       Float  @default(0)
+  discountManual Float  @default(0) @map("discount_manual")
+  shipping       Float  @default(0)
+  fee            Float  @default(0)
+  total          Float
+  financeId      String @unique @map("finance_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  finance Finance @relation(fields: [financeId], references: [id])
+
+  @@map("total")
 }
 
 model Winner {
