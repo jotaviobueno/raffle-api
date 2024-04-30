@@ -262,10 +262,13 @@ model Raffle {
   images           String[] @default([])
   metaDescription  String   @map("meta_description")
   metaKeyword      String[] @default([]) @map("meta_keyword")
-  price            Float
-  isVisible        Boolean  @default(true) @map("is_visible")
-  isActive         Boolean  @default(true) @map("is_active")
-  sellerId         String   @map("seller_id")
+
+  price Float
+  tax   Float @default(0)
+
+  isVisible Boolean @default(true) @map("is_visible")
+  isActive  Boolean @default(true) @map("is_active")
+  sellerId  String  @map("seller_id")
 
   minBuyQuotas       Int   @map("min_buy_quotas")
   maxBuyQuotas       Int   @map("max_buy_quotas")
@@ -534,6 +537,7 @@ model OrderTotal {
   discountManual Float @default(0) @map("discount_manual")
   shipping       Float @default(0)
   fee            Float @default(0)
+  tax            Float @default(0)
   total          Float
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
@@ -686,7 +690,7 @@ model OrderItem {
   quantity Int
   price    Float
   total    Float
-  tax      Float
+  tax      Float  @default(0)
 
   raffleId String @map("raffle_id")
   orderId  String @map("order_id")
@@ -706,7 +710,7 @@ model CartItem {
   quantity Int
   price    Float
   cartId   String @map("cart_id")
-  tax      Float
+  tax      Float  @default(0)
   total    Float
   raffleId String @map("raffle_id")
 
@@ -728,6 +732,7 @@ model CartTotal {
   discountManual Float @default(0) @map("discount_manual")
   shipping       Float @default(0)
   fee            Float @default(0)
+  tax            Float @default(0)
   total          Float
 
   cartId String @unique @map("cart_id")
@@ -786,6 +791,7 @@ model FinanceTotal {
   discountManual Float  @default(0) @map("discount_manual")
   shipping       Float  @default(0)
   fee            Float  @default(0)
+  tax            Float  @default(0)
   total          Float
   financeId      String @unique @map("finance_id")
 

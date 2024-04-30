@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RepositoryFactory } from 'src/common/factories';
-import { CreateCartItemDto } from 'src/domain/dtos';
+import { CreateCartItemDto, UpdateCartItemDto } from 'src/domain/dtos';
 import {
   CartEntity,
   CartItemEntity,
@@ -10,7 +10,8 @@ import {
 @Injectable()
 export class CartItemRepository extends RepositoryFactory<
   CartItemEntity,
-  CreateCartItemDto & { tax: number; total: number; price: number }
+  CreateCartItemDto,
+  UpdateCartItemDto
 > {
   constructor() {
     super('cartItem');

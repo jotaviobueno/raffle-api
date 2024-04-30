@@ -6,4 +6,5 @@ export class CreateCartTotalDto {
   total: number;
   cartId: string;
   fee: number;
+  tax: number;
 }

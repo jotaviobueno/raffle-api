@@ -8,6 +8,7 @@ import {
   IsInt,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   IsUUID,
   Min,
@@ -71,6 +72,11 @@ export class CreateRaffleDto {
   @Min(1)
   @ApiProperty({ type: Number })
   minBuyQuotas: number;
+
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty({ nullable: true, required: false })
+  tax?: number;
 
   @IsInt()
   @IsNotEmpty()

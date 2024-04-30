@@ -40,6 +40,7 @@ export class CartService implements ServiceBase<CartEntity, CreateCartDto> {
       subtotal: 0,
       total: 0,
       fee: 0,
+      tax: 0,
     });
 
     return cart;
