@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
-import { CreateCartItemDto } from 'src/domain/dtos';
+import { CreateCartItemDto, UpdateCartItemDto } from 'src/domain/dtos';
 import {
   CartEntity,
   CartItemEntity,
@@ -13,7 +13,7 @@ import { CartTotalService } from './cart-total.service';
 
 @Injectable()
 export class CartItemService
-  implements ServiceBase<CartItemEntity, CreateCartItemDto>
+  implements ServiceBase<CartItemEntity, CreateCartItemDto, UpdateCartItemDto>
 {
   constructor(
     private readonly cartItemRepository: CartItemRepository,
@@ -49,8 +49,6 @@ export class CartItemService
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
 
-    console.log(((raffle.payeds + dto.quantity) / raffle.totalNumbers) * 100);
-
     if (((raffle.payeds + dto.quantity) / raffle.totalNumbers) * 100 > 100)
       throw new HttpException(
         'You need to decrease your order quantity',
@@ -62,14 +60,15 @@ export class CartItemService
       raffleId: raffle.id,
       price: raffle.price,
       quantity: dto.quantity,
-      tax: 0,
+      tax: raffle.tax,
       total: dto.quantity * raffle.price,
     });
 
     await this.cartTotalService.update({
       id: cart.cartTotal.id,
-      total: dto.quantity * raffle.price + cart.cartTotal.total,
+      total: dto.quantity * raffle.price + cart.cartTotal.total + cartItem.tax,
       subtotal: dto.quantity * raffle.price + cart.cartTotal.subtotal,
+      tax: cart.cartTotal.tax + cartItem.tax,
     });
 
     return cartItem;

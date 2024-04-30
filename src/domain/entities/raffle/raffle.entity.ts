@@ -32,6 +32,9 @@ export class RaffleEntity implements Raffle {
   @ApiProperty({ type: Boolean })
   isVisible: boolean;
 
+  @ApiProperty({ type: Number })
+  tax: number;
+
   @ApiProperty({ type: Boolean })
   isActive: boolean;
 

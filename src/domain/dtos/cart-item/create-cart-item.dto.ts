@@ -17,4 +17,8 @@ export class CreateCartItemDto {
   @IsNotEmpty()
   @ApiProperty()
   cartId: string;
+
+  tax: number;
+  total: number;
+  price: number;
 }

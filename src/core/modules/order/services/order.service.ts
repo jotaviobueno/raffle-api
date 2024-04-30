@@ -177,6 +177,7 @@ export class OrderService
                 subtotal: cart.cartTotal.subtotal,
                 total: cart.cartTotal.total,
                 fee: cart.cartTotal.fee,
+                tax: cart.cartTotal.tax,
               },
             },
             orderCoupons: {
@@ -216,28 +217,36 @@ export class OrderService
             id: cart.id,
           },
           data: {
+            deletedAt: new Date(),
             cartItems: {
-              deleteMany: {
-                id: { in: cartItemsIds },
+              updateMany: {
+                where: {
+                  id: { in: cartItemsIds },
+                },
+                data: {
+                  deletedAt: new Date(),
+                },
               },
             },
             cartTotal: {
               update: {
-                subtotal: 0,
-                total: 0,
-                fee: 0,
-                discount: 0,
-                discountManual: 0,
-                shipping: 0,
+                deletedAt: new Date(),
               },
             },
             cartCoupons: {
-              deleteMany: {
-                id: { in: cartCouponsIds },
+              updateMany: {
+                where: {
+                  id: { in: cartCouponsIds },
+                },
+                data: {
+                  deletedAt: new Date(),
+                },
               },
             },
             cartPayment: {
-              delete: true,
+              update: {
+                deletedAt: new Date(),
+              },
             },
           },
         });
@@ -322,14 +331,19 @@ export class OrderService
           query = {
             ...query,
             finance: {
-              upsert: {
-                create: {
-                  customerId: order.customer.id,
-                  sellerId: order.seller.id,
-                },
-                update: {
-                  customerId: order.customer.id,
-                  sellerId: order.seller.id,
+              create: {
+                customerId: order.customer.id,
+                sellerId: order.seller.id,
+                financeTotal: {
+                  create: {
+                    subtotal: order.orderTotal.subtotal,
+                    total: order.orderTotal.total,
+                    tax: order.orderTotal.tax,
+                    discount: order.orderTotal.discount,
+                    discountManual: order.orderTotal.discountManual,
+                    fee: order.orderTotal.fee,
+                    shipping: order.orderTotal.shipping,
+                  },
                 },
               },
             },

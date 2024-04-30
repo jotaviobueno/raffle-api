@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "total" ADD COLUMN     "tax" DOUBLE PRECISION NOT NULL DEFAULT 0;
