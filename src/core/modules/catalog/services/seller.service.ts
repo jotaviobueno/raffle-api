@@ -12,7 +12,11 @@ import {
   SearchSellerDto,
   UpdateSellerDto,
 } from 'src/domain/dtos';
-import { FindAllResultEntity, SellerEntity } from 'src/domain/entities';
+import {
+  FindAllResultEntity,
+  SellerEntity,
+  SellerWithRelationsEntity,
+} from 'src/domain/entities';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { QueryBuilder } from 'src/common/utils';
 import { UserService } from '../../user/services/user.service';
@@ -52,6 +56,15 @@ export class SellerService
       userId: user.id,
       logo,
     });
+
+    return seller;
+  }
+
+  async findByIdAndPopulate(id: string): Promise<SellerWithRelationsEntity> {
+    const seller = await this.sellerRepository.findByIdAndPopulate(id);
+
+    if (!seller)
+      throw new HttpException('seller not found', HttpStatus.NOT_FOUND);
 
     return seller;
   }
@@ -102,40 +115,6 @@ export class SellerService
       data: sellers,
       info,
     });
-
-    return { data: sellers, info };
-  }
-
-  async findAllSellerByUserId({
-    userId,
-    ...queryParams
-  }: QueryParamsDto & { userId: string }): Promise<
-    FindAllResultEntity<SellerEntity>
-  > {
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<SellerEntity> | null>(
-        `sellers_${userId}`,
-      );
-
-    if (cache) return cache;
-
-    const query = new QueryBuilder(queryParams)
-      .where({ userId })
-      .sort()
-      .pagination()
-      .handle();
-
-    const sellers = await this.sellerRepository.findAll(query);
-    const total = await this.sellerRepository.count(query.where);
-
-    const info = {
-      page: queryParams.page,
-      pages: Math.ceil(total / queryParams.pageSize),
-      pageSize: queryParams.pageSize,
-      total,
-    };
-
-    await this.cacheManager.set(`sellers_${userId}`, { data: sellers, info });
 
     return { data: sellers, info };
   }

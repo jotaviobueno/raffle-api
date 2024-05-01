@@ -75,7 +75,7 @@ export class CreateRaffleDto {
 
   @IsNumber()
   @IsOptional()
-  @ApiProperty({ nullable: true, required: false })
+  @ApiProperty({ type: Number, nullable: true, required: false })
   tax?: number;
 
   @IsInt()

@@ -40,6 +40,7 @@ import { RoleGuard } from '../../role/guards';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SellerEntity } from '../../../../domain/entities';
 import { ApiOkFindAllResult } from 'src/common/decorators';
+import { IsPublic } from '../../auth/decorators';
 
 @Controller('seller')
 @ApiTags('seller')
@@ -102,10 +103,11 @@ export class SellerController {
   @Get(':id')
   @Permissions(PERMISSION_ENUM.CAN_READ_SELLER)
   @ApiUnauthorizedResponse()
+  @IsPublic()
   @ApiNotFoundResponse()
   @ApiOkResponse({ type: SellerEntity })
   findById(@Param('id') id: string) {
-    return this.sellerService.findById(id);
+    return this.sellerService.findByIdAndPopulate(id);
   }
 
   @Patch(':id')

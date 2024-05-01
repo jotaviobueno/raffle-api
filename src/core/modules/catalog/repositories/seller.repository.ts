@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { RepositoryFactory } from 'src/common/factories';
 import { CreateSellerDto, UpdateSellerDto } from 'src/domain/dtos';
-import { QueryBuilderEntity, SellerEntity } from 'src/domain/entities';
+import {
+  QueryBuilderEntity,
+  SellerEntity,
+  SellerWithRelationsEntity,
+} from 'src/domain/entities';
 
 @Injectable()
 export class SellerRepository extends RepositoryFactory<
@@ -15,6 +19,25 @@ export class SellerRepository extends RepositoryFactory<
 
   findAll(query: QueryBuilderEntity): Promise<SellerEntity[]> {
     return this.prismaService.seller.findMany(query);
+  }
+
+  findByIdAndPopulate(id: string): Promise<SellerWithRelationsEntity | null> {
+    return this.prismaService.seller.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
+      include: {
+        raffles: {
+          where: {
+            isActive: true,
+            isVisible: true,
+            deletedAt: null,
+          },
+        },
+        socialMedias: true,
+      },
+    });
   }
 
   findById(id: string): Promise<SellerEntity | null> {

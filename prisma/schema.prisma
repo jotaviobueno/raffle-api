@@ -104,7 +104,7 @@ model Seller {
   user   User   @relation(fields: [userId], references: [id])
   userId String @map("user_id")
 
-  logo String?
+  logo String
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
@@ -368,6 +368,7 @@ model Order {
   orderHistories OrderHistory[]
   orderStatus    OrderStatus?   @relation(fields: [orderStatusId], references: [id])
   finance        Finance?
+  gatewayEvents  GatewayEvent[]
 
   @@map("order")
 }
@@ -583,6 +584,7 @@ model PaymentMethod {
   orderPayments        OrderPayment[]
   cartPayments         CartPayment[]
   paymentGatewayConfig PaymentGatewayConfig? @relation(fields: [paymentGatewayConfigId], references: [id])
+  gatewayEvents        GatewayEvent[]
 
   @@map("payment_method")
 }
@@ -603,11 +605,10 @@ model PaymentGatewayConfig {
 }
 
 model OrderPayment {
-  id      String  @id @default(uuid())
-  orderId String  @unique @map("order_id")
-  method  String
-  status  String?
-
+  id              String  @id @default(uuid())
+  orderId         String  @unique @map("order_id")
+  method          String
+  status          String?
   paymentMethodId String  @map("payment_method_id")
   addressId       String  @map("address_id")
   gatewayPamentId String? @map("gateway_payment_id")
@@ -818,6 +819,24 @@ model Winner {
   customer User   @relation(fields: [customerId], references: [id])
 
   @@map("winner")
+}
+
+model GatewayEvent {
+  id String @id @default(uuid())
+
+  orderId         String @map("order_id")
+  paymentMethodId String @map("payment_method_id")
+
+  postback Json
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  order         Order         @relation(fields: [orderId], references: [id])
+  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+
+  @@map("gateway_event")
 }
 
 // TODO: CRIAR INVOICE

@@ -385,6 +385,16 @@ export class OrderService
                 },
               },
             },
+            gatewayEvents: {
+              create: {
+                postback: {
+                  toJSON() {
+                    return data;
+                  },
+                },
+                paymentMethodId: order.orderPayment.paymentMethodId,
+              },
+            },
             ...query,
           },
         });
