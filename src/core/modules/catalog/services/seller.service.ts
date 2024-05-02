@@ -60,11 +60,9 @@ export class SellerService
       primary: '#020202',
       secundary: '#363636',
       sellerId: seller.id,
-      text: '#e3e3e3',
       parent: {
         primary: '#c49645',
         secundary: '#daac5d',
-        text: '#dedede',
       },
     });
 

@@ -1,21 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsHexColor, IsNotEmpty } from 'class-validator';
 
 export class CreateColorDto {
-  @IsString()
+  @IsHexColor()
   @IsNotEmpty()
   @ApiProperty()
   primary: string;
 
-  @IsString()
+  @IsHexColor()
   @IsNotEmpty()
   @ApiProperty()
   secundary: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  text: string;
 
   sellerId: string;
 

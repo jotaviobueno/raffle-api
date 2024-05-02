@@ -18,14 +18,12 @@ export class ColorRepository extends RepositoryFactory<
       data: {
         primary: data.primary,
         secundary: data.secundary,
-        text: data.text,
         sellerId: data.sellerId,
         deletedAt: null,
         secundaryColor: {
           create: {
             primary: data.parent.primary,
             secundary: data.parent.secundary,
-            text: data.parent.text,
             deletedAt: null,
           },
         },
