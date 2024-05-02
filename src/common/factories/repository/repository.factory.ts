@@ -56,4 +56,8 @@ export class RepositoryFactory<K, T = void, J = void> {
       },
     });
   }
+
+  deleteMany() {
+    return this.prismaService[this.model].deleteMany();
+  }
 }

@@ -28,9 +28,18 @@ import { WinnerService } from './services/winner.service';
 import { ColorRepository } from './repositories/color.repository';
 import { ColorService } from './services/color.service';
 import { ColorController } from './controllers/collor.controller';
+import { BullModule } from '@nestjs/bull';
+import { QuotasConsumer } from './consumers/quotas.consumer';
+import { QUEUES_ENUM } from 'src/common/enums';
 
 @Module({
-  imports: [forwardRef(() => UserModule), SettingModule],
+  imports: [
+    forwardRef(() => UserModule),
+    SettingModule,
+    BullModule.registerQueue({
+      name: QUEUES_ENUM.QUOTAS,
+    }),
+  ],
   controllers: [
     SellerController,
     ProductController,
@@ -61,6 +70,7 @@ import { ColorController } from './controllers/collor.controller';
     WinnerService,
     ColorRepository,
     ColorService,
+    QuotasConsumer,
   ],
   exports: [
     SellerService,

@@ -16,13 +16,12 @@ import { CartService } from '../../cart/services/cart.service';
 import { PaymentService } from '../../payment/services/payment.service';
 import { OrderStatusService } from './order-status.service';
 import { PrismaService } from 'src/infra/database/prisma/prisma.service';
-import {
-  QueryBuilder,
-  prettyCardNumber,
-  randomNumberWithRangeUtil,
-} from 'src/common/utils';
+import { QueryBuilder, prettyCardNumber } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import * as creditCardType from 'credit-card-type';
+import { InjectQueue } from '@nestjs/bull';
+import { JOBS_ENUM, QUEUES_ENUM } from 'src/common/enums';
+import { Queue } from 'bull';
 
 @Injectable()
 export class OrderService
@@ -37,6 +36,8 @@ export class OrderService
     private readonly prismaService: PrismaService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    @InjectQueue(QUEUES_ENUM.QUOTAS)
+    private readonly quotasQueue: Queue,
   ) {}
 
   async create(dto: CreateCheckoutDto): Promise<OrderWithRelationsEntity> {
@@ -309,7 +310,7 @@ export class OrderService
           };
 
         if (data.event === 'PAYMENT_CONFIRMED') {
-          const dtos = await Promise.all(
+          await Promise.all(
             order.orderItems.map(async (orderItem) => {
               const data = {
                 progressPercentage:
@@ -326,17 +327,20 @@ export class OrderService
                 data: { ...data, isFinished: data.progressPercentage >= 100 },
               });
 
-              return Array.from({ length: orderItem.quantity }).map(() => {
-                return {
-                  raffleId: orderItem.raffleId,
-                  number: randomNumberWithRangeUtil(
-                    orderItem.raffle.initial,
-                    orderItem.raffle.final,
-                    orderItem.raffle.digits,
-                  ),
-                  deletedAt: null,
-                };
-              });
+              await this.quotasQueue.add(
+                JOBS_ENUM.CREATE_MANY_QUOTAS_JOB,
+                {
+                  raffle: orderItem.raffle,
+                  dto: {
+                    raffleId: orderItem.raffle.id,
+                    customerId: order.customer.id,
+                    quantity: orderItem.quantity,
+                  },
+                },
+                {
+                  removeOnComplete: true,
+                },
+              );
             }),
           );
 
@@ -355,16 +359,6 @@ export class OrderService
                     discountManual: order.orderTotal.discountManual,
                     fee: order.orderTotal.fee,
                     shipping: order.orderTotal.shipping,
-                  },
-                },
-              },
-            },
-            customer: {
-              update: {
-                quotas: {
-                  createMany: {
-                    data: dtos.flat(),
-                    skipDuplicates: true,
                   },
                 },
               },

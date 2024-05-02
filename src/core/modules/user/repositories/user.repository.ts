@@ -88,9 +88,6 @@ export class UserRepository extends RepositoryFactory<
         id,
         deletedAt: null,
       },
-      include: {
-        quotas: true,
-      },
     });
   }
 

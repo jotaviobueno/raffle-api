@@ -18,7 +18,7 @@ export class QutoasRepository extends RepositoryFactory<
 
   findByNumberAndRaffleId(
     number: string,
-    raffleId,
+    raffleId: string,
   ): Promise<QutoasEntity | null> {
     return this.prismaService.quotas.findFirst({
       where: {

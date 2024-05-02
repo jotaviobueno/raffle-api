@@ -14,9 +14,16 @@ import { OrderModule } from './core/modules/order/order.module';
 import { PaymentModule } from './core/modules/payment/payment.module';
 import { MarketingModule } from './core/modules/marketing/marketing.module';
 import { FinanceModule } from './core/modules/finance/finance.module';
+import { BullModule } from '@nestjs/bull';
+import { environment } from './config';
 
 @Module({
   imports: [
+    BullModule.forRoot({
+      redis: {
+        port: +environment.REDIS_PORT,
+      },
+    }),
     PrismaModule,
     RedisModule,
     UserModule,

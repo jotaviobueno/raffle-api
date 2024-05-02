@@ -7,9 +7,17 @@ import { OrderStatusService } from './services/order-status.service';
 import { OrderStatusRepository } from './repositories/order-status.repository';
 import { OrderStatusController } from './controllers/order-status.controller';
 import { CartModule } from '../cart/cart.module';
+import { BullModule } from '@nestjs/bull';
+import { QUEUES_ENUM } from 'src/common/enums';
 
 @Module({
-  imports: [PaymentModule, CartModule],
+  imports: [
+    PaymentModule,
+    CartModule,
+    BullModule.registerQueue({
+      name: QUEUES_ENUM.QUOTAS,
+    }),
+  ],
   controllers: [OrderController, OrderStatusController],
   providers: [
     OrderService,

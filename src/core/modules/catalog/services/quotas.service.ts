@@ -3,42 +3,42 @@ import { ServiceBase } from 'src/common/base';
 import { CreateQuotasDto, SearchQuotasDto } from 'src/domain/dtos';
 import { FindAllResultEntity, QutoasEntity } from 'src/domain/entities';
 import { RaffleService } from './raffle.service';
-import { QueryBuilder, randomNumberWithRangeUtil } from 'src/common/utils';
+import { QueryBuilder } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { QutoasRepository } from '../repositories/quotas.repository';
 import { UserService } from '../../user/services/user.service';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { JOBS_ENUM, QUEUES_ENUM } from 'src/common/enums';
 
 @Injectable()
 export class QuotasService
-  implements ServiceBase<QutoasEntity, CreateQuotasDto>
+  implements ServiceBase<QutoasEntity | boolean, CreateQuotasDto>
 {
   constructor(
-    private readonly qutoasRepository: QutoasRepository,
+    private readonly quotasRepository: QutoasRepository,
     private readonly userService: UserService,
     private readonly raffleService: RaffleService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    @InjectQueue(QUEUES_ENUM.QUOTAS)
+    private readonly quotasQueue: Queue,
   ) {}
 
-  async create({ quantity, ...dto }: CreateQuotasDto): Promise<QutoasEntity> {
+  async create(dto: CreateQuotasDto): Promise<boolean> {
     const raffle = await this.raffleService.findById(dto.raffleId);
 
     const customer = await this.userService.findById(dto.customerId);
 
-    const createQuotasDto = Array.from({ length: quantity }).map(() => ({
-      customerId: customer.id,
-      raffleId: raffle.id,
-      number: randomNumberWithRangeUtil(
-        raffle.initial,
-        raffle.final,
-        raffle.digits,
-      ),
-      deletedAt: null,
-    }));
+    await this.quotasQueue.add(
+      JOBS_ENUM.CREATE_MANY_QUOTAS_JOB,
+      { raffle, dto: { ...dto, customerId: customer.id } },
+      {
+        removeOnComplete: true,
+      },
+    );
 
-    const quotas = await this.qutoasRepository.createMany(createQuotasDto);
-
-    return quotas;
+    return true;
   }
 
   async findAll({
@@ -66,8 +66,8 @@ export class QuotasService
       .pagination()
       .handle();
 
-    const quotas = await this.qutoasRepository.findAll(query);
-    const total = await this.qutoasRepository.count(query.where);
+    const quotas = await this.quotasRepository.findAll(query);
+    const total = await this.quotasRepository.count(query.where);
 
     const info = {
       page: queryParams.page,
@@ -88,7 +88,7 @@ export class QuotasService
     number: string,
     raffleId: string,
   ): Promise<QutoasEntity> {
-    const quotas = await this.qutoasRepository.findByNumberAndRaffleId(
+    const quotas = await this.quotasRepository.findByNumberAndRaffleId(
       number,
       raffleId,
     );
@@ -100,7 +100,7 @@ export class QuotasService
   }
 
   async findById(id: string): Promise<QutoasEntity> {
-    const quotas = await this.qutoasRepository.findById(id);
+    const quotas = await this.quotasRepository.findById(id);
 
     if (!quotas)
       throw new HttpException('Quotas not found', HttpStatus.NOT_FOUND);
@@ -111,7 +111,7 @@ export class QuotasService
   async remove(id: string): Promise<boolean> {
     const quotas = await this.findById(id);
 
-    const remove = await this.qutoasRepository.softDelete(quotas.id);
+    const remove = await this.quotasRepository.softDelete(quotas.id);
 
     if (!remove)
       throw new HttpException('Failed to remove', HttpStatus.NOT_ACCEPTABLE);

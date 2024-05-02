@@ -7,8 +7,6 @@ import { environment } from 'src/config';
   imports: [
     CacheModule.register<RedisClientOptions>({
       isGlobal: true,
-      name: environment.REDIS_HOST,
-      password: environment.REDIS_PASSWORD,
       database: +environment.REDIS_PORT,
     }),
   ],

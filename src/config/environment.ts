@@ -1,9 +1,7 @@
 export const environment = {
   DATABASE_URL: process.env.DATABASE_URL,
   //
-  REDIS_HOST: process.env.REDIS_HOST,
   REDIS_PORT: process.env.REDIS_PORT,
-  REDIS_PASSWORD: process.env.REDIS_PASSWORD,
   //
   PORT: process.env.PORT ?? 3000,
   JWT_SECRET: process.env.JWT_SECRET,
