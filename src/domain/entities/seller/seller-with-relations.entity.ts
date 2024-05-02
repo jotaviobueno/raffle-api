@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { RaffleEntity } from '../raffle';
 import { SocialMediaEntity } from '../social-media';
 import { SellerEntity } from './seller.entity';
+import { ColorEntity, ColorWithRelationsEntity } from '../color';
 
 export class SellerWithRelationsEntity extends SellerEntity {
-  @ApiProperty({ type: [RaffleEntity] })
-  raffles: RaffleEntity[];
-
   @ApiProperty({ type: [SocialMediaEntity] })
   socialMedias: SocialMediaEntity[];
+
+  @ApiProperty({ type: ColorEntity })
+  color: ColorWithRelationsEntity;
 }

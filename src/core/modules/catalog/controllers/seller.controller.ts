@@ -68,7 +68,7 @@ export class SellerController {
         },
       },
     },
-    required: false,
+    required: true,
   })
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
@@ -85,7 +85,7 @@ export class SellerController {
         fileIsRequired: false,
       }),
     )
-    file?: Express.Multer.File,
+    file: Express.Multer.File,
   ) {
     return this.sellerService.create({ ...createSellerDto, file });
   }

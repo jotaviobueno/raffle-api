@@ -28,14 +28,12 @@ export class SellerRepository extends RepositoryFactory<
         deletedAt: null,
       },
       include: {
-        raffles: {
-          where: {
-            isActive: true,
-            isVisible: true,
-            deletedAt: null,
+        socialMedias: true,
+        color: {
+          include: {
+            secundaryColor: true,
           },
         },
-        socialMedias: true,
       },
     });
   }

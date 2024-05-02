@@ -25,6 +25,9 @@ import { QuotasController } from './controllers/quotas.controller';
 import { WinnerController } from './controllers/winner.controller';
 import { WinnerRepository } from './repositories/winner.repository';
 import { WinnerService } from './services/winner.service';
+import { ColorRepository } from './repositories/color.repository';
+import { ColorService } from './services/color.service';
+import { ColorController } from './controllers/collor.controller';
 
 @Module({
   imports: [forwardRef(() => UserModule), SettingModule],
@@ -37,6 +40,7 @@ import { WinnerService } from './services/winner.service';
     RaffleCategoryController,
     QuotasController,
     WinnerController,
+    ColorController,
   ],
   providers: [
     RaffleService,
@@ -55,6 +59,8 @@ import { WinnerService } from './services/winner.service';
     QutoasRepository,
     WinnerRepository,
     WinnerService,
+    ColorRepository,
+    ColorService,
   ],
   exports: [
     SellerService,
@@ -65,6 +71,7 @@ import { WinnerService } from './services/winner.service';
     RaffleCategoryService,
     QuotasService,
     WinnerService,
+    ColorService,
   ],
 })
 export class CatalogModule {}

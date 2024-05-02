@@ -8,7 +8,6 @@ import {
 import { ServiceBase } from 'src/common/base';
 import {
   CreateSellerDto,
-  QueryParamsDto,
   SearchSellerDto,
   UpdateSellerDto,
 } from 'src/domain/dtos';
@@ -22,6 +21,7 @@ import { QueryBuilder } from 'src/common/utils';
 import { UserService } from '../../user/services/user.service';
 import { SellerRepository } from '../repositories/seller.repository';
 import { S3Service } from '../../setting/services/s3.service';
+import { ColorService } from './color.service';
 
 @Injectable()
 export class SellerService
@@ -34,27 +34,38 @@ export class SellerService
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     private readonly s3Service: S3Service,
+    private readonly colorService: ColorService,
   ) {}
 
   async create({
     file,
     ...dto
   }: CreateSellerDto & {
-    file?: Express.Multer.File;
+    file: Express.Multer.File;
   }): Promise<SellerEntity> {
     const user = await this.userService.findById(dto.userId);
 
-    const logo =
-      file &&
-      (await this.s3Service.singleFile({
-        file,
-        path: 'seller/logo',
-      }));
+    const logo = await this.s3Service.singleFile({
+      file,
+      path: 'seller/logo',
+    });
 
     const seller = await this.sellerRepository.create({
       ...dto,
       userId: user.id,
       logo,
+    });
+
+    await this.colorService.create({
+      primary: '#020202',
+      secundary: '#363636',
+      sellerId: seller.id,
+      text: '#e3e3e3',
+      parent: {
+        primary: '#c49645',
+        secundary: '#daac5d',
+        text: '#dedede',
+      },
     });
 
     return seller;

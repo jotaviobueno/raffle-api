@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { seedCountries } from './country/seed-countries';
-import { seedMenus } from './menu/seed-menus';
 import { seedRoles } from './role/seed-roles';
 import { seedOrderStatus } from './order-status/seed-order-status';
 import { seedPaymentMethod } from './payment-method/seed-payment-method';
@@ -11,7 +10,6 @@ async function main() {
   return prisma.$transaction(
     async (tx) => {
       await seedCountries(tx);
-      await seedMenus(tx);
       await seedRoles(tx);
       await seedOrderStatus(tx);
       await seedPaymentMethod(tx);

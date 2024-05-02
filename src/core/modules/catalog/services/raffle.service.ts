@@ -28,15 +28,13 @@ export class RaffleService
     files,
     ...dto
   }: CreateRaffleDto & {
-    files?: Express.Multer.File[];
+    files: Express.Multer.File[];
   }): Promise<RaffleEntity> {
     const seller = await this.sellerService.findById(dto.sellerId);
 
-    const images =
-      files &&
-      (await this.s3Service.manyFiles(
-        files.map((file) => ({ file, path: 'raffle' })),
-      ));
+    const images = await this.s3Service.manyFiles(
+      files.map((file) => ({ file, path: 'raffle/images' })),
+    );
 
     const initialFinal = smallestLargestNumberUtil(dto.digits);
 
@@ -55,6 +53,7 @@ export class RaffleService
     isActive,
     isVisible,
     name,
+    isFinished,
     ...queryParams
   }: SearchRaffleDto): Promise<FindAllResultEntity<RaffleEntity>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
@@ -71,6 +70,7 @@ export class RaffleService
         sellerId: sellerId && sellerId,
         isActive: isActive && isActive,
         isVisible: isVisible && isVisible,
+        isFinished: isFinished && isFinished,
         name: name && { contains: name },
       })
       .sort()

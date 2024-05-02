@@ -1,21 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Menu } from '@prisma/client';
+import { Color } from '@prisma/client';
 
-export class MenuEntity implements Menu {
+export class ColorEntity implements Color {
   @ApiProperty()
   id: string;
 
-  @ApiProperty({ nullable: true })
-  label: string | null;
+  @ApiProperty()
+  primary: string;
 
   @ApiProperty()
-  name: string;
+  secundary: string;
+
+  @ApiProperty()
+  text: string;
 
   @ApiProperty({ nullable: true })
-  icon: string | null;
-
-  @ApiProperty({ nullable: true })
-  href: string | null;
+  sellerId: string | null;
 
   @ApiProperty({ nullable: true })
   parentId: string | null;

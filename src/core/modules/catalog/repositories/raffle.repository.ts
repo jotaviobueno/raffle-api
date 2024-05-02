@@ -7,7 +7,7 @@ import { RaffleEntity, QueryBuilderEntity } from 'src/domain/entities';
 export class RaffleRepository extends RepositoryFactory<
   RaffleEntity,
   CreateRaffleDto & {
-    images?: string[];
+    images: string[];
     initial: number;
     final: number;
     totalNumbers: number;

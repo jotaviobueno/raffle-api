@@ -301,17 +301,19 @@ export class OrderService
         if (data.event === 'PAYMENT_CONFIRMED') {
           const dtos = await Promise.all(
             order.orderItems.map(async (orderItem) => {
+              const data = {
+                progressPercentage:
+                  ((orderItem.raffle.payeds + orderItem.quantity) /
+                    orderItem.raffle.totalNumbers) *
+                  100,
+                payeds: {
+                  increment: orderItem.quantity,
+                },
+              };
+
               await tx.raffle.update({
                 where: { id: orderItem.raffleId },
-                data: {
-                  progressPercentage:
-                    ((orderItem.raffle.payeds + orderItem.quantity) /
-                      orderItem.raffle.totalNumbers) *
-                    100,
-                  payeds: {
-                    increment: orderItem.quantity,
-                  },
-                },
+                data: { ...data, isFinished: data.progressPercentage >= 100 },
               });
 
               return Array.from({ length: orderItem.quantity }).map(() => {

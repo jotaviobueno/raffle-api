@@ -16,13 +16,19 @@ export class SearchRaffleDto extends QueryParamsDto {
 
   @IsBoolean()
   @IsOptional()
-  @ApiProperty({ nullable: true, type: Boolean })
+  @ApiProperty({ nullable: true, required: false, type: Boolean })
+  @Transform(({ value }) => value === 'true')
+  isFinished?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  @ApiProperty({ nullable: true, required: false, type: Boolean })
   @Transform(({ value }) => value === 'true')
   isActive?: boolean;
 
   @IsBoolean()
   @IsOptional()
-  @ApiProperty({ nullable: true, type: Boolean })
+  @ApiProperty({ nullable: true, required: false, type: Boolean })
   @Transform(({ value }) => value === 'true')
   isVisible?: boolean;
 }

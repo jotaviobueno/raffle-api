@@ -120,6 +120,7 @@ model Seller {
   utmCampaigns         UtmCampaign[]
   carts                Cart[]
   finances             Finance[]
+  color                Color?
 
   @@map("seller")
 }
@@ -204,24 +205,6 @@ model State {
   @@map("state")
 }
 
-model Menu {
-  id    String  @id @default(uuid())
-  label String?
-  name  String
-  icon  String?
-  href  String?
-
-  parentId String? @map("parent_id")
-  parent   Menu?   @relation("SubMenu", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  subMenus Menu[]  @relation("SubMenu")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  @@map("menu")
-}
-
 model Category {
   id   String @id @default(uuid())
   name String
@@ -266,9 +249,11 @@ model Raffle {
   price Float
   tax   Float @default(0)
 
-  isVisible Boolean @default(true) @map("is_visible")
-  isActive  Boolean @default(true) @map("is_active")
-  sellerId  String  @map("seller_id")
+  isFinished Boolean @default(false) @map("is_finished")
+  isVisible  Boolean @default(true) @map("is_visible")
+  isActive   Boolean @default(true) @map("is_active")
+  sellerId   String  @map("seller_id")
+  quantity   Int[]   @default([5, 10, 50, 100])
 
   minBuyQuotas       Int   @map("min_buy_quotas")
   maxBuyQuotas       Int   @map("max_buy_quotas")
@@ -839,4 +824,22 @@ model GatewayEvent {
   @@map("gateway_event")
 }
 
-// TODO: CRIAR INVOICE
+model Color {
+  id        String @id @default(uuid())
+  primary   String
+  secundary String
+  text      String
+
+  sellerId String? @unique @map("seller_id")
+  parentId String? @unique @map("parent_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  parent         Color?  @relation("secundaryColor", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  secundaryColor Color?  @relation("secundaryColor")
+  seller         Seller? @relation(fields: [sellerId], references: [id])
+
+  @@map("color")
+}

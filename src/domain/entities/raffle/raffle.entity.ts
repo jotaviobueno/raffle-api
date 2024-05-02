@@ -20,6 +20,9 @@ export class RaffleEntity implements Raffle {
   @ApiProperty({ type: [String] })
   images: string[];
 
+  @ApiProperty({ type: [Number] })
+  quantity: number[];
+
   @ApiProperty()
   metaDescription: string;
 
@@ -37,6 +40,9 @@ export class RaffleEntity implements Raffle {
 
   @ApiProperty({ type: Boolean })
   isActive: boolean;
+
+  @ApiProperty({ type: Boolean })
+  isFinished: boolean;
 
   @ApiProperty()
   sellerId: string;
