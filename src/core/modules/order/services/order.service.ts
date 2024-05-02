@@ -57,11 +57,21 @@ export class OrderService
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
 
+    if (
+      cart.cartPayment.paymentMethod.code === 'credit.card' &&
+      cart.cartTotal.total < 5
+    )
+      throw new HttpException(
+        'For credit card charges, an amount greater than 5 is required',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
     for (const item of cart.cartItems) {
       if (
         new Date() > item.raffle.drawDateAt ||
         item.raffle.progressPercentage >= 100 ||
-        item.raffle.payeds >= item.raffle.totalNumbers
+        item.raffle.payeds >= item.raffle.totalNumbers ||
+        item.raffle.isFinished
       )
         throw new HttpException(
           'Raffle has already been completed',

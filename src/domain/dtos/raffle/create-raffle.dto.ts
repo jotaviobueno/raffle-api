@@ -23,22 +23,12 @@ export class CreateRaffleDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  metaTitle: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
   shortDescription: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
   description: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  metaDescription: string;
 
   @IsArray()
   @IsString({ each: true })
@@ -93,5 +83,15 @@ export class CreateRaffleDto {
   @IsNotEmpty()
   @IsInt()
   @ApiProperty({ type: Number })
-  digits: number;
+  final: number;
+
+  @IsOptional()
+  @IsInt()
+  @ApiProperty({ type: Number, nullable: true, required: false })
+  initial?: number;
+
+  @ApiProperty({ type: [Number], nullable: true, required: false })
+  @IsInt({ each: true })
+  @IsOptional()
+  quantity?: number[];
 }

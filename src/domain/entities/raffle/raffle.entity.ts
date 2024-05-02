@@ -9,9 +9,6 @@ export class RaffleEntity implements Raffle {
   title: string;
 
   @ApiProperty()
-  metaTitle: string;
-
-  @ApiProperty()
   shortDescription: string;
 
   @ApiProperty()
@@ -22,9 +19,6 @@ export class RaffleEntity implements Raffle {
 
   @ApiProperty({ type: [Number] })
   quantity: number[];
-
-  @ApiProperty()
-  metaDescription: string;
 
   @ApiProperty({ type: [String] })
   metaKeyword: string[];

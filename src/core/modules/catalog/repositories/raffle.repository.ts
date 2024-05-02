@@ -8,14 +8,12 @@ export class RaffleRepository extends RepositoryFactory<
   RaffleEntity,
   CreateRaffleDto & {
     images: string[];
-    initial: number;
-    final: number;
+    digits: number;
     totalNumbers: number;
   },
   UpdateRaffleDto & {
     images?: string[];
-    initial?: number;
-    final?: number;
+    digits?: number;
     totalNumbers?: number;
   }
 > {

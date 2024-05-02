@@ -30,7 +30,8 @@ export class CartItemService
     if (
       new Date() > raffle.drawDateAt ||
       raffle.progressPercentage >= 100 ||
-      raffle.payeds >= raffle.totalNumbers
+      raffle.payeds >= raffle.totalNumbers ||
+      raffle.isFinished
     )
       throw new HttpException(
         'Raffle has already been completed',

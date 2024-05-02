@@ -239,11 +239,9 @@ model RaffleCategory {
 model Raffle {
   id               String   @id @default(uuid())
   title            String
-  metaTitle        String   @map("meta_title")
   shortDescription String   @map("short_description")
   description      String
   images           String[] @default([])
-  metaDescription  String   @map("meta_description")
   metaKeyword      String[] @default([]) @map("meta_keyword")
 
   price Float
@@ -261,7 +259,7 @@ model Raffle {
   payeds             Int   @default(0)
 
   digits       Int
-  initial      Int
+  initial      Int @default(0)
   final        Int
   totalNumbers Int @map("total_numbers")
 
