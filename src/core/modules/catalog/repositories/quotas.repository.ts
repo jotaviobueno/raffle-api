@@ -6,7 +6,7 @@ import { QueryBuilderEntity, QutoasEntity } from 'src/domain/entities';
 @Injectable()
 export class QutoasRepository extends RepositoryFactory<
   QutoasEntity,
-  CreateQuotasDto & { number: string }
+  Omit<CreateQuotasDto & { number: string }, 'quantity'>
 > {
   constructor() {
     super('quotas');

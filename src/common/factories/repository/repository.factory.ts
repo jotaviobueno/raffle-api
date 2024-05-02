@@ -7,6 +7,13 @@ export class RepositoryFactory<K, T = void, J = void> {
 
   constructor(public model: string) {}
 
+  createMany(data: T[]) {
+    return this.prismaService[this.model].createMany({
+      data,
+      skipDuplicates: true,
+    });
+  }
+
   create(data: T): Promise<K> {
     return this.prismaService[this.model].create({
       data: {

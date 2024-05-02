@@ -20,20 +20,23 @@ export class QuotasService
     private readonly cacheManager: Cache,
   ) {}
 
-  async create(dto: CreateQuotasDto): Promise<QutoasEntity> {
+  async create({ quantity, ...dto }: CreateQuotasDto): Promise<QutoasEntity> {
     const raffle = await this.raffleService.findById(dto.raffleId);
 
     const customer = await this.userService.findById(dto.customerId);
 
-    const quotas = await this.qutoasRepository.create({
-      raffleId: raffle.id,
+    const createQuotasDto = Array.from({ length: quantity }).map(() => ({
       customerId: customer.id,
+      raffleId: raffle.id,
       number: randomNumberWithRangeUtil(
         raffle.initial,
         raffle.final,
         raffle.digits,
       ),
-    });
+      deletedAt: null,
+    }));
+
+    const quotas = await this.qutoasRepository.createMany(createQuotasDto);
 
     return quotas;
   }

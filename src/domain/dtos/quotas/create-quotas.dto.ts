@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsInt, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class CreateQuotasDto {
   @IsUUID()
@@ -11,4 +11,9 @@ export class CreateQuotasDto {
   @IsNotEmpty()
   @ApiProperty()
   customerId: string;
+
+  @IsInt()
+  @ApiProperty({ type: Number })
+  @IsNotEmpty()
+  quantity: number;
 }
