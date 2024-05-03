@@ -339,6 +339,7 @@ export class OrderService
                 },
                 {
                   removeOnComplete: true,
+                  removeOnFail: true,
                 },
               );
             }),

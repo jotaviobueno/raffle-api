@@ -1,7 +1,6 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/services/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { compare } from 'src/common/utils';
 import { CreateAuthDto } from 'src/domain/dtos';
 import { ServiceBase } from 'src/common/base';
 import { AuthEntity } from 'src/domain/entities';
@@ -14,12 +13,7 @@ export class AuthService implements ServiceBase<AuthEntity, CreateAuthDto> {
   ) {}
 
   async create(dto: CreateAuthDto): Promise<AuthEntity> {
-    const user = await this.userService.findByEmail(dto.email);
-
-    const passwordIsEqual = await compare(dto.password, user.password);
-
-    if (!passwordIsEqual)
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    const user = await this.userService.findByMobilePhone(dto.mobilePhone);
 
     const token = this.jwtService.sign({
       sub: user.id,

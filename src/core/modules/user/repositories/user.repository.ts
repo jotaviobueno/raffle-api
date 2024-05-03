@@ -24,8 +24,8 @@ export class UserRepository extends RepositoryFactory<
       data,
       select: {
         id: true,
-        lastName: true,
-        firstName: true,
+        mobilePhone: true,
+        fullName: true,
         phone: true,
         avatar: true,
         createdAt: true,
@@ -33,7 +33,6 @@ export class UserRepository extends RepositoryFactory<
         deletedAt: true,
         email: true,
         document: true,
-        birthDate: true,
       },
     });
   }
@@ -47,6 +46,15 @@ export class UserRepository extends RepositoryFactory<
     });
   }
 
+  findByMobilePhone(mobilePhone: string): Promise<UserEntity | null> {
+    return this.prismaService.user.findFirst({
+      where: {
+        mobilePhone,
+        deletedAt: null,
+      },
+    });
+  }
+
   findByIdAndPopulate(id: string): Promise<UserWithRelationsEntity | null> {
     return this.prismaService.user.findFirst({
       where: {
@@ -55,16 +63,15 @@ export class UserRepository extends RepositoryFactory<
       },
       select: {
         id: true,
-        lastName: true,
-        firstName: true,
+        fullName: true,
         phone: true,
+        mobilePhone: true,
         avatar: true,
         createdAt: true,
         updatedAt: true,
         deletedAt: true,
         email: true,
         document: true,
-        birthDate: true,
         userRoles: {
           include: {
             role: {
@@ -96,8 +103,8 @@ export class UserRepository extends RepositoryFactory<
       ...query,
       select: {
         id: true,
-        lastName: true,
-        firstName: true,
+        mobilePhone: true,
+        fullName: true,
         phone: true,
         avatar: true,
         createdAt: true,
@@ -105,7 +112,6 @@ export class UserRepository extends RepositoryFactory<
         deletedAt: true,
         email: true,
         document: true,
-        birthDate: true,
       },
     });
   }
@@ -121,8 +127,8 @@ export class UserRepository extends RepositoryFactory<
       data,
       select: {
         id: true,
-        lastName: true,
-        firstName: true,
+        mobilePhone: true,
+        fullName: true,
         phone: true,
         avatar: true,
         createdAt: true,
@@ -130,7 +136,6 @@ export class UserRepository extends RepositoryFactory<
         deletedAt: true,
         email: true,
         document: true,
-        birthDate: true,
       },
     });
   }

@@ -11,9 +11,9 @@ export class CartWithRelationsEntity extends CartEntity {
   @ApiProperty({
     type: PickType(UserEntity, [
       'id',
-      'firstName',
-      'lastName',
+      'fullName',
       'phone',
+      'mobilePhone',
       'document',
       'email',
       'avatar',
@@ -25,8 +25,8 @@ export class CartWithRelationsEntity extends CartEntity {
   customer: Pick<
     UserEntity,
     | 'id'
-    | 'firstName'
-    | 'lastName'
+    | 'mobilePhone'
+    | 'fullName'
     | 'phone'
     | 'document'
     | 'email'
@@ -81,9 +81,9 @@ export const cartQueryWithRelations = {
   customer: {
     select: {
       id: true,
-      firstName: true,
-      lastName: true,
+      fullName: true,
       phone: true,
+      mobilePhone: true,
       document: true,
       email: true,
       createdAt: true,

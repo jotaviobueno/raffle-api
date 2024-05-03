@@ -6,15 +6,15 @@ export class UserEntity implements User {
   id: string;
 
   @ApiProperty()
-  firstName: string;
+  fullName: string;
 
-  @ApiProperty()
-  lastName: string;
-
-  @ApiProperty()
-  email: string;
+  @ApiProperty({ nullable: true })
+  email: string | null;
 
   password: string | null;
+
+  @ApiProperty()
+  mobilePhone: string;
 
   @ApiProperty({ nullable: true })
   phone: string | null;
@@ -22,11 +22,8 @@ export class UserEntity implements User {
   @ApiProperty()
   avatar: string;
 
-  @ApiProperty({ nullable: true })
-  document: string | null;
-
-  @ApiProperty({ type: Date, nullable: true })
-  birthDate: Date | null;
+  @ApiProperty()
+  document: string;
 
   @ApiProperty({ type: Date })
   createdAt: Date;

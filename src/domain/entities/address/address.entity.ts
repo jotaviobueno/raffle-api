@@ -8,6 +8,9 @@ export class AddressEntity implements Address {
   @ApiProperty()
   street: string;
 
+  @ApiProperty({ type: Boolean })
+  isDefault: boolean;
+
   @ApiProperty({ nullable: true })
   reference: string | null;
 

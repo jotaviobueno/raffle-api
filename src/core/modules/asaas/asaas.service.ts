@@ -101,7 +101,11 @@ export class AsaasService {
     try {
       const { data } = await this.setup().post<AsaasPaymentResponseEntity>(
         '/payments/',
-        dto,
+        {
+          ...dto,
+          interest: { value: this.interest },
+          fine: { value: this.fine },
+        },
       );
 
       return data;

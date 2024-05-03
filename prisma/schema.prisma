@@ -14,18 +14,18 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  firstName String
-  lastName  String
-  email     String
-  password  String?
-  phone     String?
-  avatar    String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
-  document  String?
-  birthDate DateTime? @map("birth_date") @db.Timestamp
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  id          String    @id @default(uuid())
+  mobilePhone String    @map("mobile_phone")
+  fullName    String    @map("full_name")
+  document    String
+  email       String?
+  // 
+  phone       String?
+  password    String?
+  avatar      String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamp
 
   addresses      Address[]
   sellers        Seller[]
@@ -146,6 +146,7 @@ model Address {
   street       String
   reference    String?
   complement   String?
+  isDefault    Boolean @map("is_default")
   neighborhood String
   countryId    String  @map("country_id")
   stateId      String  @map("state_id")

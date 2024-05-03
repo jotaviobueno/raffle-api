@@ -40,7 +40,7 @@ export class UserService
     if (code != ROLE_ENUM.USER) {
       if (dto.password)
         throw new HttpException(
-          'Not possible to create SUPPLIER or CUSTOMER with password',
+          'Not possible to create CUSTOMER with password',
           HttpStatus.UNPROCESSABLE_ENTITY,
         );
 
@@ -63,13 +63,27 @@ export class UserService
 
     if (sellerId) await this.sellerService.findById(sellerId);
 
-    const emailAlreadyExist = await this.userRepository.findByEmail(dto.email);
+    const mobilePhoneAlreadyExist = await this.userRepository.findByMobilePhone(
+      dto.mobilePhone,
+    );
 
-    if (emailAlreadyExist)
+    if (mobilePhoneAlreadyExist)
       throw new HttpException(
-        'Email, phone or username already exist.',
+        'Email, phone already exist.',
         HttpStatus.CONFLICT,
       );
+
+    if (dto.email) {
+      const emailAlreadyExist = await this.userRepository.findByEmail(
+        dto.email,
+      );
+
+      if (emailAlreadyExist)
+        throw new HttpException(
+          'Email, phone already exist.',
+          HttpStatus.CONFLICT,
+        );
+    }
 
     if (code === ROLE_ENUM.USER) dto.password = await hash(dto.password);
 
@@ -130,8 +144,8 @@ export class UserService
     return user;
   }
 
-  async findByEmail(email: string): Promise<UserEntity> {
-    const user = await this.userRepository.findByEmail(email);
+  async findByMobilePhone(mobilePhone: string): Promise<UserEntity> {
+    const user = await this.userRepository.findByMobilePhone(mobilePhone);
 
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 

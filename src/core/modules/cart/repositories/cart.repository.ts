@@ -68,8 +68,8 @@ export class CartRepository extends RepositoryFactory<
         customer: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            fullName: true,
+            mobilePhone: true,
             phone: true,
             document: true,
             email: true,

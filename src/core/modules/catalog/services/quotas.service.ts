@@ -35,6 +35,7 @@ export class QuotasService
       { raffle, dto: { ...dto, customerId: customer.id } },
       {
         removeOnComplete: true,
+        removeOnFail: true,
       },
     );
 

@@ -1,9 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 import {
-  IsDate,
   IsEmail,
   IsEnum,
+  IsMobilePhone,
   IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
@@ -17,38 +16,32 @@ export class CreateUserDto {
   @IsString()
   @ApiProperty()
   @IsNotEmpty()
-  firstName: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  lastName: string;
+  fullName: string;
 
   @IsEmail()
-  @IsNotEmpty()
-  @ApiProperty()
-  email: string;
+  @IsOptional()
+  @ApiProperty({ nullable: true, required: false })
+  email?: string;
 
   @IsString()
   @IsOptional()
   @ApiProperty({ nullable: true, required: false })
   password?: string;
 
-  @IsPhoneNumber()
+  @IsMobilePhone()
   @IsOptional()
   @ApiProperty()
+  mobilePhone: string;
+
+  @IsPhoneNumber()
+  @IsOptional()
+  @ApiProperty({ nullable: true, required: false })
   phone?: string;
 
   @IsCpfCnpj()
   @IsOptional()
-  @ApiProperty({ nullable: true, required: false })
-  document?: string;
-
-  @IsDate()
-  @IsOptional()
-  @Transform(({ value }) => new Date(value))
-  @ApiProperty({ nullable: true, type: Date })
-  birthDate?: Date;
+  @ApiProperty()
+  document: string;
 
   @IsEnum(PUBLIC_ROLE_ENUM)
   @IsNotEmpty()

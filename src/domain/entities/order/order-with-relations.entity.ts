@@ -16,9 +16,9 @@ export class OrderWithRelationsEntity extends OrderEntity {
   @ApiProperty({
     type: PickType(UserEntity, [
       'id',
-      'firstName',
-      'lastName',
+      'fullName',
       'phone',
+      'mobilePhone',
       'document',
       'email',
       'avatar',
@@ -30,15 +30,15 @@ export class OrderWithRelationsEntity extends OrderEntity {
   customer: Pick<
     UserEntity,
     | 'id'
-    | 'firstName'
-    | 'lastName'
+    | 'mobilePhone'
+    | 'fullName'
     | 'phone'
     | 'document'
     | 'email'
-    | 'avatar'
     | 'createdAt'
     | 'updatedAt'
     | 'deletedAt'
+    | 'avatar'
   >;
 
   @ApiProperty({ type: OrderPaymentWithRelations, nullable: true })
@@ -64,9 +64,9 @@ export const orderQueryWithRelations = {
   customer: {
     select: {
       id: true,
-      firstName: true,
-      lastName: true,
+      fullName: true,
       phone: true,
+      mobilePhone: true,
       document: true,
       email: true,
       createdAt: true,
