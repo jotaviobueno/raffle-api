@@ -1,6 +1,10 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
-import { CreateQuotasDto, SearchQuotasDto } from 'src/domain/dtos';
+import {
+  CreateQuotasDto,
+  JobQuotasDto,
+  SearchQuotasDto,
+} from 'src/domain/dtos';
 import { FindAllResultEntity, QutoasEntity } from 'src/domain/entities';
 import { RaffleService } from './raffle.service';
 import { QueryBuilder } from 'src/common/utils';
@@ -22,11 +26,31 @@ export class QuotasService
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     @InjectQueue(QUEUES_ENUM.QUOTAS)
-    private readonly quotasQueue: Queue,
+    private readonly quotasQueue: Queue<JobQuotasDto>,
   ) {}
 
   async create(dto: CreateQuotasDto): Promise<boolean> {
     const raffle = await this.raffleService.findById(dto.raffleId);
+
+    if (
+      new Date() > raffle.drawDateAt ||
+      raffle.progressPercentage >= 100 ||
+      raffle.payeds >= raffle.totalNumbers ||
+      raffle.isFinished
+    )
+      throw new HttpException(
+        'Raffle has already been completed',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
+    if (
+      raffle.payeds + dto.quantity > raffle.totalNumbers ||
+      ((raffle.payeds + dto.quantity) / raffle.totalNumbers) * 100 > 100
+    )
+      throw new HttpException(
+        'You need to decrease your quantity',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
 
     const customer = await this.userService.findById(dto.customerId);
 
@@ -35,7 +59,6 @@ export class QuotasService
       { raffle, dto: { ...dto, customerId: customer.id } },
       {
         removeOnComplete: true,
-        removeOnFail: true,
       },
     );
 

@@ -50,7 +50,10 @@ export class CartItemService
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
 
-    if (((raffle.payeds + dto.quantity) / raffle.totalNumbers) * 100 > 100)
+    if (
+      raffle.payeds + dto.quantity > raffle.totalNumbers ||
+      ((raffle.payeds + dto.quantity) / raffle.totalNumbers) * 100 > 100
+    )
       throw new HttpException(
         'You need to decrease your order quantity',
         HttpStatus.UNPROCESSABLE_ENTITY,

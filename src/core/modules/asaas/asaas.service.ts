@@ -56,7 +56,7 @@ export class AsaasService {
 
       return data;
     } catch (e) {
-      Logger.debug('FAILED TO CREATE CUSTOMER (ASAAS)', e.response.data);
+      Logger.error('FAILED TO CREATE CUSTOMER (ASAAS)', e.response.data);
       throw e;
     }
   }
@@ -71,7 +71,7 @@ export class AsaasService {
 
       return data;
     } catch (e) {
-      Logger.debug('FAILED PRE-AUTHORIZE PAYMENT (ASAAS)', e.response.data);
+      Logger.error('FAILED PRE-AUTHORIZE PAYMENT (ASAAS)', e.response.data);
       throw e;
     }
   }
@@ -90,7 +90,7 @@ export class AsaasService {
 
       return data;
     } catch (e) {
-      Logger.debug('FAILED TO UPDATE CUSTOMER (ASAAS)', e.response.data);
+      Logger.error('FAILED TO UPDATE CUSTOMER (ASAAS)', e.response.data);
       throw e;
     }
   }
@@ -110,7 +110,7 @@ export class AsaasService {
 
       return data;
     } catch (e) {
-      Logger.debug('FAILED TO CREATE PAYMENT (ASAAS)', e.response.data);
+      Logger.error('FAILED TO CREATE PAYMENT (ASAAS)', e.response.data);
 
       throw e;
     }
@@ -122,7 +122,7 @@ export class AsaasService {
 
       return data;
     } catch (e) {
-      Logger.debug('FAILED TO GET PIX (ASAAS)', e.response.data);
+      Logger.error('FAILED TO GET PIX (ASAAS)', e.response.data);
 
       throw e;
     }
@@ -134,7 +134,7 @@ export class AsaasService {
 
       return data;
     } catch (e) {
-      Logger.debug(
+      Logger.error(
         'FAILED TO GET STATUS BY PAYMENT ID (ASAAS)',
         e.response.data,
       );
@@ -151,7 +151,7 @@ export class AsaasService {
 
       return data;
     } catch (e) {
-      Logger.debug('FAILED TO GET BANKSLIP (ASAAS)', e.response.data);
+      Logger.error('FAILED TO GET BANKSLIP (ASAAS)', e.response.data);
 
       throw e;
     }

@@ -1,3 +1,5 @@
-export function addZeroLeft(number: number, digits: number): string {
-  return number.toString().padStart(digits, '0');
+export function addZeroLeft(min: number, max: number, digits: number): string {
+  const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+
+  return randomNumber.toString().padStart(digits, '0');
 }

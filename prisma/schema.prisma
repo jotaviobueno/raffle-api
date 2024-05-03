@@ -842,3 +842,17 @@ model Color {
 
   @@map("color")
 }
+
+model Audit {
+  id        String @id @default(uuid())
+  namespace String
+  action    String
+  resources String
+  meta      Json
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  @@map("audit")
+}

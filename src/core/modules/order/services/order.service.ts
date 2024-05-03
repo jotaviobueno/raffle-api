@@ -3,6 +3,7 @@ import { ServiceBase } from 'src/common/base';
 import {
   AsaasWebhookEventDto,
   CreateCheckoutDto,
+  JobQuotasDto,
   QueryParamsDto,
 } from 'src/domain/dtos';
 import {
@@ -37,7 +38,7 @@ export class OrderService
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     @InjectQueue(QUEUES_ENUM.QUOTAS)
-    private readonly quotasQueue: Queue,
+    private readonly quotasQueue: Queue<JobQuotasDto>,
   ) {}
 
   async create(dto: CreateCheckoutDto): Promise<OrderWithRelationsEntity> {
@@ -339,7 +340,6 @@ export class OrderService
                 },
                 {
                   removeOnComplete: true,
-                  removeOnFail: true,
                 },
               );
             }),

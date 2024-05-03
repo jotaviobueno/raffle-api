@@ -15,6 +15,8 @@ export class AuthService implements ServiceBase<AuthEntity, CreateAuthDto> {
   async create(dto: CreateAuthDto): Promise<AuthEntity> {
     const user = await this.userService.findByMobilePhone(dto.mobilePhone);
 
+    // TODO: ARRUMAR LOGICA DO LOGIN, CASO USUARIO SEJA ADMIN NÃO ACEITAR O LOGIN POR APENAS TELEFONE
+
     const token = this.jwtService.sign({
       sub: user.id,
     });
