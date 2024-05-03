@@ -9,12 +9,14 @@ export class RaffleRepository extends RepositoryFactory<
   CreateRaffleDto & {
     images: string[];
     digits: number;
+    final: number;
     totalNumbers: number;
   },
   UpdateRaffleDto & {
     images?: string[];
     digits?: number;
     totalNumbers?: number;
+    isFinished?: boolean;
   }
 > {
   constructor() {

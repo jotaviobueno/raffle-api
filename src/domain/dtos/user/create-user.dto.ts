@@ -19,24 +19,19 @@ export class CreateUserDto {
   fullName: string;
 
   @IsEmail()
-  @IsOptional()
-  @ApiProperty({ nullable: true, required: false })
-  email?: string;
+  @IsNotEmpty()
+  @ApiProperty()
+  email: string;
 
   @IsString()
-  @IsOptional()
-  @ApiProperty({ nullable: true, required: false })
-  password?: string;
+  @IsNotEmpty()
+  @ApiProperty()
+  password: string;
 
   @IsMobilePhone()
   @IsOptional()
   @ApiProperty()
   mobilePhone: string;
-
-  @IsPhoneNumber()
-  @IsOptional()
-  @ApiProperty({ nullable: true, required: false })
-  phone?: string;
 
   @IsCpfCnpj()
   @IsOptional()
@@ -47,6 +42,11 @@ export class CreateUserDto {
   @IsNotEmpty()
   @ApiProperty({ nullable: true, enum: PUBLIC_ROLE_ENUM })
   code: keyof typeof PUBLIC_ROLE_ENUM;
+
+  @IsPhoneNumber()
+  @IsOptional()
+  @ApiProperty({ nullable: true, required: false })
+  phone?: string;
 
   @IsUUID()
   @IsOptional()

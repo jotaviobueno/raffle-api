@@ -18,10 +18,9 @@ model User {
   mobilePhone String    @map("mobile_phone")
   fullName    String    @map("full_name")
   document    String
-  email       String?
-  // 
+  email       String
   phone       String?
-  password    String?
+  password    String
   avatar      String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp

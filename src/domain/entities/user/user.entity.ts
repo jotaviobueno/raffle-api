@@ -6,15 +6,15 @@ export class UserEntity implements User {
   id: string;
 
   @ApiProperty()
-  fullName: string;
-
-  @ApiProperty({ nullable: true })
-  email: string | null;
-
-  password: string | null;
+  mobilePhone: string;
 
   @ApiProperty()
-  mobilePhone: string;
+  fullName: string;
+
+  @ApiProperty()
+  email: string;
+
+  password: string;
 
   @ApiProperty({ nullable: true })
   phone: string | null;

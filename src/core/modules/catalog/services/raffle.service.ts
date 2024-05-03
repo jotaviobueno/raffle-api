@@ -39,9 +39,8 @@ export class RaffleService
     const raffle = await this.raffleRepository.create({
       ...dto,
       images,
-      digits: dto.final.toString().length,
-      final: dto.final - 1,
-      totalNumbers: dto.final,
+      digits: dto.totalNumbers.toString().length,
+      final: dto.totalNumbers - 1,
       sellerId: seller.id,
     });
 
@@ -118,16 +117,23 @@ export class RaffleService
         files.map((file) => ({ file, path: 'raffle' })),
       ));
 
-    if (dto.final && dto.final < raffle.final)
+    if (dto.totalNumbers && dto.totalNumbers < raffle.totalNumbers)
       throw new HttpException(
         'you cannot upgrade to a lower value',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
 
+    const numbersNewConfig = dto.totalNumbers && {
+      isFinished:
+        raffle.isFinished && dto?.totalNumbers ? false : raffle.isFinished,
+      digits: dto.totalNumbers.toString().length,
+      final: dto.totalNumbers - 1,
+    };
+
     const update = await this.raffleRepository.update({
       ...dto,
+      ...numbersNewConfig,
       images,
-      totalNumbers: dto.final,
       id: raffle.id,
     });
 

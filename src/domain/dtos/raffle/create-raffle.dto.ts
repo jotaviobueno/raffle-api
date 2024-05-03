@@ -83,7 +83,7 @@ export class CreateRaffleDto {
   @IsNotEmpty()
   @IsInt()
   @ApiProperty({ type: Number })
-  final: number;
+  totalNumbers: number;
 
   @IsOptional()
   @IsInt()

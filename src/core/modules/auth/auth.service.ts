@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserService } from '../user/services/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateAuthDto } from 'src/domain/dtos';
 import { ServiceBase } from 'src/common/base';
 import { AuthEntity } from 'src/domain/entities';
+import { compare } from 'src/common/utils';
 
 @Injectable()
 export class AuthService implements ServiceBase<AuthEntity, CreateAuthDto> {
@@ -13,9 +14,15 @@ export class AuthService implements ServiceBase<AuthEntity, CreateAuthDto> {
   ) {}
 
   async create(dto: CreateAuthDto): Promise<AuthEntity> {
-    const user = await this.userService.findByMobilePhone(dto.mobilePhone);
+    const user = await this.userService.findByEmail(dto.email);
 
-    // TODO: ARRUMAR LOGICA DO LOGIN, CASO USUARIO SEJA ADMIN NÃO ACEITAR O LOGIN POR APENAS TELEFONE
+    const passwordIsEqual = await compare(dto.password, user.password);
+
+    if (!passwordIsEqual)
+      throw new HttpException(
+        'Email or password is incorret',
+        HttpStatus.UNAUTHORIZED,
+      );
 
     const token = this.jwtService.sign({
       sub: user.id,
