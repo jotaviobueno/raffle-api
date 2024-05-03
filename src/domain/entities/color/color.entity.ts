@@ -11,6 +11,9 @@ export class ColorEntity implements Color {
   @ApiProperty()
   secundary: string;
 
+  @ApiProperty()
+  text: string;
+
   @ApiProperty({ nullable: true })
   sellerId: string | null;
 

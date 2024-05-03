@@ -57,12 +57,14 @@ export class SellerService
     });
 
     await this.colorService.create({
-      primary: '#020202',
+      primary: '#0f0f0f',
       secundary: '#363636',
       sellerId: seller.id,
+      text: '#e0e0e0',
       parent: {
         primary: '#c49645',
         secundary: '#daac5d',
+        text: '#dedede',
       },
     });
 

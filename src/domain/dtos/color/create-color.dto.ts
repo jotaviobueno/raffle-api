@@ -12,6 +12,11 @@ export class CreateColorDto {
   @ApiProperty()
   secundary: string;
 
+  @IsHexColor()
+  @IsNotEmpty()
+  @ApiProperty()
+  text: string;
+
   sellerId: string;
 
   parent: Omit<CreateColorDto, 'sellerId' | 'parent'>;

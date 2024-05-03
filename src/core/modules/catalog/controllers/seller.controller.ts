@@ -82,7 +82,7 @@ export class SellerController {
           new MaxFileSizeValidator({ maxSize: 10_000 }),
           new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
         ],
-        fileIsRequired: false,
+        fileIsRequired: true,
       }),
     )
     file: Express.Multer.File,
