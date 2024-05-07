@@ -17,6 +17,8 @@ const ALL_PERMISSION = [
   'CAN_CREATE_USER_ROLE',
   'CAN_DELETE_USER_ROLE',
   //
+  'CAN_READ_CUSTOMER_SELLER',
+  //
   'CAN_CREATE_SELLER',
   'CAN_READ_SELLER',
   'CAN_UPDATE_SELLER',
@@ -103,6 +105,8 @@ export const data = [
       'CAN_CREATE_RAFFLE',
       'CAN_UPDATE_RAFFLE',
       'CAN_DELETE_RAFFLE',
+      //
+      'CAN_READ_CUSTOMER_SELLER',
       //
       'CAN_CREATE_CATEGORY',
       'CAN_UPDATE_CATEGORY',

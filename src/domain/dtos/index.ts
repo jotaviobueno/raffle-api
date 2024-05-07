@@ -28,3 +28,4 @@ export * from './finance';
 export * from './winner';
 export * from './color';
 export * from './jobs';
+export * from './customer-seller';

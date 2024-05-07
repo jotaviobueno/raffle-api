@@ -9,6 +9,9 @@ import { AddressController } from './controllers/address.controller';
 import { AddressService } from './services/address.service';
 import { AddressRepository } from './repositories/address.repository';
 import { SettingModule } from '../setting/setting.module';
+import { CustomerSellerService } from './services/customer-seller.service';
+import { CustomerSellerRepository } from './repositories/customer-seller.repository';
+import { CustomerSellerController } from './controllers/customer-seller.controller';
 
 @Module({
   imports: [
@@ -18,8 +21,15 @@ import { SettingModule } from '../setting/setting.module';
     SettingModule,
     forwardRef(() => CatalogModule),
   ],
-  controllers: [UserController, AddressController],
-  providers: [UserRepository, UserService, AddressService, AddressRepository],
-  exports: [UserService, AddressService],
+  controllers: [UserController, AddressController, CustomerSellerController],
+  providers: [
+    UserRepository,
+    UserService,
+    AddressService,
+    AddressRepository,
+    CustomerSellerService,
+    CustomerSellerRepository,
+  ],
+  exports: [UserService, AddressService, CustomerSellerService],
 })
 export class UserModule {}

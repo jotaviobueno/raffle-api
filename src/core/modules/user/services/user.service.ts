@@ -13,6 +13,7 @@ import { SellerService } from '../../catalog/services/seller.service';
 import { UserRoleService } from '../../role/services/user-role.service';
 import { ROLE_ENUM } from 'src/common/enums';
 import { S3Service } from '../../setting/services/s3.service';
+import { CustomerSellerService } from './customer-seller.service';
 
 @Injectable()
 export class UserService
@@ -30,6 +31,7 @@ export class UserService
     private readonly cacheManager: Cache,
     private readonly userRoleService: UserRoleService,
     private readonly s3Service: S3Service,
+    private readonly customerSellerService: CustomerSellerService,
   ) {}
   async create({
     sellerId,
@@ -50,11 +52,16 @@ export class UserService
             HttpStatus.BAD_REQUEST,
           );
 
-        await this.sellerService.findById(sellerId);
+        const seller = await this.sellerService.findById(sellerId);
 
         const customer = await this.handleCreate({
           ...dto,
           code,
+        });
+
+        await this.customerSellerService.create({
+          customerId: customer.id,
+          sellerId: seller.id,
         });
 
         return customer;

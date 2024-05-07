@@ -26,15 +26,16 @@ model User {
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt   DateTime? @map("deleted_at") @db.Timestamp
 
-  addresses      Address[]
-  sellers        Seller[]
-  userRoles      UserRole[]
-  orders         Order[]
-  orderHistories OrderHistory[]
-  carts          Cart[]
-  quotas         Quotas[]
-  finances       Finance[]
-  winners        Winner[]
+  addresses       Address[]
+  sellers         Seller[]
+  userRoles       UserRole[]
+  orders          Order[]
+  orderHistories  OrderHistory[]
+  carts           Cart[]
+  quotas          Quotas[]
+  finances        Finance[]
+  winners         Winner[]
+  customerSellers CustomerSeller[]
 
   @@map("user")
 }
@@ -42,13 +43,17 @@ model User {
 model CustomerSeller {
   id String @id @default(uuid())
 
-  // customer 
+  customerId String @map("customer_id")
+  sellerId   String @map("seller_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  @@ignore
+  customer User   @relation(fields: [customerId], references: [id])
+  seller   Seller @relation(fields: [sellerId], references: [id])
+
+  @@map("customer_seller")
 }
 
 model UserRole {
@@ -132,6 +137,7 @@ model Seller {
   carts                Cart[]
   finances             Finance[]
   color                Color?
+  customerSellers      CustomerSeller[]
 
   @@map("seller")
 }

@@ -39,3 +39,4 @@ export * from './finance';
 export * from './winner';
 export * from './role-permission';
 export * from './color';
+export * from './customer-seller';
