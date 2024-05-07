@@ -20,15 +20,27 @@ export class CartRepository extends RepositoryFactory<
     super('cart');
   }
 
+  create(data: CreateCartDto): Promise<CartWithRelationsEntity> {
+    return this.prismaService.cart.create({
+      data,
+      include: {
+        ...cartQueryWithRelations,
+      },
+    });
+  }
+
   findByCustomerIdAndSellerId(
     customerId: string,
     sellerId: string,
-  ): Promise<CartEntity | null> {
+  ): Promise<CartWithRelationsEntity | null> {
     return this.prismaService.cart.findFirst({
       where: {
         customerId,
         sellerId,
         deletedAt: null,
+      },
+      include: {
+        ...cartQueryWithRelations,
       },
     });
   }
@@ -60,7 +72,6 @@ export class CartRepository extends RepositoryFactory<
         },
         cartPayment: {
           include: {
-            address: true,
             paymentMethod: true,
           },
         },

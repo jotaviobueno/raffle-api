@@ -7,7 +7,7 @@ export interface CreateAsaasPaymentDto {
   externalReference?: string;
   installmentCount?: number;
   installmentValue?: number;
-  discount?: number;
+  discount?: { value: number };
   postalService?: boolean;
   creditCard?: CreateAsaasPaymentCreditCardDto;
   creditCardHolderInfo?: CreateAsaasPaymentCreditCardHolderInfoDto;

@@ -10,7 +10,7 @@ export class CreateColorDto {
   @IsHexColor()
   @IsNotEmpty()
   @ApiProperty()
-  secundary: string;
+  secondary: string;
 
   @IsHexColor()
   @IsNotEmpty()

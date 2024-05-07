@@ -20,7 +20,7 @@ export class CreateAddressDto {
 
   @IsBoolean()
   @IsNotEmpty()
-  @ApiProperty({ nullable: true, required: false })
+  @ApiProperty()
   isDefault: boolean;
 
   @IsString()

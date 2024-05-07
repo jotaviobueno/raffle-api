@@ -9,7 +9,7 @@ export class ColorEntity implements Color {
   primary: string;
 
   @ApiProperty()
-  secundary: string;
+  secondary: string;
 
   @ApiProperty()
   text: string;

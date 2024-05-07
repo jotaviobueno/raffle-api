@@ -1,15 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
-import { CreateCartDto, SearchCartDto } from 'src/domain/dtos';
-import {
-  CartEntity,
-  CartWithRelationsEntity,
-  FindAllResultEntity,
-} from 'src/domain/entities';
+import { CreateCartDto } from 'src/domain/dtos';
+import { CartEntity, CartWithRelationsEntity } from 'src/domain/entities';
 import { CartRepository } from '../repositories/cart.repository';
 import { UserService } from '../../user/services/user.service';
 import { CartTotalService } from './cart-total.service';
-import { QueryBuilder } from 'src/common/utils';
 
 @Injectable()
 export class CartService implements ServiceBase<CartEntity, CreateCartDto> {
@@ -19,7 +14,7 @@ export class CartService implements ServiceBase<CartEntity, CreateCartDto> {
     private readonly cartTotalService: CartTotalService,
   ) {}
 
-  async create(dto: CreateCartDto): Promise<CartEntity> {
+  async create(dto: CreateCartDto): Promise<CartWithRelationsEntity> {
     const customer = await this.userService.findById(dto.customerId);
 
     const customerAlreadyHaveCart =
@@ -52,31 +47,6 @@ export class CartService implements ServiceBase<CartEntity, CreateCartDto> {
     if (!cart) throw new HttpException('cart not found', HttpStatus.NOT_FOUND);
 
     return cart;
-  }
-
-  async findAll({
-    customerId,
-    ...queryParams
-  }: SearchCartDto): Promise<FindAllResultEntity<CartEntity>> {
-    const query = new QueryBuilder(queryParams)
-      .where({
-        customerId: customerId && customerId,
-      })
-      .sort()
-      .pagination()
-      .handle();
-
-    const sellers = await this.cartRepository.findAll(query);
-    const total = await this.cartRepository.count(query.where);
-
-    const info = {
-      page: queryParams.page,
-      pages: Math.ceil(total / queryParams.pageSize),
-      pageSize: queryParams.pageSize,
-      total,
-    };
-
-    return { data: sellers, info };
   }
 
   async remove(id: string): Promise<boolean> {

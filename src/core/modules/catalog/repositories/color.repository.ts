@@ -17,14 +17,14 @@ export class ColorRepository extends RepositoryFactory<
     return this.prismaService.color.create({
       data: {
         primary: data.primary,
-        secundary: data.secundary,
+        secondary: data.secondary,
         sellerId: data.sellerId,
         text: data.text,
         deletedAt: null,
-        secundaryColor: {
+        secondaryColor: {
           create: {
             primary: data.parent.primary,
-            secundary: data.parent.secundary,
+            secondary: data.parent.secondary,
             text: data.parent.text,
             deletedAt: null,
           },

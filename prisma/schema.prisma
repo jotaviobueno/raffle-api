@@ -15,12 +15,12 @@ datasource db {
 
 model User {
   id          String    @id @default(uuid())
-  mobilePhone String    @map("mobile_phone")
   fullName    String    @map("full_name")
   document    String
   email       String
   phone       String?
-  password    String
+  mobilePhone String    @map("mobile_phone")
+  password    String?
   avatar      String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
@@ -37,6 +37,18 @@ model User {
   winners        Winner[]
 
   @@map("user")
+}
+
+model CustomerSeller {
+  id String @id @default(uuid())
+
+  // customer 
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  @@ignore
 }
 
 model UserRole {
@@ -825,7 +837,7 @@ model GatewayEvent {
 model Color {
   id        String @id @default(uuid())
   primary   String
-  secundary String
+  secondary String
   text      String
 
   sellerId String? @unique @map("seller_id")
@@ -835,8 +847,8 @@ model Color {
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  parent         Color?  @relation("secundaryColor", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  secundaryColor Color?  @relation("secundaryColor")
+  parent         Color?  @relation("secondaryColor", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  secondaryColor Color?  @relation("secondaryColor")
   seller         Seller? @relation(fields: [sellerId], references: [id])
 
   @@map("color")

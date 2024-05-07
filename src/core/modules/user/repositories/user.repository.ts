@@ -37,6 +37,31 @@ export class UserRepository extends RepositoryFactory<
     });
   }
 
+  findByDocument(document: string): Promise<UserEntity | null> {
+    return this.prismaService.user.findFirst({
+      where: {
+        document,
+        deletedAt: null,
+      },
+    });
+  }
+
+  findCustomerByMobilePhone(mobilePhone: string): Promise<UserEntity | null> {
+    return this.prismaService.user.findFirst({
+      where: {
+        mobilePhone,
+        userRoles: {
+          some: {
+            role: {
+              code: 'CUSTOMER',
+            },
+          },
+        },
+        deletedAt: null,
+      },
+    });
+  }
+
   findByEmail(email: string): Promise<UserEntity | null> {
     return this.prismaService.user.findFirst({
       where: {

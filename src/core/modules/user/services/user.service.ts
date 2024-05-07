@@ -31,59 +31,83 @@ export class UserService
     private readonly userRoleService: UserRoleService,
     private readonly s3Service: S3Service,
   ) {}
-
   async create({
     sellerId,
     code,
     ...dto
   }: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
-    if (code != ROLE_ENUM.USER) {
-      if (dto.password)
-        throw new HttpException(
-          'Not possible to create CUSTOMER with password',
-          HttpStatus.UNPROCESSABLE_ENTITY,
-        );
+    switch (code) {
+      case 'CUSTOMER':
+        if (dto.password)
+          throw new HttpException(
+            'Not possible to create CUSTOMER with password',
+            HttpStatus.UNPROCESSABLE_ENTITY,
+          );
 
-      if (!sellerId)
-        throw new HttpException(
-          'Seller id is not sent',
-          HttpStatus.BAD_REQUEST,
-        );
+        if (!sellerId)
+          throw new HttpException(
+            'Seller id is not sent',
+            HttpStatus.BAD_REQUEST,
+          );
+
+        await this.sellerService.findById(sellerId);
+
+        const customer = await this.handleCreate({
+          ...dto,
+          code,
+        });
+
+        return customer;
+      case 'USER':
+        if (!dto.password)
+          throw new HttpException(
+            'Not possible to create USER without password',
+            HttpStatus.UNPROCESSABLE_ENTITY,
+          );
+
+        const user = await this.handleCreate({
+          ...dto,
+          code,
+        });
+
+        return user;
+
+      default:
+        throw new HttpException('Invalid type', HttpStatus.BAD_REQUEST);
     }
+  }
 
-    if (
-      (code === ROLE_ENUM.USER && !dto.password) ||
-      !dto.document ||
-      !dto.phone
-    )
-      throw new HttpException(
-        'Not possible to create USER without password, document or phone',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-
-    if (sellerId) await this.sellerService.findById(sellerId);
-
+  private async handleCreate({
+    code,
+    ...dto
+  }: Omit<CreateUserDto, 'sellerId'>) {
     const mobilePhoneAlreadyExist = await this.userRepository.findByMobilePhone(
       dto.mobilePhone,
     );
 
     if (mobilePhoneAlreadyExist)
       throw new HttpException(
-        'Email, phone already exist.',
+        'Email, phone or document already exist.',
         HttpStatus.CONFLICT,
       );
 
-    if (dto.email) {
-      const emailAlreadyExist = await this.userRepository.findByEmail(
-        dto.email,
+    const emailAlreadyExist = await this.userRepository.findByEmail(dto.email);
+
+    if (emailAlreadyExist)
+      throw new HttpException(
+        'Email, phone or document already exist.',
+        HttpStatus.CONFLICT,
       );
 
-      if (emailAlreadyExist)
-        throw new HttpException(
-          'Email, phone already exist.',
-          HttpStatus.CONFLICT,
-        );
-    }
+    const documentAlreadyExist = await this.userRepository.findByDocument(
+      dto.document,
+    );
+
+    if (documentAlreadyExist)
+      throw new HttpException(
+        'Email, phone or document already exist.',
+        HttpStatus.CONFLICT,
+      );
 
     if (code === ROLE_ENUM.USER) dto.password = await hash(dto.password);
 
@@ -95,6 +119,16 @@ export class UserService
     });
 
     return user;
+  }
+
+  async findCustomerByMobilePhone(mobilePhone: string): Promise<UserEntity> {
+    const customer =
+      await this.userRepository.findCustomerByMobilePhone(mobilePhone);
+
+    if (!customer)
+      throw new HttpException('Customer not found', HttpStatus.NOT_FOUND);
+
+    return customer;
   }
 
   async findAll(

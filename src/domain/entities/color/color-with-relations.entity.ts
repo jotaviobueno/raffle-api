@@ -3,5 +3,5 @@ import { ColorEntity } from './color.entity';
 
 export class ColorWithRelationsEntity extends ColorEntity {
   @ApiProperty({ type: ColorEntity })
-  secundaryColor: ColorEntity;
+  secondaryColor: ColorEntity;
 }

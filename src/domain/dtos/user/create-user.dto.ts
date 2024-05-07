@@ -24,23 +24,23 @@ export class CreateUserDto {
   email: string;
 
   @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  password: string;
+  @IsOptional()
+  @ApiProperty({ nullable: true, required: false })
+  password?: string;
 
   @IsMobilePhone()
-  @IsOptional()
+  @IsNotEmpty()
   @ApiProperty()
   mobilePhone: string;
 
   @IsCpfCnpj()
-  @IsOptional()
+  @IsNotEmpty()
   @ApiProperty()
   document: string;
 
   @IsEnum(PUBLIC_ROLE_ENUM)
   @IsNotEmpty()
-  @ApiProperty({ nullable: true, enum: PUBLIC_ROLE_ENUM })
+  @ApiProperty({ enum: PUBLIC_ROLE_ENUM })
   code: keyof typeof PUBLIC_ROLE_ENUM;
 
   @IsPhoneNumber()

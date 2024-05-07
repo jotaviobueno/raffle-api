@@ -1,13 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Query,
-} from '@nestjs/common';
-import { CreateCartDto, QueryParamsDto } from 'src/domain/dtos';
+import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
+import { CreateCartDto } from 'src/domain/dtos';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -20,9 +12,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { CartService } from '../services/cart.service';
-import { CurrentUser } from '../../user/decorators';
-import { CartEntity, UserEntity } from 'src/domain/entities';
-import { ApiOkFindAllResult } from 'src/common/decorators';
+import { CartEntity } from 'src/domain/entities';
 
 @Controller('cart')
 @ApiTags('cart')
@@ -38,16 +28,6 @@ export class CartController {
   @ApiNotFoundResponse()
   create(@Body() createCartDto: CreateCartDto) {
     return this.cartService.create(createCartDto);
-  }
-
-  @Get()
-  @ApiUnauthorizedResponse()
-  @ApiOkFindAllResult(UserEntity)
-  findAll(
-    @CurrentUser() user: UserEntity,
-    @Query() queryParams: QueryParamsDto,
-  ) {
-    return this.cartService.findAll({ ...queryParams, customerId: user.id });
   }
 
   @Delete('/:id')

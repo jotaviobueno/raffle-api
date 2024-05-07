@@ -76,7 +76,7 @@ export class AsaasGateway extends PaymentGateway<{
       billingType: 'PIX',
       value: cart.cartTotal.total,
       dueDate: new Date(),
-      discount: cart.cartTotal.discount,
+      discount: { value: cart.cartTotal.discount },
       remoteIp: dto.ip ? dto.ip : '',
     });
 
@@ -128,11 +128,11 @@ export class AsaasGateway extends PaymentGateway<{
           name: dto.holder,
           email: cart.customer.email,
           cpfCnpj: cart.customer.document.replace(/[\.-]/g, ''),
-          mobilePhone: cart.customer.phone.replace(/[\D+55]/g, ''),
+          mobilePhone: cart.customer.mobilePhone.replace(/[\D+55]/g, ''),
           postalCode: cart.cartPayment.address.postcode,
           addressNumber: cart.cartPayment.address.number,
           addressComplement: cart.cartPayment.address.street,
-          phone: cart.customer.phone.replace(/[\D+55]/g, ''),
+          phone: cart.customer?.phone?.replace(/[\D+55]/g, ''),
         },
         remoteIp: dto.ip ? dto.ip : '',
       });

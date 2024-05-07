@@ -4,3 +4,4 @@ export * from './asaas-payment-status';
 export * from './permission';
 export * from './jobs';
 export * from './queue';
+export * from './auth';

@@ -5,6 +5,7 @@ import {
   CartEntity,
   CartItemEntity,
   CartTotalEntity,
+  RaffleEntity,
 } from 'src/domain/entities';
 import { CartItemRepository } from '../repositories/cart-item.repository';
 import { RaffleService } from '../../catalog/services/raffle.service';
@@ -27,6 +28,55 @@ export class CartItemService
 
     const raffle = await this.raffleService.findById(dto.raffleId);
 
+    const raffleAlreadyExistInCart = cart.cartItems.find(
+      (item) => item.raffleId === raffle.id,
+    );
+
+    if (raffleAlreadyExistInCart) {
+      this.handleValidation(raffle, dto);
+
+      const cartItem = await this.cartItemRepository.update({
+        id: raffleAlreadyExistInCart.id,
+        price: raffle.price,
+        quantity: raffleAlreadyExistInCart.quantity + dto.quantity,
+        tax: raffleAlreadyExistInCart.tax + raffle.tax,
+        total: dto.quantity * raffle.price + raffleAlreadyExistInCart.total,
+      });
+
+      await this.cartTotalService.update({
+        id: cart.cartTotal.id,
+        total:
+          dto.quantity * raffle.price + cart.cartTotal.total + cartItem.tax,
+        subtotal: dto.quantity * raffle.price + cart.cartTotal.subtotal,
+        tax: cart.cartTotal.tax + cartItem.tax,
+      });
+
+      return cartItem;
+    } else {
+      this.handleValidation(raffle, dto);
+
+      const cartItem = await this.cartItemRepository.create({
+        cartId: cart.id,
+        raffleId: raffle.id,
+        price: raffle.price,
+        quantity: dto.quantity,
+        tax: raffle.tax,
+        total: dto.quantity * raffle.price,
+      });
+
+      await this.cartTotalService.update({
+        id: cart.cartTotal.id,
+        total:
+          dto.quantity * raffle.price + cart.cartTotal.total + cartItem.tax,
+        subtotal: dto.quantity * raffle.price + cart.cartTotal.subtotal,
+        tax: cart.cartTotal.tax + cartItem.tax,
+      });
+
+      return cartItem;
+    }
+  }
+
+  private handleValidation(raffle: RaffleEntity, dto: CreateCartItemDto) {
     if (
       new Date() > raffle.drawDateAt ||
       raffle.progressPercentage >= 100 ||
@@ -58,24 +108,6 @@ export class CartItemService
         'You need to decrease your order quantity',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
-
-    const cartItem = await this.cartItemRepository.create({
-      cartId: cart.id,
-      raffleId: raffle.id,
-      price: raffle.price,
-      quantity: dto.quantity,
-      tax: raffle.tax,
-      total: dto.quantity * raffle.price,
-    });
-
-    await this.cartTotalService.update({
-      id: cart.cartTotal.id,
-      total: dto.quantity * raffle.price + cart.cartTotal.total + cartItem.tax,
-      subtotal: dto.quantity * raffle.price + cart.cartTotal.subtotal,
-      tax: cart.cartTotal.tax + cartItem.tax,
-    });
-
-    return cartItem;
   }
 
   async findById(

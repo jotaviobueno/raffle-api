@@ -31,7 +31,7 @@ export class SellerRepository extends RepositoryFactory<
         socialMedias: true,
         color: {
           include: {
-            secundaryColor: true,
+            secondaryColor: true,
           },
         },
       },
