@@ -1,0 +1,875 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(uuid())
+  fullName    String    @map("full_name")
+  document    String
+  email       String
+  phone       String?
+  mobilePhone String    @map("mobile_phone")
+  password    String?
+  avatar      String    @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamp
+
+  addresses       Address[]
+  sellers         Seller[]
+  userRoles       UserRole[]
+  orders          Order[]
+  orderHistories  OrderHistory[]
+  carts           Cart[]
+  quotas          Quotas[]
+  finances        Finance[]
+  winners         Winner[]
+  customerSellers CustomerSeller[]
+
+  @@map("user")
+}
+
+model CustomerSeller {
+  id String @id @default(uuid())
+
+  customerId String @map("customer_id")
+  sellerId   String @map("seller_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  customer User   @relation(fields: [customerId], references: [id])
+  seller   Seller @relation(fields: [sellerId], references: [id])
+
+  @@map("customer_seller")
+}
+
+model UserRole {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  roleId String @map("role_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@map("user_role")
+}
+
+model Role {
+  id   String @id @default(uuid())
+  name String
+  code String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  @@map("role")
+}
+
+model RolePermission {
+  id           String @id @default(uuid())
+  roleId       String @map("role_id")
+  permissionId String @map("permission_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  permission Permission @relation(fields: [permissionId], references: [id])
+  role       Role       @relation(fields: [roleId], references: [id])
+
+  @@map("role_permission")
+}
+
+model Permission {
+  id   String @id @default(uuid())
+  code String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  rolePermissions RolePermission[]
+
+  @@map("permission")
+}
+
+model Seller {
+  id     String @id @default(uuid())
+  name   String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  logo String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  addresses            Address[]
+  categories           Category[]
+  raffles              Raffle[]
+  orders               Order[]
+  awards               Award[]
+  socialMedias         SocialMedia[]
+  paymentMethodSellers PaymentMethodSeller[]
+  utmCampaigns         UtmCampaign[]
+  carts                Cart[]
+  finances             Finance[]
+  color                Color?
+  customerSellers      CustomerSeller[]
+
+  @@map("seller")
+}
+
+model SocialMedia {
+  id   String @id @default(uuid())
+  name String
+  href String
+
+  sellerId String @map("seller_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  seller Seller @relation(fields: [sellerId], references: [id])
+
+  @@map("social_midia")
+}
+
+model Address {
+  id           String  @id @default(uuid())
+  street       String
+  reference    String?
+  complement   String?
+  isDefault    Boolean @map("is_default")
+  neighborhood String
+  countryId    String  @map("country_id")
+  stateId      String  @map("state_id")
+  userId       String? @map("user_id")
+  sellerId     String? @map("seller_id")
+  postcode     String
+  city         String
+  number       String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  seller        Seller?        @relation(fields: [sellerId], references: [id])
+  user          User?          @relation(fields: [userId], references: [id])
+  state         State          @relation(fields: [stateId], references: [id])
+  country       Country        @relation(fields: [countryId], references: [id])
+  orderPayments OrderPayment[]
+  cartPayments  CartPayment[]
+
+  @@map("address")
+}
+
+model Country {
+  id                 String  @id @default(uuid())
+  name               String
+  iso3               String  @map("iso_3")
+  iso2               String  @map("iso_2")
+  intermediaryRegion String? @map("intermediary_region")
+  subRegion          String? @map("sub_region")
+  continent          String?
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  states  State[]
+  address Address[]
+
+  @@map("country")
+}
+
+model State {
+  id        String    @id @default(uuid())
+  name      String
+  code3     String?   @map("code_3")
+  ibgeId    String?   @map("ibge_id")
+  region    String
+  countryId String    @map("country_id")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  country Country   @relation(fields: [countryId], references: [id])
+  address Address[]
+
+  @@map("state")
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String
+
+  sellerId String @map("seller_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  seller           Seller           @relation(fields: [sellerId], references: [id])
+  raffleCategories RaffleCategory[]
+
+  @@map("category")
+}
+
+model RaffleCategory {
+  id         String @id @default(uuid())
+  categoryId String @map("category_id")
+  raffleId   String @map("raffle_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  category Category @relation(fields: [categoryId], references: [id])
+  raffle   Raffle   @relation(fields: [raffleId], references: [id])
+
+  @@map("raffle_category")
+}
+
+model Raffle {
+  id               String   @id @default(uuid())
+  title            String
+  shortDescription String   @map("short_description")
+  description      String
+  images           String[] @default([])
+  metaKeyword      String[] @default([]) @map("meta_keyword")
+
+  price Float
+  tax   Float @default(0)
+
+  isFinished Boolean @default(false) @map("is_finished")
+  isVisible  Boolean @default(true) @map("is_visible")
+  isActive   Boolean @default(true) @map("is_active")
+  sellerId   String  @map("seller_id")
+  quantity   Int[]   @default([5, 10, 50, 100])
+
+  minBuyQuotas       Int   @map("min_buy_quotas")
+  maxBuyQuotas       Int   @map("max_buy_quotas")
+  progressPercentage Float @default(0) @map("progress_percentage")
+  payeds             Int   @default(0)
+
+  digits       Int
+  initial      Int @default(0)
+  final        Int
+  totalNumbers Int @map("total_numbers")
+
+  drawDateAt DateTime  @map("draw_date_at") @db.Timestamp
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt  DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamp
+
+  seller           Seller           @relation(fields: [sellerId], references: [id])
+  raffleCategories RaffleCategory[]
+  awards           Award[]
+  quotas           Quotas[]
+  raffleCoupons    RaffleCoupon[]
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  winners          Winner[]
+
+  @@map("raffle")
+}
+
+model Quotas {
+  id         String @id @default(uuid())
+  number     String
+  raffleId   String @map("raffle_id")
+  customerId String @map("customer_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  raffle   Raffle @relation(fields: [raffleId], references: [id])
+  customer User   @relation(fields: [customerId], references: [id])
+
+  @@map("quotas")
+}
+
+model Award {
+  id       String @id @default(uuid())
+  name     String
+  raffleId String @map("raffle_id")
+  sellerId String @map("seller_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  raffle Raffle @relation(fields: [raffleId], references: [id])
+  seller Seller @relation(fields: [sellerId], references: [id])
+
+  @@map("award")
+}
+
+model RaffleCoupon {
+  id       String @id @default(uuid())
+  raffleId String @map("raffle_id")
+  couponId String @map("coupon_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  coupon Coupon @relation(fields: [couponId], references: [id])
+  raffle Raffle @relation(fields: [raffleId], references: [id])
+
+  @@map("raffle_coupon")
+}
+
+model Order {
+  id            String  @id @default(uuid())
+  sellerId      String  @map("seller_id")
+  customerId    String  @map("customer_id")
+  invoiceNumber Int?    @map("invoice_number")
+  comment       String?
+  ip            String?
+  userAgent     String? @map("user_agent")
+  orderStatusId String? @map("order_status_id")
+
+  dueDate   DateTime? @map("due_date") @db.Timestamp
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  seller         Seller         @relation(fields: [sellerId], references: [id])
+  customer       User           @relation(fields: [customerId], references: [id])
+  orderPayment   OrderPayment?
+  orderTotal     OrderTotal?
+  orderCoupons   OrderCoupon[]
+  orderItems     OrderItem[]
+  orderHistories OrderHistory[]
+  orderStatus    OrderStatus?   @relation(fields: [orderStatusId], references: [id])
+  finance        Finance?
+  gatewayEvents  GatewayEvent[]
+
+  @@map("order")
+}
+
+model OrderHistory {
+  id String @id @default(uuid())
+
+  comment    String?
+  orderId    String  @map("order_id")
+  customerId String  @map("customer_id")
+
+  orderStatusId String @map("order_status_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  order       Order       @relation(fields: [orderId], references: [id])
+  customer    User        @relation(fields: [customerId], references: [id])
+  orderStatus OrderStatus @relation(fields: [orderStatusId], references: [id])
+
+  @@map("order_history")
+}
+
+model OrderCoupon {
+  id String @id @default(uuid())
+
+  orderId  String @map("order_id")
+  couponId String @map("coupon_id")
+
+  code     String
+  discount Float  @default(0)
+  shipping Float  @default(0)
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  order  Order  @relation(fields: [orderId], references: [id])
+  coupon Coupon @relation(fields: [couponId], references: [id])
+
+  @@map("order_coupon")
+}
+
+model CartCoupon {
+  id String @id @default(uuid())
+
+  couponId String @map("coupon_id")
+  cartId   String @map("cart_id")
+
+  code     String
+  discount Float  @default(0)
+  shipping Float  @default(0)
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  cart   Cart   @relation(fields: [cartId], references: [id])
+  coupon Coupon @relation(fields: [couponId], references: [id])
+
+  @@map("cart_coupon")
+}
+
+model OrderBankSlip {
+  id String @id @default(uuid())
+
+  orderPaymentId      String @unique @map("order_payment_id")
+  ourNumber           String @map("our_number")
+  identificationField String @map("identification_field")
+  barCode             String @map("bar_code")
+  bankSlipUrl         String @map("bank_slip_url")
+
+  expirationAt DateTime  @map("expiration_at") @db.Timestamp
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamp
+
+  orderPayment OrderPayment @relation(fields: [orderPaymentId], references: [id])
+
+  @@map("order_bank_slip")
+}
+
+model UtmCampaign {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  sellerId    String  @map("seller_id")
+
+  from DateTime? @db.Timestamp
+  to   DateTime? @db.Timestamp
+
+  isActive Boolean @map("is_active")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  seller  Seller   @relation(fields: [sellerId], references: [id])
+  coupons Coupon[]
+
+  @@map("utm_campaign")
+}
+
+// TODO: PENSAR MELHOR
+model UtmSource {
+  id   String @id @default(uuid())
+  name String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  @@map("utm_source")
+  @@ignore
+}
+
+model Coupon {
+  id               String @id @default(uuid())
+  name             String
+  code             String @unique
+  discount         Float  @default(0)
+  shipping         Float  @default(0)
+  usages           Int    @default(0)
+  maxUsages        Int    @map("max_usages")
+  maxUsagesPerUser Int    @map("max_usages_per_user")
+
+  utmCampaignId String @map("utm_campaign_id")
+
+  isActive Boolean @map("is_active")
+
+  from DateTime? @db.Timestamp
+  to   DateTime? @db.Timestamp
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  orderCoupons  OrderCoupon[]
+  cartCoupons   CartCoupon[]
+  raffleCoupons RaffleCoupon[]
+  utmCampaign   UtmCampaign    @relation(fields: [utmCampaignId], references: [id])
+
+  @@map("coupon")
+}
+
+model OrderStatus {
+  id   String @id @default(uuid())
+  name String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  orderHistories OrderHistory[]
+  order          Order[]
+
+  @@map("order_status")
+}
+
+model OrderTotal {
+  id      String @id @default(uuid())
+  orderId String @unique @map("order_id")
+
+  subtotal       Float
+  discount       Float @default(0)
+  discountManual Float @default(0) @map("discount_manual")
+  shipping       Float @default(0)
+  fee            Float @default(0)
+  tax            Float @default(0)
+  total          Float
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("order_total")
+}
+
+model PaymentMethodSeller {
+  id              String @id @default(uuid())
+  sellerId        String @map("seller_id")
+  paymentMethodId String @map("payment_method_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  seller        Seller        @relation(fields: [sellerId], references: [id])
+  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+
+  @@map("payment_method_seller")
+}
+
+model PaymentMethod {
+  id                     String  @id @default(uuid())
+  code                   String
+  name                   String
+  instructions           String
+  isActive               Boolean @default(true) @map("is_active")
+  paymentGatewayConfigId String? @map("payment_gateway_config_id")
+
+  fee           Float @default(0)
+  feePercentage Float @default(0) @map("fee_percentage")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  paymentMethodSellers PaymentMethodSeller[]
+  orderPayments        OrderPayment[]
+  cartPayments         CartPayment[]
+  paymentGatewayConfig PaymentGatewayConfig? @relation(fields: [paymentGatewayConfigId], references: [id])
+  gatewayEvents        GatewayEvent[]
+
+  @@map("payment_method")
+}
+
+model PaymentGatewayConfig {
+  id     String @id @default(uuid())
+  code   String
+  name   String
+  config Json
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  paymentMethods PaymentMethod[]
+
+  @@map("payment_gateway_config")
+}
+
+model OrderPayment {
+  id              String  @id @default(uuid())
+  orderId         String  @unique @map("order_id")
+  method          String
+  status          String?
+  paymentMethodId String  @map("payment_method_id")
+  addressId       String  @map("address_id")
+  gatewayPamentId String? @map("gateway_payment_id")
+  receiptUrl      String? @map("receipt_url")
+  invoiceUrl      String  @map("invoice_url")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  order           Order            @relation(fields: [orderId], references: [id])
+  address         Address          @relation(fields: [addressId], references: [id])
+  paymentMethod   PaymentMethod    @relation(fields: [paymentMethodId], references: [id])
+  orderBankSlip   OrderBankSlip?
+  orderCreditCard OrderCreditCard?
+  orderPix        OrderPix?
+
+  @@map("order_payment")
+}
+
+model OrderCreditCard {
+  id              String  @id @default(uuid())
+  brand           String
+  number          String
+  name            String
+  expirationMonth Int     @map("expiration_month")
+  expirationYear  Int     @map("expiration_year")
+  cvv             Int
+  token           String?
+
+  orderPaymentId String @unique @map("order_payment_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  orderPayment OrderPayment @relation(fields: [orderPaymentId], references: [id])
+
+  @@map("order_credit_card")
+}
+
+model OrderPix {
+  id             String @id @default(uuid())
+  orderPaymentId String @unique @map("payment_id")
+
+  copyPaste String @map("copy_paste")
+  image     String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  expiratAt DateTime  @map("expirat_at") @db.Timestamp
+
+  orderPayment OrderPayment @relation(fields: [orderPaymentId], references: [id])
+
+  @@map("order_pix")
+}
+
+model Cart {
+  id         String @id @default(uuid())
+  sellerId   String @map("seller_id")
+  customerId String @map("customer_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  customer    User         @relation(fields: [customerId], references: [id])
+  cartItems   CartItem[]
+  cartTotal   CartTotal?
+  cartPayment CartPayment?
+  cartCoupons CartCoupon[]
+  seller      Seller       @relation(fields: [sellerId], references: [id])
+
+  @@map("cart")
+}
+
+model OrderItem {
+  id       String @id @default(uuid())
+  quantity Int
+  price    Float
+  total    Float
+  tax      Float  @default(0)
+
+  raffleId String @map("raffle_id")
+  orderId  String @map("order_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  raffle    Raffle    @relation(fields: [raffleId], references: [id])
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("order_item")
+}
+
+model CartItem {
+  id       String @id @default(uuid())
+  quantity Int
+  price    Float
+  cartId   String @map("cart_id")
+  tax      Float  @default(0)
+  total    Float
+  raffleId String @map("raffle_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  raffle Raffle @relation(fields: [raffleId], references: [id])
+  cart   Cart   @relation(fields: [cartId], references: [id])
+
+  @@map("cart_item")
+}
+
+model CartTotal {
+  id String @id @default(uuid())
+
+  subtotal       Float
+  discount       Float @default(0)
+  discountManual Float @default(0) @map("discount_manual")
+  shipping       Float @default(0)
+  fee            Float @default(0)
+  tax            Float @default(0)
+  total          Float
+
+  cartId String @unique @map("cart_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  cart Cart @relation(fields: [cartId], references: [id])
+
+  @@map("cart_total")
+}
+
+model CartPayment {
+  id     String @id @default(uuid())
+  method String
+
+  addressId       String @map("address_id")
+  paymentMethodId String @map("payment_method_id")
+  cartId          String @unique @map("cart_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  cart          Cart          @relation(fields: [cartId], references: [id])
+  address       Address       @relation(fields: [addressId], references: [id])
+  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+
+  @@map("cart_payment")
+}
+
+model Finance {
+  id         String @id @default(uuid())
+  orderId    String @unique @map("order_id")
+  customerId String @map("customer_id")
+  sellerId   String @map("seller_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  customer     User          @relation(fields: [customerId], references: [id])
+  order        Order?        @relation(fields: [orderId], references: [id])
+  seller       Seller        @relation(fields: [sellerId], references: [id])
+  financeTotal FinanceTotal?
+
+  @@map("finance")
+}
+
+model FinanceTotal {
+  id String @id @default(uuid())
+
+  subtotal       Float
+  discount       Float  @default(0)
+  discountManual Float  @default(0) @map("discount_manual")
+  shipping       Float  @default(0)
+  fee            Float  @default(0)
+  tax            Float  @default(0)
+  total          Float
+  financeId      String @unique @map("finance_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  finance Finance @relation(fields: [financeId], references: [id])
+
+  @@map("total")
+}
+
+model Winner {
+  id         String @id @default(uuid())
+  number     String
+  raffleId   String @map("raffle_id")
+  customerId String @map("customer_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  raffle   Raffle @relation(fields: [raffleId], references: [id])
+  customer User   @relation(fields: [customerId], references: [id])
+
+  @@map("winner")
+}
+
+model GatewayEvent {
+  id String @id @default(uuid())
+
+  orderId         String @map("order_id")
+  paymentMethodId String @map("payment_method_id")
+
+  postback Json
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  order         Order         @relation(fields: [orderId], references: [id])
+  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+
+  @@map("gateway_event")
+}
+
+model Color {
+  id        String @id @default(uuid())
+  primary   String
+  secondary String
+  text      String
+
+  sellerId String? @unique @map("seller_id")
+  parentId String? @unique @map("parent_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  parent         Color?  @relation("secondaryColor", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  secondaryColor Color?  @relation("secondaryColor")
+  seller         Seller? @relation(fields: [sellerId], references: [id])
+
+  @@map("color")
+}
+
+model Audit {
+  id        String @id @default(uuid())
+  namespace String
+  action    String
+  resources String
+  meta      Json
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  @@map("audit")
+}

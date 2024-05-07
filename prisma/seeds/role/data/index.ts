@@ -1,0 +1,180 @@
+const ALL_PERMISSION = [
+  'CAN_READ_USER',
+  'CAN_UPDATE_USER',
+  'CAN_DELETE_USER',
+  //
+  'CAN_CREATE_ADDRESS',
+  'CAN_READ_ADDRESS',
+  'CAN_UPDATE_ADDRESS',
+  'CAN_DELETE_ADDRESS',
+  //
+  'CAN_CREATE_MENU',
+  'CAN_UPDATE_MENU',
+  'CAN_DELETE_MENU',
+  //
+  'CAN_UPDATE_ROLE',
+  //
+  'CAN_CREATE_USER_ROLE',
+  'CAN_DELETE_USER_ROLE',
+  //
+  'CAN_READ_CUSTOMER_SELLER',
+  //
+  'CAN_CREATE_SELLER',
+  'CAN_READ_SELLER',
+  'CAN_UPDATE_SELLER',
+  'CAN_DELETE_SELLER',
+  //
+  'CAN_CREATE_RAFFLE',
+  'CAN_UPDATE_RAFFLE',
+  'CAN_DELETE_RAFFLE',
+  //
+  'CAN_CREATE_CATEGORY',
+  'CAN_UPDATE_CATEGORY',
+  'CAN_DELETE_CATEGORY',
+  //
+  'CAN_CREATE_AWARD',
+  'CAN_UPDATE_AWARD',
+  'CAN_DELETE_AWARD',
+  //
+  'CAN_CREATE_SOCIAL_MEDIA',
+  'CAN_UPDATE_SOCIAL_MEDIA',
+  'CAN_DELETE_SOCIAL_MEDIA',
+  //
+  'CAN_CREATE_RAFFLE_CATEGORY',
+  'CAN_UPDATE_RAFFLE_CATEGORY',
+  'CAN_DELETE_RAFFLE_CATEGORY',
+  //
+  'CAN_CREATE_QUOTAS',
+  'CAN_DELETE_QUOTAS',
+  //
+  'CAN_CREATE_WINNER',
+  'CAN_DELETE_WINNER',
+  //
+  'CAN_CREATE_PAYMENT_METHOD',
+  'CAN_UPDATE_PAYMENT_METHOD',
+  'CAN_DELETE_PAYMENT_METHOD',
+  //
+  'CAN_CREATE_UTM_CAMPAIGN',
+  'CAN_READ_UTM_CAMPAIGN',
+  'CAN_UPDATE_UTM_CAMPAIGN',
+  'CAN_DELETE_UTM_CAMPAIGN',
+  //
+  'CAN_CREATE_COUPON',
+  'CAN_UPDATE_COUPON',
+  'CAN_DELETE_COUPON',
+  //
+  'CAN_CREATE_ORDER_STATUS',
+  'CAN_UPDATE_ORDER_STATUS',
+  'CAN_DELETE_ORDER_STATUS',
+  //
+  'CAN_READ_FINANCE',
+  //
+  'CAN_UPDATE_COLOR',
+  'CAN_READ_COLOR',
+];
+
+export const data = [
+  {
+    name: 'Administrador',
+    code: 'ADMIN',
+    permissions: ALL_PERMISSION,
+  },
+  {
+    name: 'Desenvolvedor',
+    code: 'DEV',
+    permissions: ALL_PERMISSION,
+  },
+  {
+    name: 'Plano Simples',
+    code: 'PLAN_1',
+    permissions: [
+      'CAN_READ_USER',
+      'CAN_UPDATE_USER',
+      'CAN_DELETE_USER',
+      //
+      'CAN_CREATE_ADDRESS',
+      'CAN_READ_ADDRESS',
+      'CAN_UPDATE_ADDRESS',
+      'CAN_DELETE_ADDRESS',
+      //
+      'CAN_CREATE_SELLER',
+      'CAN_READ_SELLER',
+      'CAN_UPDATE_SELLER',
+      'CAN_DELETE_SELLER',
+      //
+      'CAN_CREATE_RAFFLE',
+      'CAN_UPDATE_RAFFLE',
+      'CAN_DELETE_RAFFLE',
+      //
+      'CAN_READ_CUSTOMER_SELLER',
+      //
+      'CAN_CREATE_CATEGORY',
+      'CAN_UPDATE_CATEGORY',
+      'CAN_DELETE_CATEGORY',
+      //
+      'CAN_CREATE_AWARD',
+      'CAN_UPDATE_AWARD',
+      'CAN_DELETE_AWARD',
+      //
+      'CAN_CREATE_SOCIAL_MEDIA',
+      'CAN_UPDATE_SOCIAL_MEDIA',
+      'CAN_DELETE_SOCIAL_MEDIA',
+      //
+      'CAN_CREATE_RAFFLE_CATEGORY',
+      'CAN_UPDATE_RAFFLE_CATEGORY',
+      'CAN_DELETE_RAFFLE_CATEGORY',
+      //
+      'CAN_CREATE_QUOTAS',
+      'CAN_DELETE_QUOTAS',
+      //
+      'CAN_CREATE_WINNER',
+      'CAN_DELETE_WINNER',
+      //
+      'CAN_CREATE_PAYMENT_METHOD',
+      'CAN_UPDATE_PAYMENT_METHOD',
+      'CAN_DELETE_PAYMENT_METHOD',
+      //
+      'CAN_CREATE_UTM_CAMPAIGN',
+      'CAN_READ_UTM_CAMPAIGN',
+      'CAN_UPDATE_UTM_CAMPAIGN',
+      'CAN_DELETE_UTM_CAMPAIGN',
+      //
+      'CAN_CREATE_COUPON',
+      'CAN_UPDATE_COUPON',
+      'CAN_DELETE_COUPON',
+      //
+      'CAN_CREATE_ORDER_STATUS',
+      'CAN_UPDATE_ORDER_STATUS',
+      'CAN_DELETE_ORDER_STATUS',
+      //
+      'CAN_READ_FINANCE',
+      //
+      'CAN_UPDATE_COLOR',
+      'CAN_READ_COLOR',
+    ],
+  },
+  {
+    name: 'Cliente',
+    code: 'CUSTOMER',
+    permissions: [
+      'CAN_CREATE_ADDRESS',
+      'CAN_READ_ADDRESS',
+      'CAN_UPDATE_ADDRESS',
+      'CAN_DELETE_ADDRESS',
+    ],
+  },
+  {
+    name: 'Usuário',
+    code: 'USER',
+    permissions: [
+      'CAN_CREATE_ADDRESS',
+      'CAN_READ_ADDRESS',
+      'CAN_UPDATE_ADDRESS',
+      'CAN_DELETE_ADDRESS',
+      //
+      'CAN_READ_USER',
+      'CAN_UPDATE_USER',
+      'CAN_DELETE_USER',
+    ],
+  },
+];
