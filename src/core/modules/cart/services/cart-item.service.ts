@@ -32,9 +32,9 @@ export class CartItemService
       (item) => item.raffleId === raffle.id,
     );
 
-    if (raffleAlreadyExistInCart) {
-      this.handleValidation(raffle, dto);
+    this.handleValidation(raffle, dto.quantity);
 
+    if (raffleAlreadyExistInCart) {
       const cartItem = await this.cartItemRepository.update({
         id: raffleAlreadyExistInCart.id,
         price: raffle.price,
@@ -53,8 +53,6 @@ export class CartItemService
 
       return cartItem;
     } else {
-      this.handleValidation(raffle, dto);
-
       const cartItem = await this.cartItemRepository.create({
         cartId: cart.id,
         raffleId: raffle.id,
@@ -76,7 +74,7 @@ export class CartItemService
     }
   }
 
-  private handleValidation(raffle: RaffleEntity, dto: CreateCartItemDto) {
+  handleValidation(raffle: RaffleEntity, quantity: number) {
     if (
       new Date() > raffle.drawDateAt ||
       raffle.progressPercentage >= 100 ||
@@ -88,21 +86,21 @@ export class CartItemService
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
 
-    if (dto.quantity < raffle.minBuyQuotas)
+    if (quantity < raffle.minBuyQuotas)
       throw new HttpException(
         'Minimum purchase exceeded',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
 
-    if (dto.quantity > raffle.maxBuyQuotas)
+    if (quantity > raffle.maxBuyQuotas)
       throw new HttpException(
         'Maximum purchase exceeded',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
 
     if (
-      raffle.payeds + dto.quantity > raffle.totalNumbers ||
-      ((raffle.payeds + dto.quantity) / raffle.totalNumbers) * 100 > 100
+      raffle.payeds + quantity > raffle.totalNumbers ||
+      ((raffle.payeds + quantity) / raffle.totalNumbers) * 100 > 100
     )
       throw new HttpException(
         'You need to decrease your order quantity',
