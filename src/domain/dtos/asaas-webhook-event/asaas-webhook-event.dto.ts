@@ -6,7 +6,7 @@ import {
 
 export class AsaasWebhookEventDto {
   id: string;
-  event: keyof typeof ORDER_STATUS_ENUM;
+  event: ORDER_STATUS_ENUM;
   payment: {
     object: string;
     id: string;

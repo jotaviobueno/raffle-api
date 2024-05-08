@@ -8,7 +8,8 @@ export const environment = {
   //
   AWS_ACCESS_ID: process.env.AWS_ACCESS_ID,
   AWS_ACCESS_SECRET: process.env.AWS_ACCESS_SECRET,
-  AWS_S3_REGION: process.env.AWS_S3_REGION,
+  AWS_REGION: process.env.AWS_REGION,
+  //
   AWS_S3_BUCKET: process.env.AWS_S3_BUCKET,
   //
   NODE_ENV: process.env.NODE_ENV,
@@ -17,4 +18,7 @@ export const environment = {
   ASAAS_INTEREST: process.env.ASAAS_INTEREST,
   ASAAS_FINE: process.env.ASAAS_FINE,
   ASAAS_ACCESS_TOKEN: process.env.ASAAS_ACCESS_TOKEN,
+  //
+  SMTP_FROM_NAME: process.env.SMTP_FROM_NAME,
+  SMTP_FROM_EMAIL: process.env.SMTP_FROM_EMAIL,
 };

@@ -7,7 +7,7 @@ import { UploadFileDto } from 'src/domain/dtos';
 @Injectable()
 export class S3Service {
   protected readonly s3Client = new S3Client({
-    region: environment.AWS_S3_REGION,
+    region: environment.AWS_REGION,
     apiVersion: '2012-08-10',
     credentials: {
       accessKeyId: environment.AWS_ACCESS_ID,
@@ -29,7 +29,7 @@ export class S3Service {
         }),
       );
 
-      return `https://${environment.AWS_S3_BUCKET}.s3.${environment.AWS_S3_REGION}.amazonaws.com/${url}`;
+      return `https://${environment.AWS_S3_BUCKET}.s3.${environment.AWS_REGION}.amazonaws.com/${url}`;
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }

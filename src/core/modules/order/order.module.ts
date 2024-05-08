@@ -14,9 +14,10 @@ import { QUEUES_ENUM } from 'src/common/enums';
   imports: [
     PaymentModule,
     CartModule,
-    BullModule.registerQueue({
-      name: QUEUES_ENUM.QUOTAS,
-    }),
+    BullModule.registerQueue(
+      { name: QUEUES_ENUM.QUOTAS },
+      { name: QUEUES_ENUM.EMAIL },
+    ),
   ],
   controllers: [OrderController, OrderStatusController],
   providers: [

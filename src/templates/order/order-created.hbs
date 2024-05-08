@@ -1,0 +1,35 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Detalhes do Pedido de Rifa</title>
+    <style>
+      body { font-family: Arial, sans-serif; background-color: #f4f4f4; color:
+      #333; margin: 0; padding: 0; } .container { max-width: 600px; margin: 20px
+      auto; padding: 20px; background-color: #fff; border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); } h1 { color: #007bff; }
+      .raffle-details { margin-bottom: 20px; padding: 10px; background-color:
+      #f9f9f9; border-radius: 4px; } .raffle-name { font-size: 18px;
+      margin-bottom: 5px; } .quantity-total { margin-top: 0; } .total-price {
+      font-size: 20px; margin-top: 20px; text-align: right; }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <h1>Detalhes do Pedido</h1>
+      <p>Olá {{fullName}},</p>
+      <p>O seu pedido de rifa foi criado com sucesso!</p>
+      {{#each raffles}}
+        <div class='raffle-details'>
+          <p class='raffle-name'>Rifa: {{name}}</p>
+          <p class='quantity-total'>Quantidade:
+            {{quantity}}
+            | Valor Total: R$
+            {{total}}</p>
+        </div>
+      {{/each}}
+      <p class='total-price'>Valor Total do Pedido: R$ {{total}}</p>
+      <p>Obrigado por participar!</p>
+    </div>
+  </body>
+</html>

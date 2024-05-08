@@ -5,6 +5,7 @@ import {
   CreateCheckoutDto,
   JobQuotasDto,
   QueryParamsDto,
+  SendEmailDto,
 } from 'src/domain/dtos';
 import {
   FindAllResultEntity,
@@ -21,7 +22,7 @@ import { QueryBuilder, prettyCardNumber } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import * as creditCardType from 'credit-card-type';
 import { InjectQueue } from '@nestjs/bull';
-import { JOBS_ENUM, QUEUES_ENUM } from 'src/common/enums';
+import { JOBS_ENUM, ORDER_STATUS_ENUM, QUEUES_ENUM } from 'src/common/enums';
 import { Queue } from 'bull';
 
 @Injectable()
@@ -39,6 +40,8 @@ export class OrderService
     private readonly cacheManager: Cache,
     @InjectQueue(QUEUES_ENUM.QUOTAS)
     private readonly quotasQueue: Queue<JobQuotasDto>,
+    @InjectQueue(QUEUES_ENUM.EMAIL)
+    private readonly emailQueue: Queue<SendEmailDto>,
   ) {}
 
   async create(dto: CreateCheckoutDto): Promise<OrderWithRelationsEntity> {
@@ -219,49 +222,72 @@ export class OrderService
           },
         });
 
-        const cartItemsIds = cart.cartItems.map((cartItem) => cartItem.id);
-        const cartCouponsIds = cart.cartCoupons.map(
-          (cartCoupon) => cartCoupon.id,
-        );
+        // const cartItemsIds = cart.cartItems.map((cartItem) => cartItem.id);
+        // const cartCouponsIds = cart.cartCoupons.map(
+        //   (cartCoupon) => cartCoupon.id,
+        // );
 
-        await tx.cart.update({
-          where: {
-            id: cart.id,
+        // // await tx.cart.update({
+        // //   where: {
+        // //     id: cart.id,
+        // //   },
+        // //   data: {
+        // //     deletedAt: new Date(),
+        // //     cartItems: {
+        // //       updateMany: {
+        // //         where: {
+        // //           id: { in: cartItemsIds },
+        // //         },
+        // //         data: {
+        // //           deletedAt: new Date(),
+        // //         },
+        // //       },
+        // //     },
+        // //     cartTotal: {
+        // //       update: {
+        // //         deletedAt: new Date(),
+        // //       },
+        // //     },
+        // //     cartCoupons: {
+        // //       updateMany: {
+        // //         where: {
+        // //           id: { in: cartCouponsIds },
+        // //         },
+        // //         data: {
+        // //           deletedAt: new Date(),
+        // //         },
+        // //       },
+        // //     },
+        // //     cartPayment: {
+        // //       update: {
+        // //         deletedAt: new Date(),
+        // //       },
+        // //     },
+        // //   },
+        // // });
+
+        await this.emailQueue.add(
+          JOBS_ENUM.SEND_EMAIL_JOB,
+          {
+            to: cart.customer.email,
+            template: './order/order-created.hbs',
+            subject: 'Pedido recebido',
+            context: {
+              fullName: cart.customer.fullName,
+              raffles: order.orderItems.map((item) => ({
+                name: item.raffle.title,
+                quantity: item.quantity,
+                total: item.total,
+              })),
+              total: order.orderTotal.total,
+            },
           },
-          data: {
-            deletedAt: new Date(),
-            cartItems: {
-              updateMany: {
-                where: {
-                  id: { in: cartItemsIds },
-                },
-                data: {
-                  deletedAt: new Date(),
-                },
-              },
-            },
-            cartTotal: {
-              update: {
-                deletedAt: new Date(),
-              },
-            },
-            cartCoupons: {
-              updateMany: {
-                where: {
-                  id: { in: cartCouponsIds },
-                },
-                data: {
-                  deletedAt: new Date(),
-                },
-              },
-            },
-            cartPayment: {
-              update: {
-                deletedAt: new Date(),
-              },
-            },
+          {
+            attempts: 3,
+            removeOnFail: true,
+            removeOnComplete: true,
           },
-        });
+        );
 
         return order;
       },
@@ -310,7 +336,26 @@ export class OrderService
             },
           };
 
-        if (data.event === 'PAYMENT_CONFIRMED') {
+        await this.emailQueue.add(
+          JOBS_ENUM.SEND_EMAIL_JOB,
+          {
+            to: order.customer.email,
+            subject: ORDER_STATUS_ENUM[data.event],
+            template: './payment/payment-status-change.hbs',
+            context: {
+              orderId: order.id,
+              fullName: order.customer.fullName,
+              status: ORDER_STATUS_ENUM[data.event],
+            },
+          },
+          {
+            attempts: 3,
+            removeOnFail: true,
+            removeOnComplete: true,
+          },
+        );
+
+        if (data.event === ORDER_STATUS_ENUM.PAYMENT_CONFIRMED) {
           await Promise.all(
             order.orderItems.map(async (orderItem) => {
               const data = {
@@ -339,32 +384,13 @@ export class OrderService
                   },
                 },
                 {
+                  attempts: 3,
+                  removeOnFail: true,
                   removeOnComplete: true,
                 },
               );
             }),
           );
-
-          query = {
-            ...query,
-            finance: {
-              create: {
-                customerId: order.customer.id,
-                sellerId: order.seller.id,
-                financeTotal: {
-                  create: {
-                    subtotal: order.orderTotal.subtotal,
-                    total: order.orderTotal.total,
-                    tax: order.orderTotal.tax,
-                    discount: order.orderTotal.discount,
-                    discountManual: order.orderTotal.discountManual,
-                    fee: order.orderTotal.fee,
-                    shipping: order.orderTotal.shipping,
-                  },
-                },
-              },
-            },
-          };
         }
 
         return tx.order.update({
@@ -425,10 +451,18 @@ export class OrderService
   }
 
   async findById(id: string): Promise<OrderWithRelationsEntity> {
+    const cache = await this.cacheManager.get<OrderWithRelationsEntity | null>(
+      `order_${id}`,
+    );
+
+    if (cache) return cache;
+
     const order = await this.orderRepository.findById(id);
 
     if (!order)
       throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
+
+    await this.cacheManager.set(`order_${id}`, order);
 
     return order;
   }
