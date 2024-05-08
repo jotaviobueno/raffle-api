@@ -354,12 +354,14 @@ model Order {
   ip            String?
   userAgent     String? @map("user_agent")
   orderStatusId String? @map("order_status_id")
+  cartId        String  @unique @map("cart_id")
 
   dueDate   DateTime? @map("due_date") @db.Timestamp
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
+  cart           Cart           @relation(fields: [cartId], references: [id])
   seller         Seller         @relation(fields: [sellerId], references: [id])
   customer       User           @relation(fields: [customerId], references: [id])
   orderPayment   OrderPayment?
@@ -683,6 +685,7 @@ model Cart {
   cartPayment CartPayment?
   cartCoupons CartCoupon[]
   seller      Seller       @relation(fields: [sellerId], references: [id])
+  order       Order?
 
   @@map("cart")
 }
@@ -777,33 +780,11 @@ model Finance {
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  customer     User          @relation(fields: [customerId], references: [id])
-  order        Order?        @relation(fields: [orderId], references: [id])
-  seller       Seller        @relation(fields: [sellerId], references: [id])
-  financeTotal FinanceTotal?
+  customer User   @relation(fields: [customerId], references: [id])
+  order    Order? @relation(fields: [orderId], references: [id])
+  seller   Seller @relation(fields: [sellerId], references: [id])
 
   @@map("finance")
-}
-
-model FinanceTotal {
-  id String @id @default(uuid())
-
-  subtotal       Float
-  discount       Float  @default(0)
-  discountManual Float  @default(0) @map("discount_manual")
-  shipping       Float  @default(0)
-  fee            Float  @default(0)
-  tax            Float  @default(0)
-  total          Float
-  financeId      String @unique @map("finance_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  finance Finance @relation(fields: [financeId], references: [id])
-
-  @@map("total")
 }
 
 model Winner {

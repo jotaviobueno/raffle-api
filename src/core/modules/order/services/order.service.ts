@@ -179,6 +179,11 @@ export class OrderService
                 id: cart.customer.id,
               },
             },
+            cart: {
+              connect: {
+                id: cart.id,
+              },
+            },
             seller: {
               connect: {
                 id: cart.seller.id,
@@ -222,49 +227,49 @@ export class OrderService
           },
         });
 
-        // const cartItemsIds = cart.cartItems.map((cartItem) => cartItem.id);
-        // const cartCouponsIds = cart.cartCoupons.map(
-        //   (cartCoupon) => cartCoupon.id,
-        // );
+        const cartItemsIds = cart.cartItems.map((cartItem) => cartItem.id);
+        const cartCouponsIds = cart.cartCoupons.map(
+          (cartCoupon) => cartCoupon.id,
+        );
 
-        // // await tx.cart.update({
-        // //   where: {
-        // //     id: cart.id,
-        // //   },
-        // //   data: {
-        // //     deletedAt: new Date(),
-        // //     cartItems: {
-        // //       updateMany: {
-        // //         where: {
-        // //           id: { in: cartItemsIds },
-        // //         },
-        // //         data: {
-        // //           deletedAt: new Date(),
-        // //         },
-        // //       },
-        // //     },
-        // //     cartTotal: {
-        // //       update: {
-        // //         deletedAt: new Date(),
-        // //       },
-        // //     },
-        // //     cartCoupons: {
-        // //       updateMany: {
-        // //         where: {
-        // //           id: { in: cartCouponsIds },
-        // //         },
-        // //         data: {
-        // //           deletedAt: new Date(),
-        // //         },
-        // //       },
-        // //     },
-        // //     cartPayment: {
-        // //       update: {
-        // //         deletedAt: new Date(),
-        // //       },
-        // //     },
-        // //   },
-        // // });
+        await tx.cart.update({
+          where: {
+            id: cart.id,
+          },
+          data: {
+            deletedAt: new Date(),
+            cartItems: {
+              updateMany: {
+                where: {
+                  id: { in: cartItemsIds },
+                },
+                data: {
+                  deletedAt: new Date(),
+                },
+              },
+            },
+            cartTotal: {
+              update: {
+                deletedAt: new Date(),
+              },
+            },
+            cartCoupons: {
+              updateMany: {
+                where: {
+                  id: { in: cartCouponsIds },
+                },
+                data: {
+                  deletedAt: new Date(),
+                },
+              },
+            },
+            cartPayment: {
+              update: {
+                deletedAt: new Date(),
+              },
+            },
+          },
+        });
 
         await this.emailQueue.add(
           JOBS_ENUM.SEND_EMAIL_JOB,
@@ -391,6 +396,14 @@ export class OrderService
               );
             }),
           );
+
+          await tx.finance.create({
+            data: {
+              orderId: order.id,
+              sellerId: order.seller.id,
+              customerId: order.customer.id,
+            },
+          });
         }
 
         return tx.order.update({

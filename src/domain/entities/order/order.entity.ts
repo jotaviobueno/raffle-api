@@ -23,6 +23,9 @@ export class OrderEntity implements Order {
   @ApiProperty({ nullable: true })
   userAgent: string | null;
 
+  @ApiProperty()
+  cartId: string;
+
   @ApiProperty({ type: Date, nullable: true })
   dueDate: Date | null;
 
