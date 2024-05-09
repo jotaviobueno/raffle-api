@@ -5,11 +5,17 @@ import {
   QueryParamsDto,
   UpdateTicketDto,
 } from 'src/domain/dtos';
-import { FindAllResultEntity, TicketEntity } from 'src/domain/entities';
+import {
+  FindAllResultEntity,
+  TicketEntity,
+  TicketWithRelationsEntity,
+} from 'src/domain/entities';
 import { UserService } from '../../user/services/user.service';
 import { TicketRepository } from '../repositories/ticket.repository';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { QueryBuilder } from 'src/common/utils';
+import { TicketStatusService } from './ticket-status.service';
+import { TicketHistoryService } from './ticket-history.service';
 
 @Injectable()
 export class TicketService
@@ -18,6 +24,8 @@ export class TicketService
   constructor(
     private readonly userService: UserService,
     private readonly ticketRepository: TicketRepository,
+    private readonly ticketStatusService: TicketStatusService,
+    private readonly ticketHistoryService: TicketHistoryService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
   ) {}
@@ -25,18 +33,28 @@ export class TicketService
   async create(dto: CreateTicketDto): Promise<TicketEntity> {
     if (dto.customerId) await this.userService.findById(dto.customerId);
 
+    const ticketStatus = await this.ticketStatusService.findById(
+      dto.ticketStatusId,
+    );
+
     const ticket = await this.ticketRepository.create(dto);
+
+    await this.ticketHistoryService.create({
+      code: ticketStatus.code,
+      ticketId: ticket.id,
+      ticketStatusId: ticketStatus.id,
+    });
 
     return ticket;
   }
 
   async findAll(
     queryParams: QueryParamsDto,
-  ): Promise<FindAllResultEntity<TicketEntity>> {
+  ): Promise<FindAllResultEntity<TicketWithRelationsEntity>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =
-      await this.cacheManager.get<FindAllResultEntity<TicketEntity> | null>(
+      await this.cacheManager.get<FindAllResultEntity<TicketWithRelationsEntity> | null>(
         `tickets_${queryParamsStringfy}`,
       );
 
@@ -62,7 +80,7 @@ export class TicketService
     return { data: tickets, info };
   }
 
-  async findById(id: string): Promise<TicketEntity> {
+  async findById(id: string): Promise<TicketWithRelationsEntity> {
     const ticket = await this.ticketRepository.findById(id);
 
     if (!ticket)
@@ -73,6 +91,19 @@ export class TicketService
 
   async update(dto: UpdateTicketDto): Promise<TicketEntity> {
     const ticket = await this.findById(dto.id);
+
+    if (dto.ticketStatusId) {
+      const ticketStatus = await this.ticketStatusService.findById(
+        dto.ticketStatusId,
+      );
+
+      if (dto.ticketStatusId != ticket.ticketStatusId)
+        await this.ticketHistoryService.create({
+          code: ticketStatus.code,
+          ticketId: ticket.id,
+          ticketStatusId: ticketStatus.id,
+        });
+    }
 
     const update = await this.ticketRepository.softDelete(ticket.id);
 

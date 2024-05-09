@@ -27,4 +27,9 @@ export class CreateTicketDto {
   @IsNotEmpty()
   @ApiProperty()
   description: string;
+
+  @IsUUID()
+  @IsNotEmpty()
+  @ApiProperty()
+  ticketStatusId: string;
 }

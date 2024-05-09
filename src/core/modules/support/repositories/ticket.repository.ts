@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { RepositoryFactory } from 'src/common/factories';
 import { CreateTicketDto, UpdateTicketDto } from 'src/domain/dtos';
-import { QueryBuilderEntity, TicketEntity } from 'src/domain/entities';
+import {
+  QueryBuilderEntity,
+  TicketEntity,
+  TicketWithRelationsEntity,
+} from 'src/domain/entities';
 
 @Injectable()
 export class TicketRepository extends RepositoryFactory<
@@ -13,16 +17,30 @@ export class TicketRepository extends RepositoryFactory<
     super('ticket');
   }
 
-  findById(id: string): Promise<TicketEntity | null> {
+  findById(id: string): Promise<TicketWithRelationsEntity | null> {
     return this.prismaService.ticket.findFirst({
       where: {
         id,
         deletedAt: null,
       },
+      include: {
+        ticketHistories: {
+          include: { ticketStatus: true },
+        },
+        ticketStatus: true,
+      },
     });
   }
 
-  findAll(query: QueryBuilderEntity): Promise<TicketEntity[]> {
-    return this.prismaService.ticket.findMany(query);
+  findAll(query: QueryBuilderEntity): Promise<TicketWithRelationsEntity[]> {
+    return this.prismaService.ticket.findMany({
+      ...query,
+      include: {
+        ticketHistories: {
+          include: { ticketStatus: true },
+        },
+        ticketStatus: true,
+      },
+    });
   }
 }

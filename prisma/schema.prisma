@@ -861,9 +861,10 @@ model Ticket {
   customerId String? @map("customer_id")
   email      String?
 
-  title       String
-  description String
-  images      String[] @default([])
+  title          String
+  description    String
+  images         String[] @default([])
+  ticketStatusId String   @map("ticket_status_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
@@ -872,7 +873,6 @@ model Ticket {
   customer        User?           @relation(fields: [customerId], references: [id])
   ticketHistories TicketHistory[]
   ticketStatus    TicketStatus    @relation(fields: [ticketStatusId], references: [id])
-  ticketStatusId  String          @map("ticket_status_id")
 
   @@map("ticket")
 }
@@ -883,12 +883,12 @@ model TicketHistory {
   ticketId       String @map("ticket_id")
   ticketStatusId String @map("ticket_status_id")
 
-  ticketStatus TicketStatus @relation(fields: [ticketStatusId], references: [id])
-  ticket       Ticket       @relation(fields: [ticketId], references: [id])
-
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  ticketStatus TicketStatus @relation(fields: [ticketStatusId], references: [id])
+  ticket       Ticket       @relation(fields: [ticketId], references: [id])
 
   @@map("ticket_history")
 }

@@ -71,6 +71,11 @@ const ALL_PERMISSION = [
   //
   'CAN_UPDATE_THEME',
   'CAN_READ_THEME',
+  //
+  'CAN_CREATE_TICKET_STATUS',
+  'CAN_READ_TICKET_STATUS',
+  'CAN_UPDATE_TICKET_STATUS',
+  'CAN_DELETE_TICKET_STATUS',
 ];
 
 export const data = [
@@ -142,10 +147,6 @@ export const data = [
       'CAN_CREATE_COUPON',
       'CAN_UPDATE_COUPON',
       'CAN_DELETE_COUPON',
-      //
-      'CAN_CREATE_ORDER_STATUS',
-      'CAN_UPDATE_ORDER_STATUS',
-      'CAN_DELETE_ORDER_STATUS',
       //
       'CAN_READ_FINANCE',
       //

@@ -31,3 +31,5 @@ export * from './customer-seller';
 export * from './email';
 export * from './theme';
 export * from './ticket';
+export * from './ticket-status';
+export * from './ticket-history';

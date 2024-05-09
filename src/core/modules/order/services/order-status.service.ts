@@ -29,6 +29,7 @@ export class OrderStatusService
 
   async findAll({
     name,
+    code,
     ...queryParams
   }: SearchOrderStatusDto): Promise<FindAllResultEntity<OrderStatusEntity>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
@@ -43,6 +44,7 @@ export class OrderStatusService
     const query = new QueryBuilder(queryParams)
       .where({
         name: name && { contains: name },
+        code: code && { contains: code },
       })
       .sort()
       .pagination()
