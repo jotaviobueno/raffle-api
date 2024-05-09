@@ -38,5 +38,7 @@ export * from './quotas';
 export * from './finance';
 export * from './winner';
 export * from './role-permission';
-export * from './color';
+export * from './theme';
 export * from './customer-seller';
+export * from './theme';
+export * from './ticket';

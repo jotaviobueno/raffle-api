@@ -26,10 +26,10 @@ export class OrderStatusRepository extends RepositoryFactory<
     });
   }
 
-  findByName(name: string): Promise<OrderStatusEntity | null> {
+  findByCode(code: string): Promise<OrderStatusEntity | null> {
     return this.prismaService.orderStatus.findFirst({
       where: {
-        name,
+        code,
         deletedAt: null,
       },
     });

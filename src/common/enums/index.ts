@@ -5,3 +5,4 @@ export * from './permission';
 export * from './jobs';
 export * from './queue';
 export * from './auth';
+export * from './ticket-status';

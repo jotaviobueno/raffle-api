@@ -36,6 +36,7 @@ model User {
   finances        Finance[]
   winners         Winner[]
   customerSellers CustomerSeller[]
+  tickets         Ticket[]
 
   @@map("user")
 }
@@ -136,10 +137,31 @@ model Seller {
   utmCampaigns         UtmCampaign[]
   carts                Cart[]
   finances             Finance[]
-  color                Color?
   customerSellers      CustomerSeller[]
+  theme                Theme?
 
   @@map("seller")
+}
+
+model Theme {
+  id      String  @id @default(uuid())
+  primary String
+  text    String
+  link    String
+  font    String?
+
+  sellerId String? @unique @map("seller_id")
+  parentId String? @unique @map("parent_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  parent         Theme?  @relation("secondaryTheme", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  secondaryTheme Theme?  @relation("secondaryTheme")
+  seller         Seller? @relation(fields: [sellerId], references: [id])
+
+  @@map("theme")
 }
 
 model SocialMedia {
@@ -377,12 +399,10 @@ model Order {
 }
 
 model OrderHistory {
-  id String @id @default(uuid())
-
-  comment    String?
-  orderId    String  @map("order_id")
-  customerId String  @map("customer_id")
-
+  id            String @id @default(uuid())
+  code          String
+  orderId       String @map("order_id")
+  customerId    String @map("customer_id")
   orderStatusId String @map("order_status_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
@@ -521,6 +541,7 @@ model Coupon {
 model OrderStatus {
   id   String @id @default(uuid())
   name String
+  code String
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
@@ -821,26 +842,6 @@ model GatewayEvent {
   @@map("gateway_event")
 }
 
-model Color {
-  id        String @id @default(uuid())
-  primary   String
-  secondary String
-  text      String
-
-  sellerId String? @unique @map("seller_id")
-  parentId String? @unique @map("parent_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  parent         Color?  @relation("secondaryColor", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  secondaryColor Color?  @relation("secondaryColor")
-  seller         Seller? @relation(fields: [sellerId], references: [id])
-
-  @@map("color")
-}
-
 model Audit {
   id        String @id @default(uuid())
   namespace String
@@ -853,4 +854,56 @@ model Audit {
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
   @@map("audit")
+}
+
+model Ticket {
+  id         String  @id @default(uuid())
+  customerId String? @map("customer_id")
+  email      String?
+
+  title       String
+  description String
+  images      String[] @default([])
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  customer        User?           @relation(fields: [customerId], references: [id])
+  ticketHistories TicketHistory[]
+  ticketStatus    TicketStatus    @relation(fields: [ticketStatusId], references: [id])
+  ticketStatusId  String          @map("ticket_status_id")
+
+  @@map("ticket")
+}
+
+model TicketHistory {
+  id             String @id @default(uuid())
+  code           String
+  ticketId       String @map("ticket_id")
+  ticketStatusId String @map("ticket_status_id")
+
+  ticketStatus TicketStatus @relation(fields: [ticketStatusId], references: [id])
+  ticket       Ticket       @relation(fields: [ticketId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  @@map("ticket_history")
+}
+
+model TicketStatus {
+  id   String @id @default(uuid())
+  name String
+  code String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  tickets         Ticket[]
+  ticketHistories TicketHistory[]
+
+  @@map("ticket_status")
 }

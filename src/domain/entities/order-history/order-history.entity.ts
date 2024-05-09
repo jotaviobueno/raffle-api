@@ -5,8 +5,8 @@ export class OrderHistoryEntity implements OrderHistory {
   @ApiProperty()
   id: string;
 
-  @ApiProperty({ nullable: true })
-  comment: string | null;
+  @ApiProperty()
+  code: string;
 
   @ApiProperty()
   orderId: string;

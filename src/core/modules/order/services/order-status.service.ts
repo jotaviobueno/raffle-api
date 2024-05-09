@@ -66,8 +66,8 @@ export class OrderStatusService
     return { data: orderStatus, info };
   }
 
-  async findByName(name: string): Promise<OrderStatusEntity> {
-    const orderStatus = await this.orderStatusRepository.findByName(name);
+  async findByCode(code: string): Promise<OrderStatusEntity> {
+    const orderStatus = await this.orderStatusRepository.findByCode(code);
 
     if (!orderStatus)
       throw new HttpException('Order status not found', HttpStatus.NOT_FOUND);

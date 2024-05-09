@@ -8,6 +8,9 @@ export class OrderStatusEntity implements OrderStatus {
   @ApiProperty()
   name: string;
 
+  @ApiProperty()
+  code: string;
+
   @ApiProperty({ type: Date })
   createdAt: Date;
 

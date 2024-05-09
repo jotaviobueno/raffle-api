@@ -21,7 +21,7 @@ import { QueryBuilder } from 'src/common/utils';
 import { UserService } from '../../user/services/user.service';
 import { SellerRepository } from '../repositories/seller.repository';
 import { S3Service } from '../../setting/services/s3.service';
-import { ColorService } from './color.service';
+import { ThemeService } from './theme.service';
 
 @Injectable()
 export class SellerService
@@ -34,7 +34,7 @@ export class SellerService
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     private readonly s3Service: S3Service,
-    private readonly colorService: ColorService,
+    private readonly themeService: ThemeService,
   ) {}
 
   async create({
@@ -56,14 +56,14 @@ export class SellerService
       logo,
     });
 
-    await this.colorService.create({
+    await this.themeService.create({
       primary: '#0f0f0f',
-      secondary: '#363636',
       sellerId: seller.id,
+      link: '#fff0ff',
       text: '#e0e0e0',
       parent: {
         primary: '#c49645',
-        secondary: '#daac5d',
+        link: '#fff0ff',
         text: '#71717a',
       },
     });

@@ -29,9 +29,9 @@ export class SellerRepository extends RepositoryFactory<
       },
       include: {
         socialMedias: true,
-        color: {
+        theme: {
           include: {
-            secondaryColor: true,
+            secondaryTheme: true,
           },
         },
       },

@@ -33,6 +33,7 @@ export class UserService
     private readonly s3Service: S3Service,
     private readonly customerSellerService: CustomerSellerService,
   ) {}
+
   async create({
     sellerId,
     code,

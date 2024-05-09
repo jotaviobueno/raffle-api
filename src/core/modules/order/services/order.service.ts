@@ -308,7 +308,7 @@ export class OrderService
 
     const order = await this.findByInvoiceNumber(+data.payment.invoiceNumber);
 
-    const orderStatus = await this.orderStatusService.findByName(data.event);
+    const orderStatus = await this.orderStatusService.findByCode(data.event);
 
     return this.prismaService.$transaction(
       async (tx) => {
@@ -345,12 +345,12 @@ export class OrderService
           JOBS_ENUM.SEND_EMAIL_JOB,
           {
             to: order.customer.email,
-            subject: ORDER_STATUS_ENUM[data.event],
+            subject: orderStatus.name,
             template: './payment/payment-status-change.hbs',
             context: {
               orderId: order.id,
               fullName: order.customer.fullName,
-              status: ORDER_STATUS_ENUM[data.event],
+              status: orderStatus.name,
             },
           },
           {
@@ -418,6 +418,7 @@ export class OrderService
             },
             orderHistories: {
               create: {
+                code: data.event,
                 customerId: order.customer.id,
                 orderStatusId: orderStatus.id,
               },

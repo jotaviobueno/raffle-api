@@ -1,0 +1,42 @@
+export const data = [
+  { name: 'Aberto', code: 'OPEN', deletedAt: null },
+  { name: 'Fechado', code: 'CLOSED', deletedAt: null },
+  { name: 'Em andamento', code: 'IN_PROGRESS', deletedAt: null },
+  { name: 'Resolvido', code: 'RESOLVED', deletedAt: null },
+  {
+    name: 'Aguardando resposta do cliente',
+    code: 'WAITING_FOR_CUSTOMER_RESPONSE',
+    deletedAt: null,
+  },
+  {
+    name: 'Aguardando equipe de suporte',
+    code: 'WAITING_FOR_SUPPORT_TEAM',
+    deletedAt: null,
+  },
+  { name: 'Escalado', code: 'ESCALATED', deletedAt: null },
+  { name: 'Em espera', code: 'ON_HOLD', deletedAt: null },
+  { name: 'Cancelado', code: 'CANCELLED', deletedAt: null },
+  {
+    name: 'Aguardando atribuicao',
+    code: 'AWAITING_ASSIGNMENT',
+    deletedAt: null,
+  },
+  { name: 'Em revisao', code: 'UNDER_REVIEW', deletedAt: null },
+  { name: 'Agendado', code: 'SCHEDULED', deletedAt: null },
+  { name: 'Em teste', code: 'TESTING', deletedAt: null },
+  { name: 'Adiado', code: 'DEFERRED', deletedAt: null },
+  { name: 'Duplicado', code: 'DUPLICATE', deletedAt: null },
+  { name: 'Reaberto', code: 'REOPENED', deletedAt: null },
+  { name: 'Pendente de aprovacao', code: 'PENDING_APPROVAL', deletedAt: null },
+  {
+    name: 'Resolvido com contorno',
+    code: 'RESOLVED_WITH_WORKAROUND',
+    deletedAt: null,
+  },
+  {
+    name: 'Fechado nenhuma ação adicional necessaria',
+    code: 'CLOSED_NO_FURTHER_ACTION_NEEDED',
+    deletedAt: null,
+  },
+  { name: 'Fora do escopo', code: 'OUT_OF_SCOPE', deletedAt: null },
+];

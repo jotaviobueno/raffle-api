@@ -69,8 +69,8 @@ const ALL_PERMISSION = [
   //
   'CAN_READ_FINANCE',
   //
-  'CAN_UPDATE_COLOR',
-  'CAN_READ_COLOR',
+  'CAN_UPDATE_THEME',
+  'CAN_READ_THEME',
 ];
 
 export const data = [
@@ -149,8 +149,8 @@ export const data = [
       //
       'CAN_READ_FINANCE',
       //
-      'CAN_UPDATE_COLOR',
-      'CAN_READ_COLOR',
+      'CAN_UPDATE_THEME',
+      'CAN_READ_THEME',
     ],
   },
   {

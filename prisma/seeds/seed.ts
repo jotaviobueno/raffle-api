@@ -3,6 +3,7 @@ import { seedCountries } from './country/seed-countries';
 import { seedRoles } from './role/seed-roles';
 import { seedOrderStatus } from './order-status/seed-order-status';
 import { seedPaymentMethod } from './payment-method/seed-payment-method';
+import { seedTicketStatus } from './ticket-status/seed-ticket-status';
 
 const prisma = new PrismaClient();
 
@@ -13,6 +14,7 @@ async function main() {
       await seedRoles(tx);
       await seedOrderStatus(tx);
       await seedPaymentMethod(tx);
+      await seedTicketStatus(tx);
     },
     {
       maxWait: 20000, // default: 2000

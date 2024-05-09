@@ -16,7 +16,7 @@ import { MarketingModule } from './core/modules/marketing/marketing.module';
 import { FinanceModule } from './core/modules/finance/finance.module';
 import { BullModule } from '@nestjs/bull';
 import { environment } from './config';
-import { EmailModule } from './core/modules/email/email.module';
+import { SupportModule } from './core/modules/support/ticket.module';
 
 @Module({
   imports: [
@@ -25,7 +25,6 @@ import { EmailModule } from './core/modules/email/email.module';
         port: +environment.REDIS_PORT,
       },
     }),
-    EmailModule,
     PrismaModule,
     RedisModule,
     UserModule,
@@ -39,6 +38,7 @@ import { EmailModule } from './core/modules/email/email.module';
     PaymentModule,
     MarketingModule,
     FinanceModule,
+    SupportModule,
   ],
   providers: [
     {

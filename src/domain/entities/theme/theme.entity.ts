@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Color } from '@prisma/client';
+import { Theme } from '@prisma/client';
 
-export class ColorEntity implements Color {
+export class ThemeEntity implements Theme {
   @ApiProperty()
   id: string;
 
@@ -9,10 +9,13 @@ export class ColorEntity implements Color {
   primary: string;
 
   @ApiProperty()
-  secondary: string;
+  text: string;
 
   @ApiProperty()
-  text: string;
+  link: string;
+
+  @ApiProperty({ nullable: true })
+  font: string | null;
 
   @ApiProperty({ nullable: true })
   sellerId: string | null;

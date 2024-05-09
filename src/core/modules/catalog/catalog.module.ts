@@ -25,9 +25,9 @@ import { QuotasController } from './controllers/quotas.controller';
 import { WinnerController } from './controllers/winner.controller';
 import { WinnerRepository } from './repositories/winner.repository';
 import { WinnerService } from './services/winner.service';
-import { ColorRepository } from './repositories/color.repository';
-import { ColorService } from './services/color.service';
-import { ColorController } from './controllers/collor.controller';
+import { ThemeRepository } from './repositories/theme.repository';
+import { ThemeService } from './services/theme.service';
+import { ThemeController } from './controllers/theme.controller';
 import { BullModule } from '@nestjs/bull';
 import { QuotasConsumer } from './consumers/quotas.consumer';
 import { QUEUES_ENUM } from 'src/common/enums';
@@ -49,7 +49,7 @@ import { QUEUES_ENUM } from 'src/common/enums';
     RaffleCategoryController,
     QuotasController,
     WinnerController,
-    ColorController,
+    ThemeController,
   ],
   providers: [
     RaffleService,
@@ -68,8 +68,8 @@ import { QUEUES_ENUM } from 'src/common/enums';
     QutoasRepository,
     WinnerRepository,
     WinnerService,
-    ColorRepository,
-    ColorService,
+    ThemeRepository,
+    ThemeService,
     QuotasConsumer,
   ],
   exports: [
@@ -81,7 +81,7 @@ import { QUEUES_ENUM } from 'src/common/enums';
     RaffleCategoryService,
     QuotasService,
     WinnerService,
-    ColorService,
+    ThemeService,
   ],
 })
 export class CatalogModule {}

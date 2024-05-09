@@ -1,13 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  UseGuards,
-} from '@nestjs/common';
-import { UpdateColorDto } from 'src/domain/dtos';
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { UpdateThemeDto } from 'src/domain/dtos';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -22,34 +14,34 @@ import { RoleGuard } from '../../role/guards';
 import { Permissions, Roles } from '../../role/decorators';
 import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { AwardService } from '../services/award.service';
-import { ColorEntity } from 'src/domain/entities';
+import { ThemeEntity } from 'src/domain/entities';
 
-@Controller('color')
-@ApiTags('color')
+@Controller('theme')
+@ApiTags('theme')
 @UseGuards(RoleGuard)
 @Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
 @ApiBearerAuth('defaultBearerAuth')
-export class ColorController {
-  constructor(private readonly colorService: AwardService) {}
+export class ThemeController {
+  constructor(private readonly themeService: AwardService) {}
 
   @Get(':id')
-  @ApiOkResponse({ type: ColorEntity })
-  @Permissions(PERMISSION_ENUM.CAN_READ_COLOR)
+  @ApiOkResponse({ type: ThemeEntity })
+  @Permissions(PERMISSION_ENUM.CAN_READ_THEME)
   @ApiNotFoundResponse()
   @ApiUnauthorizedResponse()
   findById(@Param('id') id: string) {
-    return this.colorService.findById(id);
+    return this.themeService.findById(id);
   }
 
   @Patch(':id')
-  @Permissions(PERMISSION_ENUM.CAN_UPDATE_COLOR)
-  @ApiOkResponse({ type: ColorEntity })
-  @ApiBody({ type: UpdateColorDto })
+  @Permissions(PERMISSION_ENUM.CAN_UPDATE_THEME)
+  @ApiOkResponse({ type: ThemeEntity })
+  @ApiBody({ type: UpdateThemeDto })
   @ApiNotFoundResponse()
   @ApiNotAcceptableResponse()
   @ApiUnauthorizedResponse()
   @ApiBadRequestResponse()
-  update(@Param('id') id: string, @Body() updateColorDto: UpdateColorDto) {
-    return this.colorService.update({ ...updateColorDto, id });
+  update(@Param('id') id: string, @Body() updateThemeDto: UpdateThemeDto) {
+    return this.themeService.update({ ...updateThemeDto, id });
   }
 }
