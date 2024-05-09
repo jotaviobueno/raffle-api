@@ -8,9 +8,6 @@ export class OrderEntity implements Order {
   @ApiProperty()
   sellerId: string;
 
-  @ApiProperty()
-  customerId: string;
-
   @ApiProperty({ type: Number, nullable: true })
   invoiceNumber: number | null;
 

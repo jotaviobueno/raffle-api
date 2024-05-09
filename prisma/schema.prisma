@@ -29,7 +29,6 @@ model User {
   addresses       Address[]
   sellers         Seller[]
   userRoles       UserRole[]
-  orders          Order[]
   orderHistories  OrderHistory[]
   carts           Cart[]
   quotas          Quotas[]
@@ -37,6 +36,7 @@ model User {
   winners         Winner[]
   customerSellers CustomerSeller[]
   tickets         Ticket[]
+  orderCustomers  OrderCustomer[]
 
   @@map("user")
 }
@@ -370,7 +370,6 @@ model RaffleCoupon {
 model Order {
   id            String  @id @default(uuid())
   sellerId      String  @map("seller_id")
-  customerId    String  @map("customer_id")
   invoiceNumber Int?    @map("invoice_number")
   comment       String?
   ip            String?
@@ -385,7 +384,6 @@ model Order {
 
   cart           Cart           @relation(fields: [cartId], references: [id])
   seller         Seller         @relation(fields: [sellerId], references: [id])
-  customer       User           @relation(fields: [customerId], references: [id])
   orderPayment   OrderPayment?
   orderTotal     OrderTotal?
   orderCoupons   OrderCoupon[]
@@ -394,6 +392,7 @@ model Order {
   orderStatus    OrderStatus?   @relation(fields: [orderStatusId], references: [id])
   finance        Finance?
   gatewayEvents  GatewayEvent[]
+  orderCustomer  OrderCustomer?
 
   @@map("order")
 }
@@ -906,4 +905,24 @@ model TicketStatus {
   ticketHistories TicketHistory[]
 
   @@map("ticket_status")
+}
+
+model OrderCustomer {
+  id String @id @default(uuid())
+
+  fullName String @map("full_name")
+  email    String
+  document String
+
+  customerId String @map("customer_id")
+  orderId    String @unique @map("order_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  customer User  @relation(fields: [customerId], references: [id])
+  order    Order @relation(fields: [orderId], references: [id])
+
+  @@map("order_customer")
 }

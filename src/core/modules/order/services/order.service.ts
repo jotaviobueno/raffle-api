@@ -174,9 +174,16 @@ export class OrderService
             dueDate: new Date(),
             ip: dto.ip,
             userAgent: dto.userAgent,
-            customer: {
-              connect: {
-                id: cart.customer.id,
+            orderCustomer: {
+              create: {
+                document: cart.customer.document,
+                email: cart.customer.email,
+                fullName: cart.customer.fullName,
+                customer: {
+                  connect: {
+                    id: cart.customer.id,
+                  },
+                },
               },
             },
             cart: {
@@ -344,12 +351,12 @@ export class OrderService
         await this.emailQueue.add(
           JOBS_ENUM.SEND_EMAIL_JOB,
           {
-            to: order.customer.email,
+            to: order.orderCustomer.email,
             subject: orderStatus.name,
             template: './payment/payment-status-change.hbs',
             context: {
               orderId: order.id,
-              fullName: order.customer.fullName,
+              fullName: order.orderCustomer.fullName,
               status: orderStatus.name,
             },
           },
@@ -384,7 +391,7 @@ export class OrderService
                   raffle: orderItem.raffle,
                   dto: {
                     raffleId: orderItem.raffle.id,
-                    customerId: order.customer.id,
+                    customerId: order.orderCustomer.customerId,
                     quantity: orderItem.quantity,
                   },
                 },
@@ -401,7 +408,7 @@ export class OrderService
             data: {
               orderId: order.id,
               sellerId: order.seller.id,
-              customerId: order.customer.id,
+              customerId: order.orderCustomer.customerId,
             },
           });
         }
@@ -419,7 +426,7 @@ export class OrderService
             orderHistories: {
               create: {
                 code: data.event,
-                customerId: order.customer.id,
+                customerId: order.orderCustomer.customerId,
                 orderStatusId: orderStatus.id,
               },
             },
