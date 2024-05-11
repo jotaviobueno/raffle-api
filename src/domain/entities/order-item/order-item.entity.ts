@@ -20,8 +20,11 @@ export class OrderItemEntity implements OrderItem {
   @ApiProperty()
   orderId: string;
 
-  @ApiProperty()
-  raffleId: string;
+  @ApiProperty({ nullable: true })
+  planId: string | null;
+
+  @ApiProperty({ nullable: true })
+  raffleId: string | null;
 
   @ApiProperty({ type: Date })
   createdAt: Date;

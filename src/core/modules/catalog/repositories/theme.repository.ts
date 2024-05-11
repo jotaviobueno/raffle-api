@@ -17,18 +17,17 @@ export class ThemeRepository extends RepositoryFactory<
     return this.prismaService.theme.create({
       data: {
         primary: data.primary,
-        sellerId: data.sellerId,
         text: data.text,
-        link: data.link,
-        font: data.font,
+        background: data.background,
+        foreground: data.foreground,
+        sellerId: data.sellerId,
         deletedAt: null,
         secondaryTheme: {
           create: {
-            sellerId: data.sellerId,
             primary: data.parent.primary,
             text: data.parent.text,
-            link: data.parent.link,
-            font: data.parent.font,
+            background: data.parent?.background,
+            foreground: data.parent?.foreground,
             deletedAt: null,
           },
         },

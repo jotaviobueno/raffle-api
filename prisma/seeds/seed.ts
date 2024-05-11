@@ -4,6 +4,7 @@ import { seedRoles } from './role/seed-roles';
 import { seedOrderStatus } from './order-status/seed-order-status';
 import { seedPaymentMethod } from './payment-method/seed-payment-method';
 import { seedTicketStatus } from './ticket-status/seed-ticket-status';
+import { seedPlanCycle } from './plan-cycle/seed-plan-cycle';
 
 const prisma = new PrismaClient();
 
@@ -15,6 +16,7 @@ async function main() {
       await seedOrderStatus(tx);
       await seedPaymentMethod(tx);
       await seedTicketStatus(tx);
+      await seedPlanCycle(tx);
     },
     {
       maxWait: 20000, // default: 2000

@@ -1,9 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Permission } from '@prisma/client';
+import { PlanCycle } from '@prisma/client';
 
-export class PermissionEntity implements Permission {
+export class PlanCycleEntity implements PlanCycle {
   @ApiProperty()
   id: string;
+
+  @ApiProperty()
+  name: string;
 
   @ApiProperty()
   code: string;

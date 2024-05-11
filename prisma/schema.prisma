@@ -83,6 +83,7 @@ model Role {
 
   userRoles       UserRole[]
   rolePermissions RolePermission[]
+  rolePlans       RolePlan[]
 
   @@map("role")
 }
@@ -144,11 +145,11 @@ model Seller {
 }
 
 model Theme {
-  id      String  @id @default(uuid())
-  primary String
-  text    String
-  link    String
-  font    String?
+  id         String  @id @default(uuid())
+  primary    String
+  text       String
+  background String?
+  foreground String?
 
   sellerId String? @unique @map("seller_id")
   parentId String? @unique @map("parent_id")
@@ -717,34 +718,38 @@ model OrderItem {
   total    Float
   tax      Float  @default(0)
 
-  raffleId String @map("raffle_id")
-  orderId  String @map("order_id")
+  planId   String? @map("plan_id")
+  raffleId String? @map("raffle_id")
+  orderId  String  @map("order_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
-  raffle    Raffle    @relation(fields: [raffleId], references: [id])
 
-  order Order @relation(fields: [orderId], references: [id])
+  raffle Raffle? @relation(fields: [raffleId], references: [id])
+  order  Order   @relation(fields: [orderId], references: [id])
+  plan   Plan?   @relation(fields: [planId], references: [id])
 
   @@map("order_item")
 }
 
 model CartItem {
-  id       String @id @default(uuid())
+  id       String  @id @default(uuid())
   quantity Int
   price    Float
-  cartId   String @map("cart_id")
-  tax      Float  @default(0)
+  cartId   String  @map("cart_id")
+  tax      Float   @default(0)
   total    Float
-  raffleId String @map("raffle_id")
+  raffleId String? @map("raffle_id")
+  planId   String? @map("plan_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  raffle Raffle @relation(fields: [raffleId], references: [id])
-  cart   Cart   @relation(fields: [cartId], references: [id])
+  raffle Raffle? @relation(fields: [raffleId], references: [id])
+  plan   Plan?   @relation(fields: [planId], references: [id])
+  cart   Cart    @relation(fields: [cartId], references: [id])
 
   @@map("cart_item")
 }
@@ -925,4 +930,55 @@ model OrderCustomer {
   order    Order @relation(fields: [orderId], references: [id])
 
   @@map("order_customer")
+}
+
+model Plan {
+  id          String @id @default(uuid())
+  title       String
+  description String
+  planCycleId String @map("plan_cycle_id")
+
+  price Float
+  tax   Float @default(0)
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  planCycle  PlanCycle   @relation(fields: [planCycleId], references: [id])
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  rolePlans  RolePlan[]
+
+  @@map("plan")
+}
+
+model RolePlan {
+  id String @id @default(uuid())
+
+  roleId String @map("role_id")
+  planId String @map("plan_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  role Role @relation(fields: [roleId], references: [id])
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@map("role_plan")
+}
+
+model PlanCycle {
+  id   String @id @default(uuid())
+  name String
+  code String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  plans Plan[]
+
+  @@map("plan_cycle")
 }

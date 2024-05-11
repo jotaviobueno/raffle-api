@@ -12,15 +12,15 @@ export class CreateThemeDto {
   @ApiProperty()
   text: string;
 
-  @IsHexColor()
-  @IsNotEmpty()
-  @ApiProperty()
-  link: string;
-
+  @ApiProperty({ nullable: true, required: false })
   @IsHexColor()
   @IsOptional()
+  background?: string;
+
   @ApiProperty({ nullable: true, required: false })
-  font?: string;
+  @IsHexColor()
+  @IsOptional()
+  foreground?: string;
 
   sellerId: string;
 

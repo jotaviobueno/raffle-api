@@ -313,6 +313,10 @@ export class OrderService
   async asaasPostback(data: AsaasWebhookEventDto) {
     let query = {};
 
+    console.log(data);
+
+    return true;
+
     const order = await this.findByInvoiceNumber(+data.payment.invoiceNumber);
 
     const orderStatus = await this.orderStatusService.findByCode(data.event);

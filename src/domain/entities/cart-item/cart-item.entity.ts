@@ -20,8 +20,11 @@ export class CartItemEntity implements CartItem {
   @ApiProperty({ type: Number })
   total: number;
 
-  @ApiProperty()
-  raffleId: string;
+  @ApiProperty({ nullable: true })
+  planId: string | null;
+
+  @ApiProperty({ nullable: true })
+  raffleId: string | null;
 
   @ApiProperty({ type: Date })
   createdAt: Date;

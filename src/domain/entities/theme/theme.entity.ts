@@ -11,11 +11,11 @@ export class ThemeEntity implements Theme {
   @ApiProperty()
   text: string;
 
-  @ApiProperty()
-  link: string;
+  @ApiProperty({ nullable: true })
+  background: string | null;
 
   @ApiProperty({ nullable: true })
-  font: string | null;
+  foreground: string | null;
 
   @ApiProperty({ nullable: true })
   sellerId: string | null;

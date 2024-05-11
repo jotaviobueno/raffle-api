@@ -57,14 +57,16 @@ export class SellerService
     });
 
     await this.themeService.create({
-      primary: '#0f0f0f',
+      primary: '#363636',
       sellerId: seller.id,
-      link: '#fff0ff',
-      text: '#e0e0e0',
+      text: '#e3e3e3',
+      background: '#020202',
+      foreground: '#4a4a4a',
       parent: {
-        primary: '#c49645',
-        link: '#fff0ff',
-        text: '#71717a',
+        primary: '#d2a860',
+        text: '#dedede',
+        background: '#c49645',
+        foreground: '#daac5d',
       },
     });
 
