@@ -34,15 +34,11 @@ export class UtmCampaignService
     return utmCampaign;
   }
 
-  async findAll({
-    sellerId,
-    name,
-    isActive,
-    description,
-    from,
-    to,
-    ...queryParams
-  }: SearchUtmCampaignDto): Promise<FindAllResultEntity<UtmCampaignEntity>> {
+  async findAll(
+    queryParams: SearchUtmCampaignDto,
+  ): Promise<FindAllResultEntity<UtmCampaignEntity>> {
+    const { sellerId, name, isActive, description, from, to } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

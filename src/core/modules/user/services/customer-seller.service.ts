@@ -34,12 +34,11 @@ export class CustomerSellerService
     return customerSeller;
   }
 
-  async findAll({
-    sellerId,
-    ...queryParams
-  }: SearchCustomerSellerDto): Promise<
-    FindAllResultEntity<CustomerSellerEntity>
-  > {
+  async findAll(
+    queryParams: SearchCustomerSellerDto,
+  ): Promise<FindAllResultEntity<CustomerSellerEntity>> {
+    const { sellerId } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

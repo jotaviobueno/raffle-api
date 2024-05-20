@@ -488,10 +488,11 @@ export class OrderService
     return order;
   }
 
-  async findAll({
-    sellerId,
-    ...queryParams
-  }: SearchOrderDto): Promise<FindAllResultEntity<OrderWithRelationsEntity>> {
+  async findAll(
+    queryParams: SearchOrderDto,
+  ): Promise<FindAllResultEntity<OrderWithRelationsEntity>> {
+    const { sellerId } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

@@ -14,12 +14,11 @@ export class FinanceService implements ServiceBase<FinanceEntity> {
     private readonly cacheManager: Cache,
   ) {}
 
-  async findAll({
-    sellerId,
-    customerId,
-    orderId,
-    ...queryParams
-  }: SearchFinanceDto): Promise<FindAllResultEntity<FinanceEntity>> {
+  async findAll(
+    queryParams: SearchFinanceDto,
+  ): Promise<FindAllResultEntity<FinanceEntity>> {
+    const { sellerId, customerId, orderId } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =
@@ -36,6 +35,7 @@ export class FinanceService implements ServiceBase<FinanceEntity> {
         customerId: customerId && customerId,
       })
       .sort()
+      .date()
       .pagination()
       .handle();
 

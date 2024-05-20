@@ -33,11 +33,11 @@ export class CategoryService
     return category;
   }
 
-  async findAll({
-    sellerId,
-    name,
-    ...queryParams
-  }: SearchCategoryDto): Promise<FindAllResultEntity<CategoryEntity>> {
+  async findAll(
+    queryParams: SearchCategoryDto,
+  ): Promise<FindAllResultEntity<CategoryEntity>> {
+    const { sellerId, name } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

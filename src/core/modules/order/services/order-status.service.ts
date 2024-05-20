@@ -27,11 +27,11 @@ export class OrderStatusService
     return orderStatus;
   }
 
-  async findAll({
-    name,
-    code,
-    ...queryParams
-  }: SearchOrderStatusDto): Promise<FindAllResultEntity<OrderStatusEntity>> {
+  async findAll(
+    queryParams: SearchOrderStatusDto,
+  ): Promise<FindAllResultEntity<OrderStatusEntity>> {
+    const { name, code } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

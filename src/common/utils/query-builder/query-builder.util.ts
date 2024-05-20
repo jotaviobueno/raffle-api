@@ -29,6 +29,26 @@ export class QueryBuilder {
     return this;
   }
 
+  date() {
+    if (!this.queryParams.from && this.queryParams.to)
+      this.query.where['createdAt'] = {
+        lte: new Date(this.queryParams.to),
+      };
+
+    if (this.queryParams.from && !this.queryParams.to)
+      this.query.where['createdAt'] = {
+        gte: new Date(this.queryParams.from),
+      };
+
+    if (this.queryParams.from && this.queryParams.to)
+      this.query.where['createdAt'] = {
+        lte: new Date(this.queryParams.to),
+        gte: new Date(this.queryParams.from),
+      };
+
+    return this;
+  }
+
   sort() {
     try {
       const [field, value] = this.queryParams?.orderBy?.split('.');

@@ -21,6 +21,7 @@ import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { FinanceEntity } from 'src/domain/entities';
 import { ApiOkFindAllResult } from 'src/common/decorators';
 import { FinanceService } from '../services/finance.service';
+import { IsPublic } from '../../auth/decorators';
 
 @Controller('finance')
 @ApiTags('finance')
@@ -35,6 +36,7 @@ export class FinanceController {
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
   @ApiOkFindAllResult(FinanceEntity)
+  @IsPublic()
   findAll(@Query() queryParams: SearchAwardDto) {
     return this.financeService.findAll(queryParams);
   }

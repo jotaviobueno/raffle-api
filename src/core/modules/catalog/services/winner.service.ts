@@ -37,12 +37,11 @@ export class WinnerService
     return winner;
   }
 
-  async findAll({
-    raffleId,
-    customerId,
-    number,
-    ...queryParams
-  }: SearchWinnerDto): Promise<FindAllResultEntity<WinnerEntity>> {
+  async findAll(
+    queryParams: SearchWinnerDto,
+  ): Promise<FindAllResultEntity<WinnerEntity>> {
+    const { raffleId, customerId, number } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =
