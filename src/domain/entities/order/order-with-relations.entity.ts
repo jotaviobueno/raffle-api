@@ -31,8 +31,8 @@ export class OrderWithRelationsEntity extends OrderEntity {
   @ApiProperty({ type: [OrderHistoryWithRelationsEntity] })
   orderHistories: OrderHistoryWithRelationsEntity[];
 
-  @ApiProperty({ type: OrderStatusEntity })
-  orderStatus: OrderStatusEntity;
+  @ApiProperty({ type: OrderStatusEntity, nullable: true })
+  orderStatus?: OrderStatusEntity;
 }
 
 export const orderQueryWithRelations = {

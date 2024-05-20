@@ -1,26 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsHexColor, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsHexColor, IsNotEmpty } from 'class-validator';
 
 export class CreateThemeDto {
+  @ApiProperty()
   @IsHexColor()
   @IsNotEmpty()
-  @ApiProperty()
   primary: string;
 
+  @ApiProperty()
   @IsHexColor()
   @IsNotEmpty()
+  secondary: string;
+
   @ApiProperty()
-  text: string;
-
-  @ApiProperty({ nullable: true, required: false })
   @IsHexColor()
-  @IsOptional()
-  background?: string;
+  @IsNotEmpty()
+  tertiary: string;
 
-  @ApiProperty({ nullable: true, required: false })
+  @ApiProperty()
   @IsHexColor()
-  @IsOptional()
-  foreground?: string;
+  @IsNotEmpty()
+  quaternary: string;
+
+  @ApiProperty()
+  @IsHexColor()
+  @IsNotEmpty()
+  quinary: string;
+
+  @ApiProperty()
+  @IsHexColor()
+  @IsNotEmpty()
+  senary: string;
 
   sellerId: string;
 

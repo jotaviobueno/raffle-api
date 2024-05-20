@@ -17,8 +17,13 @@ export class OrderRepository extends RepositoryFactory<
     super('order');
   }
 
-  findAll(query: QueryBuilderEntity): Promise<OrderEntity[]> {
-    return this.prismaService.order.findMany(query);
+  findAll(query: QueryBuilderEntity): Promise<OrderWithRelationsEntity[]> {
+    return this.prismaService.order.findMany({
+      ...query,
+      include: {
+        ...orderQueryWithRelations,
+      },
+    });
   }
 
   findByInvoiceNumber(

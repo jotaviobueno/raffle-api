@@ -57,16 +57,20 @@ export class SellerService
     });
 
     await this.themeService.create({
-      primary: '#363636',
+      primary: '#519022',
+      secondary: '#1f5e00',
+      tertiary: '#2f3842',
+      quaternary: '#ffffff',
+      quinary: '#f0f0f0',
+      senary: '#3C6C19',
       sellerId: seller.id,
-      text: '#e3e3e3',
-      background: '#020202',
-      foreground: '#4a4a4a',
       parent: {
-        primary: '#d2a860',
-        text: '#dedede',
-        background: '#c49645',
-        foreground: '#daac5d',
+        primary: '#7DBD5A',
+        secondary: '#0F3C00',
+        tertiary: '#3C464F',
+        quaternary: '#ffffff',
+        quinary: '#f0f0f0',
+        senary: '#34611A',
       },
     });
 

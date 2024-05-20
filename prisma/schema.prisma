@@ -139,28 +139,47 @@ model Seller {
   carts                Cart[]
   finances             Finance[]
   customerSellers      CustomerSeller[]
-  theme                Theme?
+  pages                Page[]
 
   @@map("seller")
 }
 
-model Theme {
-  id         String  @id @default(uuid())
-  primary    String
-  text       String
-  background String?
-  foreground String?
+model Page {
+  id          String  @id @default(uuid())
+  title       String
+  description String
+  version     String
+  themeId     String? @unique @map("theme_id")
+  sellerId    String  @map("seller_id")
 
-  sellerId String? @unique @map("seller_id")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  theme  Theme? @relation(fields: [themeId], references: [id])
+  seller Seller @relation(fields: [sellerId], references: [id])
+
+  @@map("page")
+}
+
+model Theme {
+  id         String @id @default(uuid())
+  primary    String
+  secondary  String
+  tertiary   String
+  quaternary String
+  quinary    String
+  senary     String
+
   parentId String? @unique @map("parent_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  parent         Theme?  @relation("secondaryTheme", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  secondaryTheme Theme?  @relation("secondaryTheme")
-  seller         Seller? @relation(fields: [sellerId], references: [id])
+  parent         Theme? @relation("secondaryTheme", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  secondaryTheme Theme? @relation("secondaryTheme")
+  page           Page?
 
   @@map("theme")
 }

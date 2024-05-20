@@ -23,7 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { IsPublic } from '../../auth/decorators';
 import { OrderService } from '../services/order.service';
-import { CreateCheckoutDto, QueryParamsDto } from 'src/domain/dtos';
+import { CreateCheckoutDto, SearchOrderDto } from 'src/domain/dtos';
 import { OrderEntity, OrderWithRelationsEntity } from 'src/domain/entities';
 import { ApiOkFindAllResult } from 'src/common/decorators';
 
@@ -58,7 +58,7 @@ export class OrderController {
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(15)
   @ApiOkFindAllResult(OrderEntity)
-  findAll(@Query() queryParams: QueryParamsDto) {
+  findAll(@Query() queryParams: SearchOrderDto) {
     return this.orderService.findAll(queryParams);
   }
 

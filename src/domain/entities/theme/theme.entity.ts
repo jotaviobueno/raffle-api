@@ -9,13 +9,19 @@ export class ThemeEntity implements Theme {
   primary: string;
 
   @ApiProperty()
-  text: string;
+  secondary: string;
 
-  @ApiProperty({ nullable: true })
-  background: string | null;
+  @ApiProperty()
+  tertiary: string;
 
-  @ApiProperty({ nullable: true })
-  foreground: string | null;
+  @ApiProperty()
+  quaternary: string;
+
+  @ApiProperty()
+  quinary: string;
+
+  @ApiProperty()
+  senary: string;
 
   @ApiProperty({ nullable: true })
   sellerId: string | null;

@@ -4,7 +4,7 @@ import {
   AsaasWebhookEventDto,
   CreateCheckoutDto,
   JobQuotasDto,
-  QueryParamsDto,
+  SearchOrderDto,
   SendEmailDto,
 } from 'src/domain/dtos';
 import {
@@ -313,10 +313,6 @@ export class OrderService
   async asaasPostback(data: AsaasWebhookEventDto) {
     let query = {};
 
-    console.log(data);
-
-    return true;
-
     const order = await this.findByInvoiceNumber(+data.payment.invoiceNumber);
 
     const orderStatus = await this.orderStatusService.findByCode(data.event);
@@ -492,19 +488,26 @@ export class OrderService
     return order;
   }
 
-  async findAll(
-    queryParams: QueryParamsDto,
-  ): Promise<FindAllResultEntity<OrderEntity>> {
+  async findAll({
+    sellerId,
+    ...queryParams
+  }: SearchOrderDto): Promise<FindAllResultEntity<OrderWithRelationsEntity>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =
-      await this.cacheManager.get<FindAllResultEntity<OrderEntity> | null>(
+      await this.cacheManager.get<FindAllResultEntity<OrderWithRelationsEntity> | null>(
         `orders_${queryParamsStringfy}`,
       );
 
     if (cache) return cache;
 
-    const query = new QueryBuilder(queryParams).sort().pagination().handle();
+    const query = new QueryBuilder(queryParams)
+      .where({
+        sellerId: sellerId,
+      })
+      .sort()
+      .pagination()
+      .handle();
 
     const orders = await this.orderRepository.findAll(query);
     const total = await this.orderRepository.count(query.where);
