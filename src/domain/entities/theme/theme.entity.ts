@@ -20,11 +20,11 @@ export class ThemeEntity implements Theme {
   @ApiProperty()
   quinary: string;
 
-  @ApiProperty()
-  senary: string;
-
   @ApiProperty({ nullable: true })
   sellerId: string | null;
+
+  @ApiProperty()
+  senary: string;
 
   @ApiProperty({ nullable: true })
   parentId: string | null;

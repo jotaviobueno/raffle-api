@@ -139,7 +139,9 @@ model Seller {
   carts                Cart[]
   finances             Finance[]
   customerSellers      CustomerSeller[]
-  pages                Page[]
+
+  pages Page[] @ignore
+  theme Theme?
 
   @@map("seller")
 }
@@ -160,6 +162,7 @@ model Page {
   seller Seller @relation(fields: [sellerId], references: [id])
 
   @@map("page")
+  @@ignore
 }
 
 model Theme {
@@ -172,14 +175,16 @@ model Theme {
   senary     String
 
   parentId String? @unique @map("parent_id")
+  sellerId String? @unique @map("seller_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  parent         Theme? @relation("secondaryTheme", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  secondaryTheme Theme? @relation("secondaryTheme")
-  page           Page?
+  parent         Theme?  @relation("secondaryTheme", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  secondaryTheme Theme?  @relation("secondaryTheme")
+  page           Page?   @ignore
+  seller         Seller? @relation(fields: [sellerId], references: [id])
 
   @@map("theme")
 }
