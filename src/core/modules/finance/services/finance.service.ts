@@ -35,7 +35,7 @@ export class FinanceService implements ServiceBase<FinanceEntity> {
         customerId: customerId && customerId,
       })
       .sort()
-      .date()
+      .date('createdAt')
       .pagination()
       .handle();
 

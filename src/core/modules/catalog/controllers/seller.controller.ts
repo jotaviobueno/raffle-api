@@ -88,7 +88,7 @@ export class SellerController {
 
   @Get()
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @ApiUnauthorizedResponse()
   @Permissions(PERMISSION_ENUM.CAN_READ_SELLER)
   @ApiOkFindAllResult(SellerEntity)

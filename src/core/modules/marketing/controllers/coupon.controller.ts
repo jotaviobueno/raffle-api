@@ -58,7 +58,7 @@ export class CouponController {
 
   @Get()
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @IsPublic()
   @ApiOkFindAllResult(CouponEntity)
   findAll(@Query() queryParams: SearchCouponDto) {

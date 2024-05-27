@@ -56,7 +56,7 @@ export class OrderController {
 
   @Get()
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @ApiOkFindAllResult(OrderEntity)
   findAll(@Query() queryParams: SearchOrderDto) {
     return this.orderService.findAll(queryParams);
@@ -64,7 +64,6 @@ export class OrderController {
 
   @Get(':id')
   @ApiOkResponse({ type: OrderWithRelationsEntity })
-  @IsPublic()
   @CacheTTL(30)
   @ApiNotFoundResponse()
   findById(@Param('id') id: string) {

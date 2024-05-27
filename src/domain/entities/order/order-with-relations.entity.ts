@@ -38,7 +38,11 @@ export class OrderWithRelationsEntity extends OrderEntity {
 export const orderQueryWithRelations = {
   orderPayment: {
     include: {
-      address: true,
+      address: {
+        include: {
+          state: true,
+        },
+      },
       orderBankSlip: true,
       orderCreditCard: true,
       orderPix: true,

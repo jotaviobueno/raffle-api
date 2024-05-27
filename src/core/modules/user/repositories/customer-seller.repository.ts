@@ -35,6 +35,9 @@ export class CustomerSellerRepository extends RepositoryFactory<
   }
 
   findAll(query: QueryBuilderEntity): Promise<CustomerSellerEntity[]> {
-    return this.prismaService.customerSeller.findMany(query);
+    return this.prismaService.customerSeller.findMany({
+      ...query,
+      include: { customer: true },
+    });
   }
 }

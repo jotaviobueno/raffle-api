@@ -13,7 +13,7 @@ export class CountryController {
 
   @Get()
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @IsPublic()
   findAll(@Query() queryParams: QueryParamsDto) {
     return this.countryService.findAll(queryParams);

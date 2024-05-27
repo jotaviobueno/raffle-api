@@ -56,7 +56,7 @@ export class CategoryController {
 
   @Get()
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @IsPublic()
   @ApiOkFindAllResult(CategoryEntity)
   findAll(@Query() queryParams: SearchCategoryDto) {

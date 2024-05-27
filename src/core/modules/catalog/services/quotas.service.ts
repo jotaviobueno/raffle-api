@@ -86,11 +86,9 @@ export class QuotasService
         number: number && number,
       })
       .sort()
-      .date()
+      .date('createdAt')
       .pagination()
       .handle();
-
-    console.log(query);
 
     const quotas = await this.quotasRepository.findAll(query);
     const total = await this.quotasRepository.count(query.where);

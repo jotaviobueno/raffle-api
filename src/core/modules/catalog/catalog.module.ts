@@ -31,6 +31,8 @@ import { ThemeController } from './controllers/theme.controller';
 import { BullModule } from '@nestjs/bull';
 import { QuotasConsumer } from './consumers/quotas.consumer';
 import { QUEUES_ENUM } from 'src/common/enums';
+import { SellerDetailController } from './controllers/seller-detail.controller';
+import { SellerDetailService } from './services/seller-detail.service';
 
 @Module({
   imports: [
@@ -50,6 +52,7 @@ import { QUEUES_ENUM } from 'src/common/enums';
     QuotasController,
     WinnerController,
     ThemeController,
+    SellerDetailController,
   ],
   providers: [
     RaffleService,
@@ -71,6 +74,7 @@ import { QUEUES_ENUM } from 'src/common/enums';
     ThemeRepository,
     ThemeService,
     QuotasConsumer,
+    SellerDetailService,
   ],
   exports: [
     SellerService,

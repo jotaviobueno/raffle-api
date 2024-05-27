@@ -7,4 +7,9 @@ export class SearchOrderDto extends QueryParamsDto {
   @IsOptional()
   @ApiProperty({ nullable: true, required: false })
   sellerId?: string;
+
+  @IsUUID()
+  @IsOptional()
+  @ApiProperty({ nullable: true, required: false })
+  orderStatusId?: string;
 }

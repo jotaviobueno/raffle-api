@@ -56,7 +56,7 @@ export class UtmCampaignController {
   @Get()
   @Permissions(PERMISSION_ENUM.CAN_READ_UTM_CAMPAIGN)
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @ApiOkFindAllResult(UtmCampaignEntity)
   findAll(@Query() queryParams: SearchUtmCampaignDto) {
     return this.utmCampaignService.findAll(queryParams);

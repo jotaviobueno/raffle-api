@@ -400,7 +400,7 @@ model Order {
   ip            String?
   userAgent     String? @map("user_agent")
   orderStatusId String? @map("order_status_id")
-  cartId        String  @unique @map("cart_id")
+  cartId        String  @map("cart_id")
 
   dueDate   DateTime? @map("due_date") @db.Timestamp
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
@@ -730,7 +730,7 @@ model Cart {
   cartPayment CartPayment?
   cartCoupons CartCoupon[]
   seller      Seller       @relation(fields: [sellerId], references: [id])
-  order       Order?
+  order       Order[]
 
   @@map("cart")
 }
@@ -829,11 +829,33 @@ model Finance {
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @map("deleted_at") @db.Timestamp
 
-  customer User   @relation(fields: [customerId], references: [id])
-  order    Order? @relation(fields: [orderId], references: [id])
-  seller   Seller @relation(fields: [sellerId], references: [id])
+  customer     User          @relation(fields: [customerId], references: [id])
+  order        Order?        @relation(fields: [orderId], references: [id])
+  seller       Seller        @relation(fields: [sellerId], references: [id])
+  financeTotal FinanceTotal?
 
   @@map("finance")
+}
+
+model FinanceTotal {
+  id String @id @default(uuid())
+
+  financeId      String @unique @map("finance_id")
+  subtotal       Float
+  discount       Float  @default(0)
+  discountManual Float  @default(0) @map("discount_manual")
+  shipping       Float  @default(0)
+  fee            Float  @default(0)
+  tax            Float  @default(0)
+  total          Float
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  finance Finance @relation(fields: [financeId], references: [id])
+
+  @@map("finance_total")
 }
 
 model Winner {
@@ -939,9 +961,11 @@ model TicketStatus {
 model OrderCustomer {
   id String @id @default(uuid())
 
-  fullName String @map("full_name")
-  email    String
-  document String
+  fullName    String  @map("full_name")
+  email       String
+  document    String
+  phone       String?
+  mobilePhone String  @map("mobile_phone")
 
   customerId String @map("customer_id")
   orderId    String @unique @map("order_id")

@@ -34,7 +34,7 @@ export class FinanceController {
   @Get()
   @Permissions(PERMISSION_ENUM.CAN_READ_FINANCE)
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @ApiOkFindAllResult(FinanceEntity)
   @IsPublic()
   findAll(@Query() queryParams: SearchAwardDto) {

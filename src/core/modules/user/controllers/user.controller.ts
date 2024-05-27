@@ -40,7 +40,7 @@ export class UserController {
   @Get()
   @Permissions(PERMISSION_ENUM.CAN_READ_USER)
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   findAll(@Query() queryParams: QueryParamsDto) {
     return this.userService.findAll(queryParams);
   }
