@@ -55,7 +55,7 @@ export class TicketController {
 
   @Get()
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @ApiOkFindAllResult(TicketEntity)
   findAll(@Query() queryParams: SearchAwardDto) {
     return this.ticketService.findAll(queryParams);

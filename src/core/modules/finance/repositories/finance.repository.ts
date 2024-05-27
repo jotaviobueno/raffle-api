@@ -9,7 +9,10 @@ export class FinanceRepository extends RepositoryFactory<FinanceEntity> {
   }
 
   findAll(query: QueryBuilderEntity): Promise<FinanceEntity[]> {
-    return this.prismaService.finance.findMany(query);
+    return this.prismaService.finance.findMany({
+      ...query,
+      include: { financeTotal: true },
+    });
   }
 
   findById(id: string): Promise<FinanceEntity | null> {

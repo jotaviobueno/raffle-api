@@ -11,7 +11,6 @@ import {
   UseGuards,
   UploadedFile,
   ParseFilePipe,
-  MaxFileSizeValidator,
   FileTypeValidator,
 } from '@nestjs/common';
 import {
@@ -78,10 +77,7 @@ export class SellerController {
     @Body() createSellerDto: CreateSellerDto,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 10_000 }),
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
-        ],
+        validators: [new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' })],
         fileIsRequired: true,
       }),
     )
@@ -92,7 +88,7 @@ export class SellerController {
 
   @Get()
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @ApiUnauthorizedResponse()
   @Permissions(PERMISSION_ENUM.CAN_READ_SELLER)
   @ApiOkFindAllResult(SellerEntity)
@@ -140,10 +136,7 @@ export class SellerController {
     @Body() updateSellerDto: UpdateSellerDto,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 10_000 }),
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
-        ],
+        validators: [new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' })],
         fileIsRequired: false,
       }),
     )

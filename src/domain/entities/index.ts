@@ -47,3 +47,5 @@ export * from './ticket-history';
 export * from './order-customer';
 export * from './plan';
 export * from './plan-cycle';
+export * from './seller-detail';
+export * from './finance-total';

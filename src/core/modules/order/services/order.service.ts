@@ -4,7 +4,7 @@ import {
   AsaasWebhookEventDto,
   CreateCheckoutDto,
   JobQuotasDto,
-  QueryParamsDto,
+  SearchOrderDto,
   SendEmailDto,
 } from 'src/domain/dtos';
 import {
@@ -94,6 +94,10 @@ export class OrderService
         );
     }
 
+    const orderStatus = await this.orderStatusService.findByCode(
+      ORDER_STATUS_ENUM.AWAIT_CALLBACK,
+    );
+
     return this.prismaService.$transaction(
       async (tx) => {
         let query = {};
@@ -179,6 +183,8 @@ export class OrderService
                 document: cart.customer.document,
                 email: cart.customer.email,
                 fullName: cart.customer.fullName,
+                mobilePhone: cart.customer.mobilePhone,
+                phone: cart.customer.phone,
                 customer: {
                   connect: {
                     id: cart.customer.id,
@@ -194,6 +200,18 @@ export class OrderService
             seller: {
               connect: {
                 id: cart.seller.id,
+              },
+            },
+            orderStatus: {
+              connect: {
+                id: orderStatus.id,
+              },
+            },
+            orderHistories: {
+              create: {
+                code: ORDER_STATUS_ENUM.AWAIT_CALLBACK,
+                customerId: cart.customer.id,
+                orderStatusId: orderStatus.id,
               },
             },
             orderTotal: {
@@ -234,50 +252,6 @@ export class OrderService
           },
         });
 
-        const cartItemsIds = cart.cartItems.map((cartItem) => cartItem.id);
-        const cartCouponsIds = cart.cartCoupons.map(
-          (cartCoupon) => cartCoupon.id,
-        );
-
-        await tx.cart.update({
-          where: {
-            id: cart.id,
-          },
-          data: {
-            deletedAt: new Date(),
-            cartItems: {
-              updateMany: {
-                where: {
-                  id: { in: cartItemsIds },
-                },
-                data: {
-                  deletedAt: new Date(),
-                },
-              },
-            },
-            cartTotal: {
-              update: {
-                deletedAt: new Date(),
-              },
-            },
-            cartCoupons: {
-              updateMany: {
-                where: {
-                  id: { in: cartCouponsIds },
-                },
-                data: {
-                  deletedAt: new Date(),
-                },
-              },
-            },
-            cartPayment: {
-              update: {
-                deletedAt: new Date(),
-              },
-            },
-          },
-        });
-
         await this.emailQueue.add(
           JOBS_ENUM.SEND_EMAIL_JOB,
           {
@@ -311,11 +285,7 @@ export class OrderService
   }
 
   async asaasPostback(data: AsaasWebhookEventDto) {
-    let query = {};
-
-    console.log(data);
-
-    return true;
+    const query = {};
 
     const order = await this.findByInvoiceNumber(+data.payment.invoiceNumber);
 
@@ -333,18 +303,16 @@ export class OrderService
         if (orderAlreadyUpdated) return;
 
         if (order?.orderPayment?.orderCreditCard)
-          query = {
-            orderPayment: {
-              update: {
-                data: {
-                  status: data?.payment?.status,
-                  gatewayPamentId: data.payment.id,
-                  receiptUrl: data.payment.transactionReceiptUrl,
-                  orderCreditCard: {
-                    update: {
-                      data: {
-                        token: data.payment.creditCard.creditCardToken,
-                      },
+          query['orderPayment'] = {
+            update: {
+              data: {
+                status: data?.payment?.status,
+                gatewayPamentId: data.payment.id,
+                receiptUrl: data.payment.transactionReceiptUrl,
+                orderCreditCard: {
+                  update: {
+                    data: {
+                      token: data.payment.creditCard.creditCardToken,
                     },
                   },
                 },
@@ -408,13 +376,23 @@ export class OrderService
             }),
           );
 
-          await tx.finance.create({
-            data: {
-              orderId: order.id,
+          query['finance'] = {
+            create: {
               sellerId: order.seller.id,
               customerId: order.orderCustomer.customerId,
+              financeTotal: {
+                create: {
+                  subtotal: order.orderTotal.subtotal,
+                  discount: order.orderTotal.discount,
+                  discountManual: order.orderTotal.discountManual,
+                  shipping: order.orderTotal.shipping,
+                  fee: order.orderTotal.fee,
+                  tax: order.orderTotal.tax,
+                  total: order.orderTotal.total,
+                },
+              },
             },
-          });
+          };
         }
 
         return tx.order.update({
@@ -493,18 +471,27 @@ export class OrderService
   }
 
   async findAll(
-    queryParams: QueryParamsDto,
-  ): Promise<FindAllResultEntity<OrderEntity>> {
+    queryParams: SearchOrderDto,
+  ): Promise<FindAllResultEntity<OrderWithRelationsEntity>> {
+    const { sellerId } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =
-      await this.cacheManager.get<FindAllResultEntity<OrderEntity> | null>(
+      await this.cacheManager.get<FindAllResultEntity<OrderWithRelationsEntity> | null>(
         `orders_${queryParamsStringfy}`,
       );
 
     if (cache) return cache;
 
-    const query = new QueryBuilder(queryParams).sort().pagination().handle();
+    const query = new QueryBuilder(queryParams)
+      .where({
+        sellerId: sellerId,
+      })
+      .date('createdAt')
+      .sort()
+      .pagination()
+      .handle();
 
     const orders = await this.orderRepository.findAll(query);
     const total = await this.orderRepository.count(query.where);

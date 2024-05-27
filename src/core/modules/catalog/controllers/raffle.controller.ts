@@ -93,7 +93,7 @@ export class ProductController {
 
   @Get()
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @IsPublic()
   @ApiOkFindAllResult(RaffleEntity)
   @ApiUnauthorizedResponse()

@@ -65,12 +65,11 @@ export class QuotasService
     return true;
   }
 
-  async findAll({
-    customerId,
-    raffleId,
-    number,
-    ...queryParams
-  }: SearchQuotasDto): Promise<FindAllResultEntity<QutoasEntity>> {
+  async findAll(
+    queryParams: SearchQuotasDto,
+  ): Promise<FindAllResultEntity<QutoasEntity>> {
+    const { customerId, raffleId, number } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =
@@ -87,6 +86,7 @@ export class QuotasService
         number: number && number,
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

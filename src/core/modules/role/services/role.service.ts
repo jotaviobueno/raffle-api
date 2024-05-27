@@ -17,11 +17,11 @@ export class RoleService
     private readonly roleRepository: RoleRepository,
   ) {}
 
-  async findAll({
-    name,
-    code,
-    ...queryParams
-  }: SearchRoleDto): Promise<FindAllResultEntity<RoleEntity>> {
+  async findAll(
+    queryParams: SearchRoleDto,
+  ): Promise<FindAllResultEntity<RoleEntity>> {
+    const { name, code } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

@@ -31,11 +31,11 @@ export class TicketStatusService
     return ticketStatus;
   }
 
-  async findAll({
-    name,
-    code,
-    ...queryParams
-  }: SearchTicketStatusDto): Promise<FindAllResultEntity<TicketStatusEntity>> {
+  async findAll(
+    queryParams: SearchTicketStatusDto,
+  ): Promise<FindAllResultEntity<TicketStatusEntity>> {
+    const { name, code } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

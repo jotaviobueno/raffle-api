@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
 import { IsSort } from 'src/common/validators';
 
 export class QueryParamsDto {
@@ -21,4 +21,12 @@ export class QueryParamsDto {
   @IsSort()
   @ApiProperty({ nullable: true, required: false })
   orderBy?: string;
+
+  @IsOptional()
+  @IsDateString()
+  from?: string;
+
+  @IsOptional()
+  @IsDateString()
+  to?: string;
 }

@@ -35,15 +35,11 @@ export class PaymentMethodService
     return paymentMethod;
   }
 
-  async findAll({
-    code,
-    name,
-    instructions,
-    isActive,
-    ...queryParams
-  }: SearchPaymentMethodDto): Promise<
-    FindAllResultEntity<PaymentMethodEntity>
-  > {
+  async findAll(
+    queryParams: SearchPaymentMethodDto,
+  ): Promise<FindAllResultEntity<PaymentMethodEntity>> {
+    const { code, name, instructions, isActive } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

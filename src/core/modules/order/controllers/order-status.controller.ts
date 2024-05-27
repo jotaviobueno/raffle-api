@@ -55,7 +55,7 @@ export class OrderStatusController {
 
   @Get()
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @IsPublic()
   @ApiOkFindAllResult(OrderStatusEntity)
   findAll(@Query() queryParams: SearchOrderStatusDto) {

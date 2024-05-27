@@ -4,15 +4,8 @@ import { AppModule } from './app.module';
 import { environment } from './config';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as aws from 'aws-sdk';
 
 async function bootstrap() {
-  aws.config.update({
-    accessKeyId: environment.AWS_ACCESS_ID,
-    secretAccessKey: environment.AWS_ACCESS_SECRET,
-    region: environment.AWS_REGION,
-  });
-
   const app = await NestFactory.create(AppModule, {
     snapshot: true,
   });

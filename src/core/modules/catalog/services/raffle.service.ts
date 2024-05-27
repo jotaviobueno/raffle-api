@@ -47,14 +47,11 @@ export class RaffleService
     return raffle;
   }
 
-  async findAll({
-    sellerId,
-    isActive,
-    isVisible,
-    name,
-    isFinished,
-    ...queryParams
-  }: SearchRaffleDto): Promise<FindAllResultEntity<RaffleEntity>> {
+  async findAll(
+    queryParams: SearchRaffleDto,
+  ): Promise<FindAllResultEntity<RaffleEntity>> {
+    const { sellerId, isActive, isVisible, name, isFinished } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

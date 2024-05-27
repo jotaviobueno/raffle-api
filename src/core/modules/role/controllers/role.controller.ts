@@ -27,7 +27,7 @@ export class RoleController {
 
   @Get()
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @IsPublic()
   findAll(@Query() queryParams: SearchRoleDto) {
     return this.roleRepository.findAll(queryParams);

@@ -29,6 +29,26 @@ export class QueryBuilder {
     return this;
   }
 
+  date(field: string) {
+    if (!this.queryParams.from && this.queryParams.to)
+      this.query.where[field] = {
+        lte: new Date(this.queryParams.to),
+      };
+
+    if (this.queryParams.from && !this.queryParams.to)
+      this.query.where[field] = {
+        gte: new Date(this.queryParams.from),
+      };
+
+    if (this.queryParams.from && this.queryParams.to)
+      this.query.where[field] = {
+        lte: new Date(this.queryParams.to),
+        gte: new Date(this.queryParams.from),
+      };
+
+    return this;
+  }
+
   sort() {
     try {
       const [field, value] = this.queryParams?.orderBy?.split('.');

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AddressEntity } from '../address';
+import { AddressWithRelationsEntity } from '../address';
 import { OrderBankSlipEntity } from '../order-bank-slip';
 import { OrderCreditCardEntity } from '../order-credit-card';
 import { OrderPixEntity } from '../order-pix';
@@ -10,8 +10,8 @@ export class OrderPaymentWithRelations extends OrderPaymentEntity {
   @ApiProperty({ type: PaymentMethodEntity })
   paymentMethod: PaymentMethodEntity;
 
-  @ApiProperty({ type: AddressEntity })
-  address: AddressEntity;
+  @ApiProperty({ type: AddressWithRelationsEntity })
+  address: AddressWithRelationsEntity;
 
   @ApiProperty({ type: OrderBankSlipEntity, nullable: true })
   orderBankSlip?: OrderBankSlipEntity;

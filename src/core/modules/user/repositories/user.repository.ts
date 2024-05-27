@@ -110,6 +110,7 @@ export class UserRepository extends RepositoryFactory<
             },
           },
         },
+        sellers: true,
       },
     });
   }

@@ -38,12 +38,11 @@ export class AwardService
     return award;
   }
 
-  async findAll({
-    raffleId,
-    sellerId,
-    name,
-    ...queryParams
-  }: SearchAwardDto): Promise<FindAllResultEntity<AwardEntity>> {
+  async findAll(
+    queryParams: SearchAwardDto,
+  ): Promise<FindAllResultEntity<AwardEntity>> {
+    const { raffleId, sellerId, name } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

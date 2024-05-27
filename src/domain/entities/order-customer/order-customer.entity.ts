@@ -11,6 +11,12 @@ export class OrderCustomerEntity implements OrderCustomer {
   @ApiProperty()
   email: string;
 
+  @ApiProperty({ nullable: true })
+  phone: string | null;
+
+  @ApiProperty()
+  mobilePhone: string;
+
   @ApiProperty()
   document: string;
 

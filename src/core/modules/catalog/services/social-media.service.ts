@@ -34,11 +34,11 @@ export class SocialMediaService
     return socialMedia;
   }
 
-  async findAll({
-    name,
-    sellerId,
-    ...queryParams
-  }: SearchSocialMediaDto): Promise<FindAllResultEntity<SocialMediaEntity>> {
+  async findAll(
+    queryParams: SearchSocialMediaDto,
+  ): Promise<FindAllResultEntity<SocialMediaEntity>> {
+    const { name, sellerId } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

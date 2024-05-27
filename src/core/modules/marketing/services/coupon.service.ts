@@ -44,15 +44,11 @@ export class CouponService
     return coupon;
   }
 
-  async findAll({
-    code,
-    from,
-    isActive,
-    name,
-    to,
-    utmCampaignId,
-    ...queryParams
-  }: SearchCouponDto): Promise<FindAllResultEntity<CouponEntity>> {
+  async findAll(
+    queryParams: SearchCouponDto,
+  ): Promise<FindAllResultEntity<CouponEntity>> {
+    const { code, from, isActive, name, to, utmCampaignId } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

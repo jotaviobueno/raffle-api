@@ -26,20 +26,19 @@ export class CustomerSellerService
         dto.sellerId,
       );
 
-    const customerSeller = await this.customerSellerRepository.upsert({
-      id: customerAlreadyExistInSeller?.id,
-      ...dto,
-    });
-
-    return customerSeller;
+    if (customerAlreadyExistInSeller)
+      return this.customerSellerRepository.upsert({
+        id: customerAlreadyExistInSeller.id,
+        ...dto,
+      });
+    else return this.customerSellerRepository.create(dto);
   }
 
-  async findAll({
-    sellerId,
-    ...queryParams
-  }: SearchCustomerSellerDto): Promise<
-    FindAllResultEntity<CustomerSellerEntity>
-  > {
+  async findAll(
+    queryParams: SearchCustomerSellerDto,
+  ): Promise<FindAllResultEntity<CustomerSellerEntity>> {
+    const { sellerId } = queryParams;
+
     const queryParamsStringfy = JSON.stringify(queryParams);
 
     const cache =

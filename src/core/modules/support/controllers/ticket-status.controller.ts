@@ -55,7 +55,7 @@ export class TicketStatusController {
   @Get()
   @Permissions(PERMISSION_ENUM.CAN_READ_TICKET_STATUS)
   @UseInterceptors(CacheInterceptor)
-  @CacheTTL(15)
+  @CacheTTL(30)
   @ApiOkFindAllResult(TicketStatusEntity)
   findAll(@Query() queryParams: SearchTicketStatusDto) {
     return this.ticketStatusService.findAll(queryParams);
