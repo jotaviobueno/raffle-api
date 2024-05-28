@@ -473,7 +473,7 @@ export class OrderService
   async findAll(
     queryParams: SearchOrderDto,
   ): Promise<FindAllResultEntity<OrderWithRelationsEntity>> {
-    const { sellerId } = queryParams;
+    const { sellerId, customer, orderStatusId } = queryParams;
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
@@ -486,7 +486,11 @@ export class OrderService
 
     const query = new QueryBuilder(queryParams)
       .where({
-        sellerId: sellerId,
+        sellerId: sellerId && sellerId,
+        orderCustomer: customer && {
+          customer: { fullName: { contains: customer } },
+        },
+        orderStatusId: orderStatusId && orderStatusId,
       })
       .date('createdAt')
       .sort()
