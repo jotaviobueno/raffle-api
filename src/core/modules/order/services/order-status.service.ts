@@ -47,6 +47,7 @@ export class OrderStatusService
         code: code && { contains: code },
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

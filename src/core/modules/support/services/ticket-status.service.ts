@@ -51,6 +51,7 @@ export class TicketStatusService
         code: code && { contains: code },
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

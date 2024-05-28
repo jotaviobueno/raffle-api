@@ -58,6 +58,7 @@ export class UtmCampaignService
         from: from && { gte: from },
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

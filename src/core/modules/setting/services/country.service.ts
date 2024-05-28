@@ -28,7 +28,11 @@ export class CountryService implements ServiceBase<CountryEntity> {
 
     if (cache) return cache;
 
-    const query = new QueryBuilder(queryParams).sort().pagination().handle();
+    const query = new QueryBuilder(queryParams)
+      .sort()
+      .date('createdAt')
+      .pagination()
+      .handle();
 
     const countries = await this.countryRepository.findAll(query);
     const total = await this.countryRepository.count(query.where);

@@ -59,6 +59,7 @@ export class AwardService
         name: name && { contains: name },
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

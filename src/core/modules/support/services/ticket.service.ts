@@ -60,7 +60,11 @@ export class TicketService
 
     if (cache) return cache;
 
-    const query = new QueryBuilder(queryParams).sort().pagination().handle();
+    const query = new QueryBuilder(queryParams)
+      .sort()
+      .date('createdAt')
+      .pagination()
+      .handle();
 
     const tickets = await this.ticketRepository.findAll(query);
     const total = await this.ticketRepository.count(query.where);

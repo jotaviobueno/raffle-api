@@ -68,6 +68,7 @@ export class CouponService
         from: from && { gte: from },
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

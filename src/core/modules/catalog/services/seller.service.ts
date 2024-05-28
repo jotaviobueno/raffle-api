@@ -115,6 +115,7 @@ export class SellerService
         userId: userId && userId,
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

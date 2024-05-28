@@ -58,6 +58,7 @@ export class CustomerSellerService
         },
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 
