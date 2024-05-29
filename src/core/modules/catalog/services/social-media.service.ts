@@ -54,6 +54,7 @@ export class SocialMediaService
         name: name && { contains: name },
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

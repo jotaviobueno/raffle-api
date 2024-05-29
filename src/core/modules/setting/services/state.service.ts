@@ -26,7 +26,11 @@ export class StateService implements ServiceBase<StateEntity> {
 
     if (cache) return cache;
 
-    const query = new QueryBuilder(queryParams).sort().pagination().handle();
+    const query = new QueryBuilder(queryParams)
+      .sort()
+      .date('createdAt')
+      .pagination()
+      .handle();
 
     const states = await this.stateRepository.findAll(query);
     const total = await this.stateRepository.count(query.where);

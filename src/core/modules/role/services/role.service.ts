@@ -41,6 +41,7 @@ export class RoleService
         },
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

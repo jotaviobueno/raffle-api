@@ -58,6 +58,7 @@ export class WinnerService
         number: number && number,
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

@@ -57,6 +57,7 @@ export class PaymentMethodService
         instructions: instructions && { contains: instructions },
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

@@ -70,6 +70,7 @@ export class RaffleService
         name: name && { contains: name },
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

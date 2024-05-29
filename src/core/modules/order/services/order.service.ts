@@ -494,6 +494,7 @@ export class OrderService
       })
       .date('createdAt')
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 

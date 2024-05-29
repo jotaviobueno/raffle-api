@@ -55,6 +55,7 @@ export class CategoryService
         },
       })
       .sort()
+      .date('createdAt')
       .pagination()
       .handle();
 
