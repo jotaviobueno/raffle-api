@@ -2,6 +2,7 @@ version: '2'
 
 services:
   redis:
+    container_name: redis_raffle
     image: redis:alpine
     ports:
       - '6379:6379'
