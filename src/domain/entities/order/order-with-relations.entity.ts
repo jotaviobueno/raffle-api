@@ -8,6 +8,7 @@ import { OrderEntity } from './order.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { OrderPaymentWithRelations } from '../order-payment';
 import { OrderCustomerEntity } from '../order-customer';
+import { OrderTypeEntity } from '../order-type';
 
 export class OrderWithRelationsEntity extends OrderEntity {
   @ApiProperty({ type: SellerEntity })
@@ -24,6 +25,9 @@ export class OrderWithRelationsEntity extends OrderEntity {
 
   @ApiProperty({ type: [OrderCouponWithRelationsEntity] })
   orderCoupons: OrderCouponWithRelationsEntity[];
+
+  @ApiProperty({ type: OrderTypeEntity })
+  orderType: OrderTypeEntity;
 
   @ApiProperty({ type: [OrderItemWithRelationsEntity] })
   orderItems: OrderItemWithRelationsEntity[];
@@ -50,6 +54,7 @@ export const orderQueryWithRelations = {
     },
   },
   orderCustomer: true,
+  orderType: true,
   orderCoupons: {
     include: {
       coupon: true,

@@ -398,6 +398,7 @@ model Order {
   invoiceNumber Int?    @map("invoice_number")
   comment       String?
   ip            String?
+  orderTypeId   String? @map("order_type_id")
   userAgent     String? @map("user_agent")
   orderStatusId String? @map("order_status_id")
   cartId        String  @map("cart_id")
@@ -418,6 +419,7 @@ model Order {
   finance        Finance?
   gatewayEvents  GatewayEvent[]
   orderCustomer  OrderCustomer?
+  orderType      OrderType?     @relation(fields: [orderTypeId], references: [id])
 
   @@map("order")
 }
@@ -1029,4 +1031,18 @@ model PlanCycle {
   plans Plan[]
 
   @@map("plan_cycle")
+}
+
+model OrderType {
+  id   String @id @default(uuid())
+  code String
+  name String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  orders Order[]
+
+  @@map("order_type")
 }

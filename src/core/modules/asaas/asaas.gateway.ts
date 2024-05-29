@@ -36,7 +36,7 @@ export class AsaasGateway extends PaymentGateway<{
   }): Promise<{
     cart: CartWithRelationsEntity;
     payment: AsaasPaymentResponseEntity;
-    data?: any;
+    data: any;
     customer: AsaasCustomerEntity;
   }> {
     this.asaasService.setConfig(this.config);
@@ -140,7 +140,7 @@ export class AsaasGateway extends PaymentGateway<{
       if (payment.status === 'AUTHORIZED')
         await this.asaasService.preAuthorization(payment.id);
 
-      return { cart, payment, customer };
+      return { cart, data: payment, payment, customer };
     } catch (e) {
       Logger.log('PROCESSS CREDIT-CARD ASAAS ERROR', e);
 

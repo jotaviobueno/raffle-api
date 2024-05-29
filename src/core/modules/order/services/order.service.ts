@@ -104,6 +104,10 @@ export class OrderService
 
         const response = await this.paymentService.process({ dto, cart });
 
+        const orderType = await tx.orderType.findFirst({
+          where: { code: response?.data?.object },
+        });
+
         switch (cart.cartPayment.paymentMethod.code) {
           case 'pix':
             query = {
@@ -174,6 +178,9 @@ export class OrderService
         const order = await tx.order.create({
           data: {
             ...query,
+            orderType: {
+              connect: { id: orderType.id },
+            },
             invoiceNumber: +response.payment.invoiceNumber,
             dueDate: new Date(),
             ip: dto.ip,

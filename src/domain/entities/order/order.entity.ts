@@ -12,6 +12,9 @@ export class OrderEntity implements Order {
   invoiceNumber: number | null;
 
   @ApiProperty({ nullable: true })
+  orderTypeId: string | null;
+
+  @ApiProperty({ nullable: true })
   comment: string | null;
 
   @ApiProperty({ nullable: true })
