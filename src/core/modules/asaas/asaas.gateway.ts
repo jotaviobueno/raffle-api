@@ -7,6 +7,7 @@ import {
 } from 'src/domain/entities';
 import { AsaasService } from './asaas.service';
 import { CreateCheckoutDto } from 'src/domain/dtos';
+import { addDays, addMinutes } from 'date-fns';
 
 @Injectable()
 export class AsaasGateway extends PaymentGateway<{
@@ -75,7 +76,7 @@ export class AsaasGateway extends PaymentGateway<{
       customer: customer.id,
       billingType: 'PIX',
       value: cart.cartTotal.total,
-      dueDate: new Date(),
+      dueDate: addMinutes(new Date(), 10),
       discount: { value: cart.cartTotal.discount },
       remoteIp: dto.ip ? dto.ip : '',
     });
@@ -94,7 +95,7 @@ export class AsaasGateway extends PaymentGateway<{
       customer: customer.id,
       billingType: 'BOLETO',
       value: cart.cartTotal.total,
-      dueDate: new Date(),
+      dueDate: addDays(new Date(), 3),
       remoteIp: dto.ip ? dto.ip : '',
     });
 
@@ -113,7 +114,7 @@ export class AsaasGateway extends PaymentGateway<{
         customer: customer.id,
         billingType: 'CREDIT_CARD',
         value: cart.cartTotal.total,
-        dueDate: new Date(),
+        dueDate: addMinutes(new Date(), 10),
         creditCard: {
           holderName: dto.holder,
           number: dto.number.replace(/\s/g, ''),

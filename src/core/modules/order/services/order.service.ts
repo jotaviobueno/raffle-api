@@ -182,7 +182,7 @@ export class OrderService
               connect: { id: orderType.id },
             },
             invoiceNumber: +response.payment.invoiceNumber,
-            dueDate: new Date(),
+            dueDate: new Date(response.payment.dueDate),
             ip: dto.ip,
             userAgent: dto.userAgent,
             orderCustomer: {

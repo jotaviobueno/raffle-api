@@ -1,12 +1,6 @@
 import { Controller, Get, UseInterceptors, Param } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
-import { SellerEntity } from '../../../../domain/entities';
-import { ApiOkFindAllResult } from 'src/common/decorators';
 import { SellerDetailService } from '../services/seller-detail.service';
 import { IsPublic } from '../../auth/decorators';
 
@@ -17,11 +11,16 @@ import { IsPublic } from '../../auth/decorators';
 export class SellerDetailController {
   constructor(private readonly sellerDetailService: SellerDetailService) {}
 
+  @Get(':id/monthly-sales')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60)
+  findMonthlySales(@Param('id') id: string) {
+    return this.sellerDetailService.findMonthlySales(id);
+  }
+
   @Get(':id/customers')
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(60)
-  @ApiUnauthorizedResponse()
-  @ApiOkFindAllResult(SellerEntity)
   findByIdCustomers(@Param('id') id: string) {
     return this.sellerDetailService.findByIdAndType(id, 'customers');
   }
@@ -29,8 +28,6 @@ export class SellerDetailController {
   @Get(':id/sales')
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(60)
-  @ApiUnauthorizedResponse()
-  @ApiOkFindAllResult(SellerEntity)
   findByIdSales(@Param('id') id: string) {
     return this.sellerDetailService.findByIdAndType(id, 'sales');
   }
@@ -38,8 +35,6 @@ export class SellerDetailController {
   @Get(':id/orders')
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(60)
-  @ApiUnauthorizedResponse()
-  @ApiOkFindAllResult(SellerEntity)
   findByIdOrders(@Param('id') id: string) {
     return this.sellerDetailService.findByIdAndType(id, 'orders');
   }

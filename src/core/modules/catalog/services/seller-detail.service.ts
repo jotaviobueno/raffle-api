@@ -1,8 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { SellerService } from './seller.service';
 import { PrismaService } from 'src/infra/database/prisma/prisma.service';
-import { subMonths, subWeeks, subYears } from 'date-fns';
-import { SellerDetailEntity } from 'src/domain/entities';
+import {
+  endOfMonth,
+  startOfMonth,
+  subMonths,
+  subWeeks,
+  subYears,
+} from 'date-fns';
+import {
+  SellerDetailEntity,
+  SellerDetailMonthlySalesEntity,
+} from 'src/domain/entities';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
@@ -13,6 +22,51 @@ export class SellerDetailService {
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
   ) {}
+
+  async findMonthlySales(
+    sellerId: string,
+  ): Promise<SellerDetailMonthlySalesEntity[]> {
+    const cache = await this.cacheManager.get<
+      SellerDetailMonthlySalesEntity[] | null
+    >(`seller_detail_${sellerId}_monthly_sales`);
+
+    if (cache) return cache;
+
+    const monthlySales = await Promise.all(
+      Array.from({ length: 12 }).map(async (_, index) => {
+        const startDate = startOfMonth(
+          new Date(new Date().getFullYear(), index, 1),
+        );
+        const endDate = endOfMonth(
+          new Date(new Date().getFullYear(), index, 1),
+        );
+
+        // TODO: TALVEZ REMOVER O ORDERS
+        const orders = await this.findOrdersDetails(
+          sellerId,
+          endDate,
+          startDate,
+        );
+
+        const sales = await this.findSalesDetails(sellerId, endDate, startDate);
+
+        return {
+          month: index + 1,
+          orders,
+          sales,
+          startDate,
+          endDate,
+        };
+      }),
+    );
+
+    await this.cacheManager.set(
+      `seller_detail_${sellerId}_monthly_sales`,
+      monthlySales,
+    );
+
+    return monthlySales;
+  }
 
   async findByIdAndType(
     sellerId: string,
@@ -155,6 +209,6 @@ export class SellerDetailService {
       },
     });
 
-    return details._sum.total ? details._sum.total : 0;
+    return details._sum.total ? +details._sum.total.toFixed(2) : 0;
   }
 }
