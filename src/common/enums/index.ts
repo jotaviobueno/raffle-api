@@ -7,3 +7,4 @@ export * from './queue';
 export * from './auth';
 export * from './ticket-status';
 export * from './order-type';
+export * from './user';

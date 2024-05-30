@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@prisma/client';
+import { $Enums, User } from '@prisma/client';
 
 export class UserEntity implements User {
   @ApiProperty()
@@ -10,6 +10,9 @@ export class UserEntity implements User {
 
   @ApiProperty()
   fullName: string;
+
+  @ApiProperty({ nullable: true })
+  type: $Enums.USER_TYPE | null;
 
   @ApiProperty()
   email: string;
@@ -22,8 +25,8 @@ export class UserEntity implements User {
   @ApiProperty()
   avatar: string;
 
-  @ApiProperty()
-  document: string;
+  @ApiProperty({ nullable: true })
+  document: string | null;
 
   @ApiProperty({ type: Date })
   createdAt: Date;
