@@ -11,4 +11,9 @@ export class CreateSellerDto {
   @ApiProperty()
   @IsNotEmpty()
   userId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  logo: string;
 }

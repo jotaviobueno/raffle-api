@@ -35,3 +35,4 @@ export * from './ticket-status';
 export * from './ticket-history';
 export * from './plan';
 export * from './plan-cycle';
+export * from './file';

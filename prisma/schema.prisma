@@ -38,6 +38,7 @@ model User {
   customerSellers CustomerSeller[]
   tickets         Ticket[]
   orderCustomers  OrderCustomer[]
+  files           File[]
 
   @@map("user")
 }
@@ -62,6 +63,25 @@ model CustomerSeller {
   seller   Seller @relation(fields: [sellerId], references: [id])
 
   @@map("customer_seller")
+}
+
+model File {
+  id       String  @id @default(uuid())
+  userId   String? @map("user_id")
+  sellerId String? @map("seller_id")
+  raffleId String? @map("raffle_id")
+
+  path String[] @default([])
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+
+  user   User?   @relation(fields: [userId], references: [id])
+  seller Seller? @relation(fields: [sellerId], references: [id])
+  raffle Raffle? @relation(fields: [raffleId], references: [id])
+
+  @@map("file")
 }
 
 model UserRole {
@@ -149,6 +169,7 @@ model Seller {
 
   pages Page[] @ignore
   theme Theme?
+  files File[]
 
   @@map("seller")
 }
@@ -348,6 +369,7 @@ model Raffle {
   cartItems        CartItem[]
   orderItems       OrderItem[]
   winners          Winner[]
+  files            File[]
 
   @@map("raffle")
 }

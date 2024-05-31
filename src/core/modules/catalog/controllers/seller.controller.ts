@@ -9,9 +9,6 @@ import {
   Query,
   UseInterceptors,
   UseGuards,
-  UploadedFile,
-  ParseFilePipe,
-  FileTypeValidator,
 } from '@nestjs/common';
 import {
   CreateSellerDto,
@@ -22,7 +19,6 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
-  ApiConsumes,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotAcceptableResponse,
@@ -36,7 +32,6 @@ import { SellerService } from '../services/seller.service';
 import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { Permissions, Roles } from '../../role/decorators';
 import { RoleGuard } from '../../role/guards';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { SellerEntity } from '../../../../domain/entities';
 import { ApiOkFindAllResult } from 'src/common/decorators';
 import { IsPublic } from '../../auth/decorators';
@@ -51,39 +46,16 @@ export class SellerController {
 
   @Post()
   @Permissions(PERMISSION_ENUM.CAN_CREATE_SELLER)
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiConsumes('multipart/form-data')
   @ApiCreatedResponse({ type: SellerEntity })
   @ApiBody({
     type: CreateSellerDto,
-  })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        media: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-    required: true,
   })
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
   @ApiUnauthorizedResponse()
   @ApiBadRequestResponse()
-  create(
-    @Body() createSellerDto: CreateSellerDto,
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' })],
-        fileIsRequired: true,
-      }),
-    )
-    file: Express.Multer.File,
-  ) {
-    return this.sellerService.create({ ...createSellerDto, file });
+  create(@Body() createSellerDto: CreateSellerDto) {
+    return this.sellerService.create(createSellerDto);
   }
 
   @Get()
@@ -108,41 +80,17 @@ export class SellerController {
 
   @Patch(':id')
   @Permissions(PERMISSION_ENUM.CAN_UPDATE_SELLER)
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiConsumes('multipart/form-data')
   @ApiCreatedResponse({ type: SellerEntity })
   @ApiBody({
     type: UpdateSellerDto,
-  })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        media: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-    required: false,
   })
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
   @ApiUnauthorizedResponse()
   @ApiBadRequestResponse()
   @ApiNotAcceptableResponse()
-  update(
-    @Param('id') id: string,
-    @Body() updateSellerDto: UpdateSellerDto,
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' })],
-        fileIsRequired: false,
-      }),
-    )
-    file?: Express.Multer.File,
-  ) {
-    return this.sellerService.update({ ...updateSellerDto, id, file });
+  update(@Param('id') id: string, @Body() updateSellerDto: UpdateSellerDto) {
+    return this.sellerService.update({ ...updateSellerDto, id });
   }
 
   @Delete(':id')

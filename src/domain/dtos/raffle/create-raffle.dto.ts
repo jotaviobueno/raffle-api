@@ -102,4 +102,9 @@ export class CreateRaffleDto {
   @IsInt({ each: true })
   @IsOptional()
   quantity?: number[];
+
+  @IsString({ each: true })
+  @IsNotEmpty()
+  @ApiProperty({ type: [String] })
+  images: string[];
 }

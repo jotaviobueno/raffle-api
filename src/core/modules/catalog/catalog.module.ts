@@ -18,7 +18,6 @@ import { SocialMedialRepository } from './repositories/social-media.repository';
 import { RaffleCategoryRepository } from './repositories/raffle-category.repository';
 import { RaffleCategoryService } from './services/raffle-category.service';
 import { RaffleCategoryController } from './controllers/raffle-category.controller';
-import { SettingModule } from '../setting/setting.module';
 import { QuotasService } from './services/quotas.service';
 import { QutoasRepository } from './repositories/quotas.repository';
 import { QuotasController } from './controllers/quotas.controller';
@@ -37,7 +36,6 @@ import { SellerDetailService } from './services/seller-detail.service';
 @Module({
   imports: [
     forwardRef(() => UserModule),
-    SettingModule,
     BullModule.registerQueue({
       name: QUEUES_ENUM.QUOTAS,
     }),

@@ -16,6 +16,8 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailConsumer } from './consumers/email.consumer';
+import { FileController } from './controllers/file.controller';
+import { FileService } from './services/file.service';
 
 @Module({
   imports: [
@@ -53,7 +55,12 @@ import { EmailConsumer } from './consumers/email.consumer';
       },
     }),
   ],
-  controllers: [CountryController, StateController, HealthController],
+  controllers: [
+    CountryController,
+    StateController,
+    HealthController,
+    FileController,
+  ],
   providers: [
     CountryService,
     CountryRepository,
@@ -62,7 +69,8 @@ import { EmailConsumer } from './consumers/email.consumer';
     S3Service,
     EmailService,
     EmailConsumer,
+    FileService,
   ],
-  exports: [CountryService, StateService, S3Service, EmailService],
+  exports: [CountryService, StateService, S3Service, EmailService, FileService],
 })
 export class SettingModule {}

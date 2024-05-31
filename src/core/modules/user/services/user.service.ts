@@ -12,7 +12,6 @@ import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from '../../catalog/services/seller.service';
 import { UserRoleService } from '../../role/services/user-role.service';
 import { ROLE_ENUM } from 'src/common/enums';
-import { S3Service } from '../../setting/services/s3.service';
 import { CustomerSellerService } from './customer-seller.service';
 
 @Injectable()
@@ -30,7 +29,6 @@ export class UserService
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     private readonly userRoleService: UserRoleService,
-    private readonly s3Service: S3Service,
     private readonly customerSellerService: CustomerSellerService,
   ) {}
 
@@ -198,16 +196,8 @@ export class UserService
     return user;
   }
 
-  async update({
-    file,
-    ...dto
-  }: UpdateUserDto & { file?: Express.Multer.File }): Promise<
-    Omit<UserEntity, 'password'>
-  > {
+  async update(dto: UpdateUserDto): Promise<Omit<UserEntity, 'password'>> {
     const user = await this.findById(dto.id);
-
-    const avatar =
-      file && (await this.s3Service.singleFile({ file, path: 'user/avatar' }));
 
     if (dto?.document != user.document) {
       const documentAlreadyExist = await this.userRepository.findByDocument(
@@ -247,7 +237,6 @@ export class UserService
     const update = await this.userRepository.update({
       ...dto,
       id: user.id,
-      avatar,
     });
 
     if (!update)

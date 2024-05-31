@@ -8,10 +8,6 @@ import {
   Delete,
   Query,
   UseInterceptors,
-  UploadedFile,
-  ParseFilePipe,
-  MaxFileSizeValidator,
-  FileTypeValidator,
   UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto, QueryParamsDto, UpdateUserDto } from 'src/domain/dtos';
@@ -19,7 +15,6 @@ import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { UserService } from '../services/user.service';
 import { IsPublic } from '../../auth/decorators';
 import { ApiTags } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { Permissions, Roles } from '../../role/decorators';
 import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
 import { RoleGuard } from '../../role/guards';
@@ -53,22 +48,8 @@ export class UserController {
 
   @Patch(':id')
   @Permissions(PERMISSION_ENUM.CAN_UPDATE_USER)
-  @UseInterceptors(FileInterceptor('file'))
-  update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 10_000 }),
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
-        ],
-        fileIsRequired: false,
-      }),
-    )
-    file: Express.Multer.File,
-  ) {
-    return this.userService.update({ ...updateUserDto, id, file });
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update({ ...updateUserDto, id });
   }
 
   @Delete(':id')

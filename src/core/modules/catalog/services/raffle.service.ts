@@ -10,7 +10,6 @@ import { RaffleRepository } from '../repositories/raffle.repository';
 import { QueryBuilder } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from './seller.service';
-import { S3Service } from '../../setting/services/s3.service';
 
 @Injectable()
 export class RaffleService
@@ -21,24 +20,13 @@ export class RaffleService
     private readonly sellerService: SellerService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    private readonly s3Service: S3Service,
   ) {}
 
-  async create({
-    files,
-    ...dto
-  }: CreateRaffleDto & {
-    files: Express.Multer.File[];
-  }): Promise<RaffleEntity> {
+  async create(dto: CreateRaffleDto): Promise<RaffleEntity> {
     const seller = await this.sellerService.findById(dto.sellerId);
-
-    const images = await this.s3Service.manyFiles(
-      files.map((file) => ({ file, path: 'raffle/images' })),
-    );
 
     const raffle = await this.raffleRepository.create({
       ...dto,
-      images,
       digits: dto.totalNumbers.toString().length,
       final: dto.totalNumbers - 1,
       sellerId: seller.id,
@@ -101,19 +89,8 @@ export class RaffleService
     return raffle;
   }
 
-  async update({
-    files,
-    ...dto
-  }: UpdateRaffleDto & {
-    files?: Express.Multer.File[];
-  }): Promise<RaffleEntity> {
+  async update(dto: UpdateRaffleDto): Promise<RaffleEntity> {
     const raffle = await this.findById(dto.id);
-
-    const images =
-      files &&
-      (await this.s3Service.manyFiles(
-        files.map((file) => ({ file, path: 'raffle' })),
-      ));
 
     if (dto.totalNumbers && dto.totalNumbers < raffle.totalNumbers)
       throw new HttpException(
@@ -131,7 +108,6 @@ export class RaffleService
     const update = await this.raffleRepository.update({
       ...dto,
       ...numbersNewConfig,
-      images,
       id: raffle.id,
     });
 

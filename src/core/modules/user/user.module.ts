@@ -8,18 +8,17 @@ import { RoleModule } from '../role/role.module';
 import { AddressController } from './controllers/address.controller';
 import { AddressService } from './services/address.service';
 import { AddressRepository } from './repositories/address.repository';
-import { SettingModule } from '../setting/setting.module';
 import { CustomerSellerService } from './services/customer-seller.service';
 import { CustomerSellerRepository } from './repositories/customer-seller.repository';
 import { CustomerSellerController } from './controllers/customer-seller.controller';
+import { SettingModule } from '../setting/setting.module';
 
 @Module({
   imports: [
     RedisModule,
-    SettingModule,
     RoleModule,
-    SettingModule,
     forwardRef(() => CatalogModule),
+    SettingModule,
   ],
   controllers: [UserController, AddressController, CustomerSellerController],
   providers: [

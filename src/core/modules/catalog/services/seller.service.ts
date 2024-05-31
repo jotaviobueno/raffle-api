@@ -20,7 +20,6 @@ import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { QueryBuilder } from 'src/common/utils';
 import { UserService } from '../../user/services/user.service';
 import { SellerRepository } from '../repositories/seller.repository';
-import { S3Service } from '../../setting/services/s3.service';
 import { ThemeService } from './theme.service';
 
 @Injectable()
@@ -33,27 +32,15 @@ export class SellerService
     private readonly userService: UserService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    private readonly s3Service: S3Service,
     private readonly themeService: ThemeService,
   ) {}
 
-  async create({
-    file,
-    ...dto
-  }: CreateSellerDto & {
-    file: Express.Multer.File;
-  }): Promise<SellerEntity> {
+  async create(dto: CreateSellerDto): Promise<SellerEntity> {
     const user = await this.userService.findById(dto.userId);
-
-    const logo = await this.s3Service.singleFile({
-      file,
-      path: 'seller/logo',
-    });
 
     const seller = await this.sellerRepository.create({
       ...dto,
       userId: user.id,
-      logo,
     });
 
     await this.themeService.create({
@@ -137,25 +124,12 @@ export class SellerService
     return { data: sellers, info };
   }
 
-  async update({
-    file,
-    ...dto
-  }: UpdateSellerDto & {
-    file?: Express.Multer.File;
-  }): Promise<SellerEntity> {
+  async update(dto: UpdateSellerDto): Promise<SellerEntity> {
     const seller = await this.findById(dto.id);
-
-    const logo =
-      file &&
-      (await this.s3Service.singleFile({
-        file,
-        path: 'seller/logo',
-      }));
 
     const update = await this.sellerRepository.update({
       ...dto,
       id: seller.id,
-      logo,
     });
 
     if (!update)
