@@ -189,7 +189,7 @@ export class OrderService
               create: {
                 document: cart.customer.document,
                 email: cart.customer.email,
-                fullName: cart.customer.fullName,
+                name: cart.customer.name,
                 mobilePhone: cart.customer.mobilePhone,
                 phone: cart.customer.phone,
                 customer: {
@@ -266,7 +266,7 @@ export class OrderService
             template: './order/order-created.hbs',
             subject: 'Pedido recebido',
             context: {
-              fullName: cart.customer.fullName,
+              name: cart.customer.name,
               raffles: order.orderItems.map((item) => ({
                 name: item.raffle.title,
                 quantity: item.quantity,
@@ -335,7 +335,7 @@ export class OrderService
             template: './payment/payment-status-change.hbs',
             context: {
               orderId: order.id,
-              fullName: order.orderCustomer.fullName,
+              name: order.orderCustomer.name,
               status: orderStatus.name,
             },
           },
@@ -495,7 +495,7 @@ export class OrderService
       .where({
         sellerId: sellerId && sellerId,
         orderCustomer: customer && {
-          customer: { fullName: { contains: customer } },
+          customer: { name: { contains: customer } },
         },
         orderStatusId: orderStatusId && orderStatusId,
       })

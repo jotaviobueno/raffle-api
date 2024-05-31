@@ -209,6 +209,41 @@ export class UserService
     const avatar =
       file && (await this.s3Service.singleFile({ file, path: 'user/avatar' }));
 
+    if (dto?.document != user.document) {
+      const documentAlreadyExist = await this.userRepository.findByDocument(
+        dto.document,
+      );
+
+      if (documentAlreadyExist)
+        throw new HttpException(
+          'Email, phone or document already exist.',
+          HttpStatus.CONFLICT,
+        );
+    }
+
+    if (dto?.mobilePhone != user.mobilePhone) {
+      const mobilePhoneAlreadyExist =
+        await this.userRepository.findByMobilePhone(dto.mobilePhone);
+
+      if (mobilePhoneAlreadyExist)
+        throw new HttpException(
+          'Email, phone or document already exist.',
+          HttpStatus.CONFLICT,
+        );
+    }
+
+    if (dto?.email != user.email) {
+      const emailAlreadyExist = await this.userRepository.findByEmail(
+        dto.email,
+      );
+
+      if (emailAlreadyExist)
+        throw new HttpException(
+          'Email, phone or document already exist.',
+          HttpStatus.CONFLICT,
+        );
+    }
+
     const update = await this.userRepository.update({
       ...dto,
       id: user.id,

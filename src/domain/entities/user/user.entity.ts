@@ -9,7 +9,7 @@ export class UserEntity implements User {
   mobilePhone: string;
 
   @ApiProperty()
-  fullName: string;
+  name: string;
 
   @ApiProperty({ nullable: true })
   type: $Enums.USER_TYPE | null;

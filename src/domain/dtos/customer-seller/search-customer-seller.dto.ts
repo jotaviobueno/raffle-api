@@ -12,5 +12,5 @@ export class SearchCustomerSellerDto extends QueryParamsDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({ nullable: true, required: false })
-  fullName?: string;
+  name?: string;
 }

@@ -25,7 +25,7 @@ export class UserRepository extends RepositoryFactory<
       select: {
         id: true,
         mobilePhone: true,
-        fullName: true,
+        name: true,
         phone: true,
         avatar: true,
         type: true,
@@ -89,7 +89,7 @@ export class UserRepository extends RepositoryFactory<
       },
       select: {
         id: true,
-        fullName: true,
+        name: true,
         phone: true,
         mobilePhone: true,
         type: true,
@@ -132,7 +132,7 @@ export class UserRepository extends RepositoryFactory<
       select: {
         id: true,
         mobilePhone: true,
-        fullName: true,
+        name: true,
         phone: true,
         type: true,
         avatar: true,
@@ -157,7 +157,7 @@ export class UserRepository extends RepositoryFactory<
       select: {
         id: true,
         mobilePhone: true,
-        fullName: true,
+        name: true,
         type: true,
         phone: true,
         avatar: true,

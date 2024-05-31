@@ -6,7 +6,7 @@ export class OrderCustomerEntity implements OrderCustomer {
   id: string;
 
   @ApiProperty()
-  fullName: string;
+  name: string;
 
   @ApiProperty()
   email: string;

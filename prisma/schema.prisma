@@ -16,7 +16,7 @@ datasource db {
 model User {
   id          String     @id @default(uuid())
   type        USER_TYPE?
-  fullName    String     @map("full_name")
+  name        String
   document    String?
   email       String
   phone       String?
@@ -968,9 +968,8 @@ model TicketStatus {
 }
 
 model OrderCustomer {
-  id String @id @default(uuid())
-
-  fullName    String  @map("full_name")
+  id          String  @id @default(uuid())
+  name        String
   email       String
   document    String
   phone       String?

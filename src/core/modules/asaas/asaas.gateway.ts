@@ -49,7 +49,7 @@ export class AsaasGateway extends PaymentGateway<{
       mobilePhone: data.cart.customer.mobilePhone.replace(/[\D+55]/g, ''),
       phone: data.cart?.customer?.phone?.replace(/[\D+55]/g, ''),
       email: data.cart.customer.email,
-      name: data.cart.customer.fullName,
+      name: data.cart.customer.name,
       province: data.cart.cartPayment.address.neighborhood,
       postalCode: data.cart.cartPayment.address.postcode,
       externalReference: data.cart.customer.id,

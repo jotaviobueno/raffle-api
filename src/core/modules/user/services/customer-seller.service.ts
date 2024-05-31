@@ -37,7 +37,7 @@ export class CustomerSellerService
   async findAll(
     queryParams: SearchCustomerSellerDto,
   ): Promise<FindAllResultEntity<CustomerSellerEntity>> {
-    const { sellerId, fullName } = queryParams;
+    const { sellerId, name } = queryParams;
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
@@ -51,9 +51,9 @@ export class CustomerSellerService
     const query = new QueryBuilder(queryParams)
       .where({
         sellerId: sellerId && sellerId,
-        customer: fullName && {
-          fullName: {
-            contains: fullName,
+        customer: name && {
+          name: {
+            contains: name,
           },
         },
       })
