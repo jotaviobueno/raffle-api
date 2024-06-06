@@ -5,7 +5,11 @@ import {
   SearchRaffleDto,
   UpdateRaffleDto,
 } from 'src/domain/dtos';
-import { FindAllResultEntity, RaffleEntity } from 'src/domain/entities';
+import {
+  FindAllResultEntity,
+  RaffleEntity,
+  RaffleWithRelationsEntity,
+} from 'src/domain/entities';
 import { RaffleRepository } from '../repositories/raffle.repository';
 import { QueryBuilder } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
@@ -13,7 +17,12 @@ import { SellerService } from './seller.service';
 
 @Injectable()
 export class RaffleService
-  implements ServiceBase<RaffleEntity, CreateRaffleDto, UpdateRaffleDto>
+  implements
+    ServiceBase<
+      RaffleEntity | RaffleWithRelationsEntity,
+      CreateRaffleDto,
+      UpdateRaffleDto
+    >
 {
   constructor(
     private readonly raffleRepository: RaffleRepository,
@@ -37,17 +46,19 @@ export class RaffleService
 
   async findAll(
     queryParams: SearchRaffleDto,
-  ): Promise<FindAllResultEntity<RaffleEntity>> {
+  ): Promise<FindAllResultEntity<RaffleWithRelationsEntity>> {
     const { sellerId, isActive, isVisible, name, isFinished } = queryParams;
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<RaffleEntity> | null>(
-        `raffles_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<RaffleWithRelationsEntity> | null>(
+          `raffles_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -72,10 +83,11 @@ export class RaffleService
       total,
     };
 
-    await this.cacheManager.set(`raffles_${queryParamsStringfy}`, {
-      data: raffles,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`raffles_${queryParamsStringfy}`, {
+        data: raffles,
+        info,
+      });
 
     return { data: raffles, info };
   }

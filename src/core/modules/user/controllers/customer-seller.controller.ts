@@ -1,4 +1,11 @@
-import { Controller, Get, Param, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  UseGuards,
+  Query,
+  Delete,
+} from '@nestjs/common';
 import { SearchCustomerSellerDto } from 'src/domain/dtos';
 import { ApiTags } from '@nestjs/swagger';
 import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
@@ -23,5 +30,11 @@ export class CustomerSellerController {
   @Permissions(PERMISSION_ENUM.CAN_READ_CUSTOMER_SELLER)
   findAll(@Query() queryParams: SearchCustomerSellerDto) {
     return this.customerSellerService.findAll(queryParams);
+  }
+
+  @Delete(':id')
+  @Permissions(PERMISSION_ENUM.CAN_DELETE_CUSTOMER_SELLER)
+  remove(@Param('id') id: string) {
+    return this.customerSellerService.remove(id);
   }
 }

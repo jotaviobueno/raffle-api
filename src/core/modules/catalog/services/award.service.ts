@@ -45,12 +45,14 @@ export class AwardService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<AwardEntity> | null>(
-        `awards_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<AwardEntity> | null>(
+          `awards_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -73,10 +75,11 @@ export class AwardService
       total,
     };
 
-    await this.cacheManager.set(`awards_${queryParamsStringfy}`, {
-      data: awards,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`awards_${queryParamsStringfy}`, {
+        data: awards,
+        info,
+      });
 
     return { data: awards, info };
   }

@@ -40,12 +40,14 @@ export class CategoryService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<CategoryEntity> | null>(
-        `categories_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<CategoryEntity> | null>(
+          `categories_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -69,10 +71,11 @@ export class CategoryService
       total,
     };
 
-    await this.cacheManager.set(`categories_${queryParamsStringfy}`, {
-      data: categories,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`categories_${queryParamsStringfy}`, {
+        data: categories,
+        info,
+      });
 
     return { data: categories, info };
   }

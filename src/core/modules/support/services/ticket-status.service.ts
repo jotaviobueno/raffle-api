@@ -38,12 +38,14 @@ export class TicketStatusService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<TicketStatusEntity> | null>(
-        `ticket_status_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<TicketStatusEntity> | null>(
+          `ticket_status_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -65,10 +67,11 @@ export class TicketStatusService
       total,
     };
 
-    await this.cacheManager.set(`ticket_status_${queryParamsStringfy}`, {
-      data: ticketStatus,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`ticket_status_${queryParamsStringfy}`, {
+        data: ticketStatus,
+        info,
+      });
 
     return { data: ticketStatus, info };
   }

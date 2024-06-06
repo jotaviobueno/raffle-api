@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
-  ArrayMaxSize,
   IsArray,
   IsBoolean,
   IsDate,
@@ -30,29 +29,19 @@ export class CreateRaffleDto {
   @ApiProperty()
   description: string;
 
-  @IsArray()
-  @IsString({ each: true })
-  @IsNotEmpty()
-  @ArrayMaxSize(5)
-  @ApiProperty({ type: [String] })
-  metaKeyword: string[];
-
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({ type: Number })
-  @Transform(({ value }) => +value)
   price: number;
 
   @IsBoolean()
   @ApiProperty({ type: Boolean })
   @IsNotEmpty()
-  @Transform(({ value }) => value === 'true')
   isVisible: boolean;
 
   @IsBoolean()
   @IsNotEmpty()
   @ApiProperty({ type: Boolean })
-  @Transform(({ value }) => value === 'true')
   isActive: boolean;
 
   @IsUUID()
@@ -64,12 +53,10 @@ export class CreateRaffleDto {
   @IsNotEmpty()
   @Min(1)
   @ApiProperty({ type: Number })
-  @Transform(({ value }) => +value)
   minBuyQuotas: number;
 
   @IsNumber()
   @IsOptional()
-  @ApiProperty({ type: Number, nullable: true, required: false })
   @Transform(({ value }) => +value)
   tax?: number;
 
@@ -77,7 +64,6 @@ export class CreateRaffleDto {
   @IsNotEmpty()
   @Min(1)
   @ApiProperty({ type: Number })
-  @Transform(({ value }) => +value)
   maxBuyQuotas: number;
 
   @IsDate()
@@ -98,13 +84,14 @@ export class CreateRaffleDto {
   @Transform(({ value }) => +value)
   initial?: number;
 
-  @ApiProperty({ type: [Number], nullable: true, required: false })
-  @IsInt({ each: true })
-  @IsOptional()
-  quantity?: number[];
-
+  @ApiProperty({ type: [String], nullable: true, required: false })
   @IsString({ each: true })
+  @IsOptional()
+  packages?: string[];
+
   @IsNotEmpty()
+  @IsString({ each: true })
+  @IsArray()
   @ApiProperty({ type: [String] })
   images: string[];
 }

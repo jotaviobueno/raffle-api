@@ -41,12 +41,14 @@ export class UtmCampaignService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<UtmCampaignEntity> | null>(
-        `utm_campaigns_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<UtmCampaignEntity> | null>(
+          `utm_campaigns_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -72,10 +74,11 @@ export class UtmCampaignService
       total,
     };
 
-    await this.cacheManager.set(`utm_campaigns_${queryParamsStringfy}`, {
-      data: utmCampaigns,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`utm_campaigns_${queryParamsStringfy}`, {
+        data: utmCampaigns,
+        info,
+      });
 
     return { data: utmCampaigns, info };
   }

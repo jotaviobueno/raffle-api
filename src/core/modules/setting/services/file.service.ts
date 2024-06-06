@@ -12,50 +12,37 @@ export class FileService {
 
   async create({
     files,
-    ...data
+    ...dto
   }: CreateFileDto & {
     files: Express.Multer.File[];
-  }) {
-    if (data.raffleId) {
-      const raffle = await this.prismaService.raffle.findFirst({
-        where: { id: data.raffleId, deletedAt: null },
-      });
-
-      if (!raffle)
-        throw new HttpException('Raffle not found', HttpStatus.NOT_FOUND);
-    }
-
-    if (data.userId) {
-      const user = await this.prismaService.user.findFirst({
-        where: { id: data.userId, deletedAt: null },
-      });
-
-      if (!user)
-        throw new HttpException('user not found', HttpStatus.NOT_FOUND);
-    }
-
-    if (data.sellerId) {
+  }): Promise<Express.Multer.File[]> {
+    if (dto.sellerId) {
       const seller = await this.prismaService.seller.findFirst({
-        where: { id: data.sellerId, deletedAt: null },
+        where: { id: dto.sellerId, deletedAt: null },
       });
 
       if (!seller)
         throw new HttpException('Seller not found', HttpStatus.NOT_FOUND);
     }
 
-    const images =
-      files &&
-      (await this.s3Service.manyFiles(
-        files.map((file) => ({ file, path: 'files' })),
-      ));
+    const values = await this.s3Service.manyFiles(
+      files.map((file) => ({ file, path: 'files' })),
+    );
 
-    const result = await this.prismaService.file.create({
-      data: {
-        ...data,
-        path: images,
-      },
+    await this.prismaService.file.createMany({
+      data: values.map((value) => ({
+        ...dto,
+        fieldname: value.fieldname,
+        filename: value.filename,
+        originalname: value.originalname,
+        path: value.path,
+        size: value.size,
+        deletedAt: null,
+        destination: value.destination,
+        mimetype: value.mimetype,
+      })),
     });
 
-    return result;
+    return values;
   }
 }

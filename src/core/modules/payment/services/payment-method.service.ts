@@ -42,12 +42,14 @@ export class PaymentMethodService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<PaymentMethodEntity> | null>(
-        `payment_methods_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<PaymentMethodEntity> | null>(
+          `payment_methods_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -71,10 +73,11 @@ export class PaymentMethodService
       total,
     };
 
-    await this.cacheManager.set(`payment_methods_${queryParamsStringfy}`, {
-      data: paymentMethods,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`payment_methods_${queryParamsStringfy}`, {
+        data: paymentMethods,
+        info,
+      });
 
     return { data: paymentMethods, info };
   }

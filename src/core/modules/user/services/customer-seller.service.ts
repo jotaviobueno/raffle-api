@@ -41,12 +41,14 @@ export class CustomerSellerService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<CustomerSellerEntity> | null>(
-        `customer_sellers_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<CustomerSellerEntity> | null>(
+          `customer_sellers_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -72,10 +74,11 @@ export class CustomerSellerService
       total,
     };
 
-    await this.cacheManager.set(`customer_sellers_${queryParamsStringfy}`, {
-      data: customerSeller,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`customer_sellers_${queryParamsStringfy}`, {
+        data: customerSeller,
+        info,
+      });
 
     return { data: customerSeller, info };
   }
@@ -90,5 +93,18 @@ export class CustomerSellerService
       );
 
     return customerSeller;
+  }
+
+  async remove(id: string): Promise<boolean> {
+    const customerSeller = await this.findById(id);
+
+    const remove = await this.customerSellerRepository.softDelete(
+      customerSeller.id,
+    );
+
+    if (!remove)
+      throw new HttpException('Failed to remove', HttpStatus.NOT_ACCEPTABLE);
+
+    return true;
   }
 }

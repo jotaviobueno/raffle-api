@@ -1,10 +1,6 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
-import { UpdateThemeDto } from 'src/domain/dtos';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import {
-  ApiBadRequestResponse,
   ApiBearerAuth,
-  ApiBody,
-  ApiNotAcceptableResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
@@ -13,8 +9,9 @@ import {
 import { RoleGuard } from '../../role/guards';
 import { Permissions, Roles } from '../../role/decorators';
 import { PERMISSION_ENUM, ROLE_ENUM } from 'src/common/enums';
-import { AwardService } from '../services/award.service';
 import { ThemeEntity } from 'src/domain/entities';
+import { QueryParamsDto } from 'src/domain/dtos';
+import { ThemeService } from '../services/theme.service';
 
 @Controller('theme')
 @ApiTags('theme')
@@ -22,7 +19,7 @@ import { ThemeEntity } from 'src/domain/entities';
 @Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
 @ApiBearerAuth('defaultBearerAuth')
 export class ThemeController {
-  constructor(private readonly themeService: AwardService) {}
+  constructor(private readonly themeService: ThemeService) {}
 
   @Get(':id')
   @ApiOkResponse({ type: ThemeEntity })
@@ -33,15 +30,12 @@ export class ThemeController {
     return this.themeService.findById(id);
   }
 
-  @Patch(':id')
-  @Permissions(PERMISSION_ENUM.CAN_UPDATE_THEME)
-  @ApiOkResponse({ type: ThemeEntity })
-  @ApiBody({ type: UpdateThemeDto })
+  @Get()
+  @ApiOkResponse({ type: [ThemeEntity] })
+  @Permissions(PERMISSION_ENUM.CAN_READ_THEME)
   @ApiNotFoundResponse()
-  @ApiNotAcceptableResponse()
   @ApiUnauthorizedResponse()
-  @ApiBadRequestResponse()
-  update(@Param('id') id: string, @Body() updateThemeDto: UpdateThemeDto) {
-    return this.themeService.update({ ...updateThemeDto, id });
+  findAll(@Query() queryParams: QueryParamsDto) {
+    return this.themeService.findAll(queryParams);
   }
 }

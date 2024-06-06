@@ -142,11 +142,13 @@ export class UserService
   ): Promise<FindAllResultEntity<Omit<UserEntity, 'password'>>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache = await this.cacheManager.get<FindAllResultEntity<
-      Omit<UserEntity, 'password'>
-    > | null>(`users_${queryParamsStringfy}`);
+    if (queryParams.cache) {
+      const cache = await this.cacheManager.get<FindAllResultEntity<
+        Omit<UserEntity, 'password'>
+      > | null>(`users_${queryParamsStringfy}`);
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .sort()
@@ -164,10 +166,11 @@ export class UserService
       total,
     };
 
-    await this.cacheManager.set(`users_${queryParamsStringfy}`, {
-      data: users,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`users_${queryParamsStringfy}`, {
+        data: users,
+        info,
+      });
 
     return { data: users, info };
   }

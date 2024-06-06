@@ -34,12 +34,14 @@ export class OrderStatusService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<OrderStatusEntity> | null>(
-        `order_status_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<OrderStatusEntity> | null>(
+          `order_status_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -61,10 +63,11 @@ export class OrderStatusService
       total,
     };
 
-    await this.cacheManager.set(`order_status_${queryParamsStringfy}`, {
-      data: orderStatus,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`order_status_${queryParamsStringfy}`, {
+        data: orderStatus,
+        info,
+      });
 
     return { data: orderStatus, info };
   }

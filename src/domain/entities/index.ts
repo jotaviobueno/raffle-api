@@ -51,3 +51,4 @@ export * from './seller-detail';
 export * from './finance-total';
 export * from './order-type';
 export * from './file';
+export * from './raffle';

@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsDateString,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { IsSort } from 'src/common/validators';
 
 export class QueryParamsDto {
@@ -24,9 +30,22 @@ export class QueryParamsDto {
 
   @IsOptional()
   @IsDateString()
+  @ApiProperty({ nullable: true, required: false })
   from?: string;
 
   @IsOptional()
   @IsDateString()
+  @ApiProperty({ nullable: true, required: false })
   to?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true')
+  @ApiProperty({ nullable: true, required: false })
+  cache: boolean = true;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ nullable: true, required: false })
+  language: 'pt-BR' | 'en-US' = 'en-US';
 }

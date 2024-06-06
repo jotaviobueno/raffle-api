@@ -38,27 +38,12 @@ export class SellerService
   async create(dto: CreateSellerDto): Promise<SellerEntity> {
     const user = await this.userService.findById(dto.userId);
 
+    const theme = await this.themeService.findById(dto.themeId);
+
     const seller = await this.sellerRepository.create({
       ...dto,
       userId: user.id,
-    });
-
-    await this.themeService.create({
-      primary: '#519022',
-      secondary: '#1f5e00',
-      tertiary: '#2f3842',
-      quaternary: '#ffffff',
-      quinary: '#f0f0f0',
-      senary: '#3C6C19',
-      sellerId: seller.id,
-      parent: {
-        primary: '#7DBD5A',
-        secondary: '#0F3C00',
-        tertiary: '#3C464F',
-        quaternary: '#ffffff',
-        quinary: '#f0f0f0',
-        senary: '#34611A',
-      },
+      themeId: theme.id,
     });
 
     return seller;
@@ -89,12 +74,14 @@ export class SellerService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<SellerEntity> | null>(
-        `sellers_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<SellerEntity> | null>(
+          `sellers_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -116,16 +103,19 @@ export class SellerService
       total,
     };
 
-    await this.cacheManager.set(`sellers_${queryParamsStringfy}`, {
-      data: sellers,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`sellers_${queryParamsStringfy}`, {
+        data: sellers,
+        info,
+      });
 
     return { data: sellers, info };
   }
 
   async update(dto: UpdateSellerDto): Promise<SellerEntity> {
     const seller = await this.findById(dto.id);
+
+    if (dto.themeId) await this.themeService.findById(dto.themeId);
 
     const update = await this.sellerRepository.update({
       ...dto,

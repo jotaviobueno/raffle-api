@@ -5,21 +5,18 @@ import {
   RaffleEntity,
   QueryBuilderEntity,
   RaffleWithRelationsEntity,
+  raffleQueryWithRelations,
 } from 'src/domain/entities';
 
 @Injectable()
 export class RaffleRepository extends RepositoryFactory<
   RaffleEntity,
   CreateRaffleDto & {
-    images: string[];
     digits: number;
     final: number;
-    totalNumbers: number;
   },
   UpdateRaffleDto & {
-    images?: string[];
     digits?: number;
-    totalNumbers?: number;
     isFinished?: boolean;
   }
 > {
@@ -27,8 +24,13 @@ export class RaffleRepository extends RepositoryFactory<
     super('raffle');
   }
 
-  findAll(query: QueryBuilderEntity): Promise<RaffleEntity[]> {
-    return this.prismaService.raffle.findMany(query);
+  findAll(query: QueryBuilderEntity): Promise<RaffleWithRelationsEntity[]> {
+    return this.prismaService.raffle.findMany({
+      ...query,
+      include: {
+        ...raffleQueryWithRelations,
+      },
+    });
   }
 
   findById(id: string): Promise<RaffleWithRelationsEntity | null> {
@@ -38,11 +40,7 @@ export class RaffleRepository extends RepositoryFactory<
         deletedAt: null,
       },
       include: {
-        raffleCategories: {
-          include: { category: true },
-        },
-        winners: true,
-        awards: true,
+        ...raffleQueryWithRelations,
       },
     });
   }

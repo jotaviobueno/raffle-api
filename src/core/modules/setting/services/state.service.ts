@@ -19,12 +19,14 @@ export class StateService implements ServiceBase<StateEntity> {
   ): Promise<FindAllResultEntity<StateEntity>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<StateEntity> | null>(
-        `states_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<StateEntity> | null>(
+          `states_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .sort()
@@ -42,10 +44,11 @@ export class StateService implements ServiceBase<StateEntity> {
       total,
     };
 
-    await this.cacheManager.set(`states_${queryParamsStringfy}`, {
-      data: states,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`states_${queryParamsStringfy}`, {
+        data: states,
+        info,
+      });
 
     return { data: states, info };
   }
@@ -65,12 +68,14 @@ export class StateService implements ServiceBase<StateEntity> {
   }: QueryParamsDto & { countryId: string }): Promise<
     FindAllResultEntity<StateEntity>
   > {
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<StateEntity> | null>(
-        `states_${countryId}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<StateEntity> | null>(
+          `states_${countryId}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({ countryId })
@@ -87,7 +92,11 @@ export class StateService implements ServiceBase<StateEntity> {
       total,
     };
 
-    await this.cacheManager.set(`states_${countryId}`, { data: states, info });
+    if (queryParams.cache)
+      await this.cacheManager.set(`states_${countryId}`, {
+        data: states,
+        info,
+      });
 
     return { data: states, info };
   }

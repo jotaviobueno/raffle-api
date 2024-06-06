@@ -6,28 +6,7 @@ export class ThemeEntity implements Theme {
   id: string;
 
   @ApiProperty()
-  primary: string;
-
-  @ApiProperty()
-  secondary: string;
-
-  @ApiProperty()
-  tertiary: string;
-
-  @ApiProperty()
-  quaternary: string;
-
-  @ApiProperty()
-  quinary: string;
-
-  @ApiProperty({ nullable: true })
-  sellerId: string | null;
-
-  @ApiProperty()
-  senary: string;
-
-  @ApiProperty({ nullable: true })
-  parentId: string | null;
+  code: string;
 
   @ApiProperty({ type: Date })
   createdAt: Date;

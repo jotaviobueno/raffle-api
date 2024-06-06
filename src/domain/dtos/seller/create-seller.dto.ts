@@ -16,4 +16,8 @@ export class CreateSellerDto {
   @IsNotEmpty()
   @ApiProperty()
   logo: string;
+
+  @IsUUID()
+  @IsNotEmpty()
+  themeId: string;
 }

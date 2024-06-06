@@ -41,12 +41,14 @@ export class SocialMediaService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<SocialMediaEntity> | null>(
-        `socialMedias_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<SocialMediaEntity> | null>(
+          `socialMedias_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -68,10 +70,11 @@ export class SocialMediaService
       total,
     };
 
-    await this.cacheManager.set(`socialMedias_${queryParamsStringfy}`, {
-      data: socialMedias,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`socialMedias_${queryParamsStringfy}`, {
+        data: socialMedias,
+        info,
+      });
 
     return { data: socialMedias, info };
   }

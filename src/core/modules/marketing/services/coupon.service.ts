@@ -51,12 +51,14 @@ export class CouponService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<CouponEntity> | null>(
-        `coupons_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<CouponEntity> | null>(
+          `coupons_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -82,10 +84,11 @@ export class CouponService
       total,
     };
 
-    await this.cacheManager.set(`coupons_${queryParamsStringfy}`, {
-      data: coupons,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`coupons_${queryParamsStringfy}`, {
+        data: coupons,
+        info,
+      });
 
     return { data: coupons, info };
   }

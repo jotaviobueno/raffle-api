@@ -29,11 +29,7 @@ export class SellerRepository extends RepositoryFactory<
       },
       include: {
         socialMedias: true,
-        theme: {
-          include: {
-            secondaryTheme: true,
-          },
-        },
+        theme: true,
       },
     });
   }

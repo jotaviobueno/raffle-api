@@ -17,11 +17,8 @@ export class RaffleEntity implements Raffle {
   @ApiProperty({ type: [String] })
   images: string[];
 
-  @ApiProperty({ type: [Number] })
-  quantity: number[];
-
   @ApiProperty({ type: [String] })
-  metaKeyword: string[];
+  packages: string[];
 
   @ApiProperty({ type: Number })
   price: number;

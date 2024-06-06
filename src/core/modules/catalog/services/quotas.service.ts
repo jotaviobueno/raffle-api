@@ -72,12 +72,14 @@ export class QuotasService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<QutoasEntity> | null>(
-        `quotas_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<QutoasEntity> | null>(
+          `quotas_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -100,10 +102,11 @@ export class QuotasService
       total,
     };
 
-    await this.cacheManager.set(`quotas_${queryParamsStringfy}`, {
-      data: quotas,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`quotas_${queryParamsStringfy}`, {
+        data: quotas,
+        info,
+      });
 
     return { data: quotas, info };
   }

@@ -9,6 +9,9 @@ export class SellerEntity implements Seller {
   name: string;
 
   @ApiProperty()
+  themeId: string;
+
+  @ApiProperty()
   userId: string;
 
   @ApiProperty({ type: String, nullable: true })

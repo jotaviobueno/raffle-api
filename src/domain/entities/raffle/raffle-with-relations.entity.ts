@@ -14,3 +14,11 @@ export class RaffleWithRelationsEntity extends RaffleEntity {
   @ApiProperty({ type: [AwardEntity] })
   awards: AwardEntity[];
 }
+
+export const raffleQueryWithRelations = {
+  raffleCategories: {
+    include: { category: true },
+  },
+  winners: true,
+  awards: true,
+};

@@ -6,6 +6,7 @@ import { seedPaymentMethod } from './payment-method/seed-payment-method';
 import { seedTicketStatus } from './ticket-status/seed-ticket-status';
 import { seedPlanCycle } from './plan-cycle/seed-plan-cycle';
 import { seedOrderType } from './order-type/seed-order-type';
+import { seedThemes } from './theme/seed-themes';
 
 const prisma = new PrismaClient();
 
@@ -19,6 +20,7 @@ async function main() {
       await seedTicketStatus(tx);
       await seedPlanCycle(tx);
       await seedOrderType(tx);
+      await seedThemes(tx);
     },
     {
       maxWait: 20000, // default: 2000

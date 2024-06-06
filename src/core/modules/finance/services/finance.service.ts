@@ -21,12 +21,14 @@ export class FinanceService implements ServiceBase<FinanceEntity> {
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<FinanceEntity> | null>(
-        `finances_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<FinanceEntity> | null>(
+          `finances_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -49,10 +51,11 @@ export class FinanceService implements ServiceBase<FinanceEntity> {
       total,
     };
 
-    await this.cacheManager.set(`finances_${queryParamsStringfy}`, {
-      data: finances,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`finances_${queryParamsStringfy}`, {
+        data: finances,
+        info,
+      });
 
     return { data: finances, info };
   }

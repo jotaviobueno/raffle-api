@@ -21,12 +21,14 @@ export class CountryService implements ServiceBase<CountryEntity> {
   ): Promise<FindAllResultEntity<CountryEntity>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<CountryEntity> | null>(
-        `countries_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<CountryEntity> | null>(
+          `countries_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .sort()
@@ -44,10 +46,11 @@ export class CountryService implements ServiceBase<CountryEntity> {
       total,
     };
 
-    await this.cacheManager.set(`countries_${queryParamsStringfy}`, {
-      data: countries,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`countries_${queryParamsStringfy}`, {
+        data: countries,
+        info,
+      });
 
     return { data: countries, info };
   }

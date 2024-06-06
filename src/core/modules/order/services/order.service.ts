@@ -294,9 +294,9 @@ export class OrderService
   async asaasPostback(data: AsaasWebhookEventDto) {
     const query = {};
 
-    const order = await this.findByInvoiceNumber(+data.payment.invoiceNumber);
-
     const orderStatus = await this.orderStatusService.findByCode(data.event);
+
+    const order = await this.findByInvoiceNumber(+data.payment.invoiceNumber);
 
     return this.prismaService.$transaction(
       async (tx) => {
@@ -461,18 +461,10 @@ export class OrderService
   }
 
   async findById(id: string): Promise<OrderWithRelationsEntity> {
-    const cache = await this.cacheManager.get<OrderWithRelationsEntity | null>(
-      `order_${id}`,
-    );
-
-    if (cache) return cache;
-
     const order = await this.orderRepository.findById(id);
 
     if (!order)
       throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
-
-    await this.cacheManager.set(`order_${id}`, order);
 
     return order;
   }
@@ -484,12 +476,14 @@ export class OrderService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<OrderWithRelationsEntity> | null>(
-        `orders_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<OrderWithRelationsEntity> | null>(
+          `orders_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -515,10 +509,11 @@ export class OrderService
       total,
     };
 
-    await this.cacheManager.set(`orders_${queryParamsStringfy}`, {
-      data: orders,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`orders_${queryParamsStringfy}`, {
+        data: orders,
+        info,
+      });
 
     return { data: orders, info };
   }

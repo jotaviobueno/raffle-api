@@ -53,12 +53,14 @@ export class TicketService
   ): Promise<FindAllResultEntity<TicketWithRelationsEntity>> {
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<TicketWithRelationsEntity> | null>(
-        `tickets_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<TicketWithRelationsEntity> | null>(
+          `tickets_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .sort()
@@ -76,10 +78,11 @@ export class TicketService
       total,
     };
 
-    await this.cacheManager.set(`tickets_${queryParamsStringfy}`, {
-      data: tickets,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`tickets_${queryParamsStringfy}`, {
+        data: tickets,
+        info,
+      });
 
     return { data: tickets, info };
   }

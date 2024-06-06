@@ -25,7 +25,7 @@ model User {
   avatar      String     @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
   createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamp
   updatedAt   DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt   DateTime?  @map("deleted_at") @db.Timestamp
+  deletedAt   DateTime?  @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   addresses       Address[]
   sellers         Seller[]
@@ -38,7 +38,6 @@ model User {
   customerSellers CustomerSeller[]
   tickets         Ticket[]
   orderCustomers  OrderCustomer[]
-  files           File[]
 
   @@map("user")
 }
@@ -57,7 +56,7 @@ model CustomerSeller {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   customer User   @relation(fields: [customerId], references: [id])
   seller   Seller @relation(fields: [sellerId], references: [id])
@@ -66,20 +65,23 @@ model CustomerSeller {
 }
 
 model File {
-  id       String  @id @default(uuid())
-  userId   String? @map("user_id")
-  sellerId String? @map("seller_id")
-  raffleId String? @map("raffle_id")
+  id String @id @default(uuid())
 
-  path String[] @default([])
+  fieldname    String?
+  originalname String?
+  filename     String?
+  path         String
+  size         Float?
+  destination  String?
+  mimetype     String?
+
+  sellerId String? @map("seller_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
-  user   User?   @relation(fields: [userId], references: [id])
   seller Seller? @relation(fields: [sellerId], references: [id])
-  raffle Raffle? @relation(fields: [raffleId], references: [id])
 
   @@map("file")
 }
@@ -91,7 +93,7 @@ model UserRole {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   user User @relation(fields: [userId], references: [id])
   role Role @relation(fields: [roleId], references: [id])
@@ -106,7 +108,7 @@ model Role {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   userRoles       UserRole[]
   rolePermissions RolePermission[]
@@ -122,7 +124,7 @@ model RolePermission {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   permission Permission @relation(fields: [permissionId], references: [id])
   role       Role       @relation(fields: [roleId], references: [id])
@@ -136,7 +138,7 @@ model Permission {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   rolePermissions RolePermission[]
 
@@ -149,11 +151,12 @@ model Seller {
   user   User   @relation(fields: [userId], references: [id])
   userId String @map("user_id")
 
-  logo String
+  themeId String @map("theme_id")
+  logo    String
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   addresses            Address[]
   categories           Category[]
@@ -166,53 +169,21 @@ model Seller {
   carts                Cart[]
   finances             Finance[]
   customerSellers      CustomerSeller[]
-
-  pages Page[] @ignore
-  theme Theme?
-  files File[]
+  files                File[]
+  theme                Theme                 @relation(fields: [themeId], references: [id])
 
   @@map("seller")
 }
 
-model Page {
-  id          String  @id @default(uuid())
-  title       String
-  description String
-  version     String
-  themeId     String? @unique @map("theme_id")
-  sellerId    String  @map("seller_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
-
-  theme  Theme? @relation(fields: [themeId], references: [id])
-  seller Seller @relation(fields: [sellerId], references: [id])
-
-  @@map("page")
-  @@ignore
-}
-
 model Theme {
-  id         String @id @default(uuid())
-  primary    String
-  secondary  String
-  tertiary   String
-  quaternary String
-  quinary    String
-  senary     String
-
-  parentId String? @unique @map("parent_id")
-  sellerId String? @unique @map("seller_id")
+  id   String @id @default(uuid())
+  code String
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
-  parent         Theme?  @relation("secondaryTheme", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  secondaryTheme Theme?  @relation("secondaryTheme")
-  page           Page?   @ignore
-  seller         Seller? @relation(fields: [sellerId], references: [id])
+  sellers Seller[]
 
   @@map("theme")
 }
@@ -226,7 +197,7 @@ model SocialMedia {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   seller Seller @relation(fields: [sellerId], references: [id])
 
@@ -250,7 +221,7 @@ model Address {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   seller        Seller?        @relation(fields: [sellerId], references: [id])
   user          User?          @relation(fields: [userId], references: [id])
@@ -273,7 +244,7 @@ model Country {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   states  State[]
   address Address[]
@@ -290,7 +261,7 @@ model State {
   countryId String    @map("country_id")
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   country Country   @relation(fields: [countryId], references: [id])
   address Address[]
@@ -306,7 +277,7 @@ model Category {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   seller           Seller           @relation(fields: [sellerId], references: [id])
   raffleCategories RaffleCategory[]
@@ -321,7 +292,7 @@ model RaffleCategory {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   category Category @relation(fields: [categoryId], references: [id])
   raffle   Raffle   @relation(fields: [raffleId], references: [id])
@@ -330,21 +301,20 @@ model RaffleCategory {
 }
 
 model Raffle {
-  id               String   @id @default(uuid())
+  id               String @id @default(uuid())
   title            String
-  shortDescription String   @map("short_description")
+  shortDescription String @map("short_description")
   description      String
-  images           String[] @default([])
-  metaKeyword      String[] @default([]) @map("meta_keyword")
 
-  price Float
-  tax   Float @default(0)
+  price  Float
+  tax    Float    @default(0)
+  images String[] @default([])
 
-  isFinished Boolean @default(false) @map("is_finished")
-  isVisible  Boolean @default(true) @map("is_visible")
-  isActive   Boolean @default(true) @map("is_active")
-  sellerId   String  @map("seller_id")
-  quantity   Int[]   @default([5, 10, 50, 100])
+  isFinished Boolean  @default(false) @map("is_finished")
+  isVisible  Boolean  @default(true) @map("is_visible")
+  isActive   Boolean  @default(true) @map("is_active")
+  sellerId   String   @map("seller_id")
+  packages   String[] @default(["5", "10", "50", "100"])
 
   minBuyQuotas       Int   @map("min_buy_quotas")
   maxBuyQuotas       Int   @map("max_buy_quotas")
@@ -359,7 +329,7 @@ model Raffle {
   drawDateAt DateTime  @map("draw_date_at") @db.Timestamp
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt  DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt  DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt  DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   seller           Seller           @relation(fields: [sellerId], references: [id])
   raffleCategories RaffleCategory[]
@@ -369,7 +339,6 @@ model Raffle {
   cartItems        CartItem[]
   orderItems       OrderItem[]
   winners          Winner[]
-  files            File[]
 
   @@map("raffle")
 }
@@ -382,7 +351,7 @@ model Quotas {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   raffle   Raffle @relation(fields: [raffleId], references: [id])
   customer User   @relation(fields: [customerId], references: [id])
@@ -398,7 +367,7 @@ model Award {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   raffle Raffle @relation(fields: [raffleId], references: [id])
   seller Seller @relation(fields: [sellerId], references: [id])
@@ -413,7 +382,7 @@ model RaffleCoupon {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   coupon Coupon @relation(fields: [couponId], references: [id])
   raffle Raffle @relation(fields: [raffleId], references: [id])
@@ -435,7 +404,7 @@ model Order {
   dueDate   DateTime? @map("due_date") @db.Timestamp
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   cart           Cart           @relation(fields: [cartId], references: [id])
   seller         Seller         @relation(fields: [sellerId], references: [id])
@@ -462,7 +431,7 @@ model OrderHistory {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   order       Order       @relation(fields: [orderId], references: [id])
   customer    User        @relation(fields: [customerId], references: [id])
@@ -483,7 +452,7 @@ model OrderCoupon {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   order  Order  @relation(fields: [orderId], references: [id])
   coupon Coupon @relation(fields: [couponId], references: [id])
@@ -503,7 +472,7 @@ model CartCoupon {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   cart   Cart   @relation(fields: [cartId], references: [id])
   coupon Coupon @relation(fields: [couponId], references: [id])
@@ -523,7 +492,7 @@ model OrderBankSlip {
   expirationAt DateTime  @map("expiration_at") @db.Timestamp
   createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt    DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt    DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   orderPayment OrderPayment @relation(fields: [orderPaymentId], references: [id])
 
@@ -543,7 +512,7 @@ model UtmCampaign {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   seller  Seller   @relation(fields: [sellerId], references: [id])
   coupons Coupon[]
@@ -558,7 +527,7 @@ model UtmSource {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   @@map("utm_source")
   @@ignore
@@ -583,7 +552,7 @@ model Coupon {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   orderCoupons  OrderCoupon[]
   cartCoupons   CartCoupon[]
@@ -600,7 +569,7 @@ model OrderStatus {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   orderHistories OrderHistory[]
   order          Order[]
@@ -622,7 +591,7 @@ model OrderTotal {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   order Order @relation(fields: [orderId], references: [id])
 
@@ -636,7 +605,7 @@ model PaymentMethodSeller {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   seller        Seller        @relation(fields: [sellerId], references: [id])
   paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
@@ -657,7 +626,7 @@ model PaymentMethod {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   paymentMethodSellers PaymentMethodSeller[]
   orderPayments        OrderPayment[]
@@ -676,7 +645,7 @@ model PaymentGatewayConfig {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   paymentMethods PaymentMethod[]
 
@@ -696,7 +665,7 @@ model OrderPayment {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   order           Order            @relation(fields: [orderId], references: [id])
   address         Address          @relation(fields: [addressId], references: [id])
@@ -722,7 +691,7 @@ model OrderCreditCard {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   orderPayment OrderPayment @relation(fields: [orderPaymentId], references: [id])
 
@@ -738,7 +707,7 @@ model OrderPix {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
   expiratAt DateTime  @map("expirat_at") @db.Timestamp
 
   orderPayment OrderPayment @relation(fields: [orderPaymentId], references: [id])
@@ -753,7 +722,7 @@ model Cart {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   customer    User         @relation(fields: [customerId], references: [id])
   cartItems   CartItem[]
@@ -779,7 +748,7 @@ model OrderItem {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   raffle Raffle? @relation(fields: [raffleId], references: [id])
   order  Order   @relation(fields: [orderId], references: [id])
@@ -800,7 +769,7 @@ model CartItem {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   raffle Raffle? @relation(fields: [raffleId], references: [id])
   plan   Plan?   @relation(fields: [planId], references: [id])
@@ -824,7 +793,7 @@ model CartTotal {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   cart Cart @relation(fields: [cartId], references: [id])
 
@@ -841,7 +810,7 @@ model CartPayment {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   cart          Cart          @relation(fields: [cartId], references: [id])
   address       Address       @relation(fields: [addressId], references: [id])
@@ -858,7 +827,7 @@ model Finance {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   customer     User          @relation(fields: [customerId], references: [id])
   order        Order?        @relation(fields: [orderId], references: [id])
@@ -882,7 +851,7 @@ model FinanceTotal {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   finance Finance @relation(fields: [financeId], references: [id])
 
@@ -897,7 +866,7 @@ model Winner {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   raffle   Raffle @relation(fields: [raffleId], references: [id])
   customer User   @relation(fields: [customerId], references: [id])
@@ -915,7 +884,7 @@ model GatewayEvent {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   order         Order         @relation(fields: [orderId], references: [id])
   paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
@@ -932,7 +901,7 @@ model Audit {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   @@map("audit")
 }
@@ -949,7 +918,7 @@ model Ticket {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   customer        User?           @relation(fields: [customerId], references: [id])
   ticketHistories TicketHistory[]
@@ -966,7 +935,7 @@ model TicketHistory {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   ticketStatus TicketStatus @relation(fields: [ticketStatusId], references: [id])
   ticket       Ticket       @relation(fields: [ticketId], references: [id])
@@ -981,7 +950,7 @@ model TicketStatus {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   tickets         Ticket[]
   ticketHistories TicketHistory[]
@@ -1002,7 +971,7 @@ model OrderCustomer {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   customer User  @relation(fields: [customerId], references: [id])
   order    Order @relation(fields: [orderId], references: [id])
@@ -1021,7 +990,7 @@ model Plan {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   planCycle  PlanCycle   @relation(fields: [planCycleId], references: [id])
   cartItems  CartItem[]
@@ -1039,7 +1008,7 @@ model RolePlan {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   role Role @relation(fields: [roleId], references: [id])
   plan Plan @relation(fields: [planId], references: [id])
@@ -1054,7 +1023,7 @@ model PlanCycle {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   plans Plan[]
 
@@ -1068,7 +1037,7 @@ model OrderType {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   orders Order[]
 

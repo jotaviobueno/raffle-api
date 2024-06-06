@@ -44,12 +44,14 @@ export class WinnerService
 
     const queryParamsStringfy = JSON.stringify(queryParams);
 
-    const cache =
-      await this.cacheManager.get<FindAllResultEntity<WinnerEntity> | null>(
-        `winners_${queryParamsStringfy}`,
-      );
+    if (queryParams.cache) {
+      const cache =
+        await this.cacheManager.get<FindAllResultEntity<WinnerEntity> | null>(
+          `winners_${queryParamsStringfy}`,
+        );
 
-    if (cache) return cache;
+      if (cache) return cache;
+    }
 
     const query = new QueryBuilder(queryParams)
       .where({
@@ -72,10 +74,11 @@ export class WinnerService
       total,
     };
 
-    await this.cacheManager.set(`winners_${queryParamsStringfy}`, {
-      data: winners,
-      info,
-    });
+    if (queryParams.cache)
+      await this.cacheManager.set(`winners_${queryParamsStringfy}`, {
+        data: winners,
+        info,
+      });
 
     return { data: winners, info };
   }
