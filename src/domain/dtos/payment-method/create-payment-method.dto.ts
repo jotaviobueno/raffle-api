@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
 } from 'class-validator';
 
 export class CreatePaymentMethodDto {
@@ -32,4 +33,8 @@ export class CreatePaymentMethodDto {
   @IsBoolean()
   @ApiProperty({ nullable: true, required: false })
   isActive?: boolean;
+
+  @IsUUID()
+  @IsNotEmpty()
+  gatewayId: string;
 }

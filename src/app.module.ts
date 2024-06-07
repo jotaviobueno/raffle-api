@@ -8,7 +8,6 @@ import { AuthGuard } from './core/modules/auth/guards';
 import { AuthModule } from './core/modules/auth/auth.module';
 import { SettingModule } from './core/modules/setting/setting.module';
 import { CatalogModule } from './core/modules/catalog/catalog.module';
-import { AsaasModule } from './core/modules/asaas/asaas.module';
 import { CartModule } from './core/modules/cart/cart.module';
 import { OrderModule } from './core/modules/order/order.module';
 import { PaymentModule } from './core/modules/payment/payment.module';
@@ -17,6 +16,7 @@ import { SupportModule } from './core/modules/support/support.module';
 import { FinanceModule } from './core/modules/finance/finance.module';
 import { BullModule } from '@nestjs/bull';
 import { environment } from './config';
+import { GatewayModule } from './core/modules/gateway/gateway.module';
 
 @Module({
   imports: [
@@ -32,7 +32,7 @@ import { environment } from './config';
     AuthModule,
     SettingModule,
     CatalogModule,
-    AsaasModule,
+    GatewayModule,
     CartModule,
     OrderModule,
     PaymentModule,

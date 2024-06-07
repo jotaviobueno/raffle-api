@@ -50,7 +50,11 @@ export const orderQueryWithRelations = {
       orderBankSlip: true,
       orderCreditCard: true,
       orderPix: true,
-      paymentMethod: true,
+      paymentMethod: {
+        include: {
+          gateway: true,
+        },
+      },
     },
   },
   orderCustomer: true,

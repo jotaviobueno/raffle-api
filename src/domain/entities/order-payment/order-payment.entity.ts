@@ -6,7 +6,7 @@ export class OrderPaymentEntity implements OrderPayment {
   id: string;
 
   @ApiProperty({ nullable: true })
-  gatewayPamentId: string | null;
+  gatewayPaymentId: string | null;
 
   @ApiProperty({ nullable: true })
   status: string | null;

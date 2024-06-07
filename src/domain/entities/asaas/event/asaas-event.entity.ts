@@ -4,7 +4,7 @@ import {
   ORDER_STATUS_ENUM,
 } from 'src/common/enums';
 
-export class AsaasWebhookEventDto {
+export class AsaasEventDto {
   id: string;
   event: ORDER_STATUS_ENUM;
   payment: {

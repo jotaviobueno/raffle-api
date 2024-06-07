@@ -1,8 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { data } from './data';
 import { DefaultArgs } from '@prisma/client/runtime/library';
-import { environment } from '../../../src/config';
-import { PaymentGatewayConfigEntity } from 'src/domain/entities';
 
 export async function seedPaymentMethod(
   tx: Omit<
@@ -10,44 +8,32 @@ export async function seedPaymentMethod(
     '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
   >,
 ) {
-  let asaasPaymentGatewayConfig: PaymentGatewayConfigEntity;
-
-  const configExist = await tx.paymentGatewayConfig.findFirst({
-    where: {
-      code: 'asaas',
-      deletedAt: null,
-    },
-  });
-
-  if (configExist) asaasPaymentGatewayConfig = configExist;
-  else
-    asaasPaymentGatewayConfig = await tx.paymentGatewayConfig.create({
-      data: {
+  for (const gateway of data) {
+    await tx.gateway.upsert({
+      where: {
+        code: 'asaas',
+      },
+      update: {
+        name: 'Asaas',
+        code: 'asaas',
+      },
+      create: {
         code: 'asaas',
         name: 'Asaas',
-        config: {
-          accessToken: environment.ASAAS_ACCESS_TOKEN,
-          fine: environment.ASAAS_FINE,
-          interest: environment.ASAAS_INTEREST,
+        paymentMethods: {
+          createMany: {
+            data: gateway.methods.map((method) => ({
+              code: method.code,
+              name: method.name,
+              isActive: method.isActive,
+              instructions: method.instructions,
+              fee: method.fee,
+              feePercentage: method.feePercentage,
+              deletedAt: null,
+            })),
+            skipDuplicates: true,
+          },
         },
-      },
-    });
-
-  for (const paymentMethod of data) {
-    const paymentMethodAlreadyExist = await tx.paymentMethod.findFirst({
-      where: {
-        code: paymentMethod.code,
-        deletedAt: null,
-      },
-    });
-
-    if (paymentMethodAlreadyExist) return;
-
-    await tx.paymentMethod.create({
-      data: {
-        ...paymentMethod,
-        paymentGatewayConfigId: asaasPaymentGatewayConfig.id,
-        deletedAt: null,
       },
     });
   }

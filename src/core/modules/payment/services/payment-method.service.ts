@@ -5,14 +5,11 @@ import {
   SearchPaymentMethodDto,
   UpdatePaymentMethodDto,
 } from 'src/domain/dtos';
-import {
-  FindAllResultEntity,
-  PaymentGatewayConfigEntity,
-  PaymentMethodEntity,
-} from 'src/domain/entities';
+import { FindAllResultEntity, PaymentMethodEntity } from 'src/domain/entities';
 import { PaymentMethodRepository } from '../repositories/payment-method.repository';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { QueryBuilder } from 'src/common/utils';
+import { GatewayService } from '../../gateway/services/gateway.service';
 
 @Injectable()
 export class PaymentMethodService
@@ -27,10 +24,16 @@ export class PaymentMethodService
     private readonly paymentMethodRepository: PaymentMethodRepository,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    private readonly gatewayService: GatewayService,
   ) {}
 
   async create(dto: CreatePaymentMethodDto): Promise<PaymentMethodEntity> {
-    const paymentMethod = await this.paymentMethodRepository.create(dto);
+    const gateway = await this.gatewayService.findById(dto.gatewayId);
+
+    const paymentMethod = await this.paymentMethodRepository.create({
+      ...dto,
+      gatewayId: gateway.id,
+    });
 
     return paymentMethod;
   }
@@ -80,23 +83,6 @@ export class PaymentMethodService
       });
 
     return { data: paymentMethods, info };
-  }
-
-  async findByIdAndReturnRelations(
-    id: string,
-  ): Promise<
-    PaymentMethodEntity & { paymentGatewayConfig: PaymentGatewayConfigEntity }
-  > {
-    const paymentGatewayConfig =
-      await this.paymentMethodRepository.findByIdAndReturnRelations(id);
-
-    if (!paymentGatewayConfig)
-      throw new HttpException(
-        'Payment gateway config not found',
-        HttpStatus.NOT_FOUND,
-      );
-
-    return paymentGatewayConfig;
   }
 
   async findById(id: string): Promise<PaymentMethodEntity> {

@@ -5,6 +5,11 @@ export const data = [
     deletedAt: null,
   },
   {
+    code: 'AWAIT_CALLBACK',
+    name: 'Aguardando resposta',
+    deletedAt: null,
+  },
+  {
     code: 'PAYMENT_AWAITING_RISK_ANALYSIS',
     name: 'Pagamento aguardando análise de risco',
     deletedAt: null,

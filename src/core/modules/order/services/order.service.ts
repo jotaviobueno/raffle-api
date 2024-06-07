@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import {
-  AsaasWebhookEventDto,
   CreateCheckoutDto,
   JobQuotasDto,
   SearchOrderDto,
@@ -9,6 +8,7 @@ import {
 } from 'src/domain/dtos';
 import {
   FindAllResultEntity,
+  AsaasEventDto,
   OrderEntity,
   OrderWithRelationsEntity,
   orderQueryWithRelations,
@@ -291,7 +291,7 @@ export class OrderService
     );
   }
 
-  async asaasPostback(data: AsaasWebhookEventDto) {
+  async asaasPostback(data: AsaasEventDto) {
     const query = {};
 
     const orderStatus = await this.orderStatusService.findByCode(data.event);
@@ -314,7 +314,7 @@ export class OrderService
             update: {
               data: {
                 status: data?.payment?.status,
-                gatewayPamentId: data.payment.id,
+                gatewayPaymentId: data.payment.id,
                 receiptUrl: data.payment.transactionReceiptUrl,
                 orderCreditCard: {
                   update: {
@@ -423,7 +423,7 @@ export class OrderService
               update: {
                 data: {
                   status: data.payment.status,
-                  gatewayPamentId: data.payment.id,
+                  gatewayPaymentId: data.payment.id,
                   receiptUrl: data.payment.transactionReceiptUrl,
                 },
               },

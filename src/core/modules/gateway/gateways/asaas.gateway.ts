@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PaymentGateway } from '../payment/gateway/payment.gateway';
 import {
   AsaasCustomerEntity,
   AsaasPaymentResponseEntity,
   CartWithRelationsEntity,
 } from 'src/domain/entities';
-import { AsaasService } from './asaas.service';
 import { CreateCheckoutDto } from 'src/domain/dtos';
 import { addDays, addMinutes } from 'date-fns';
+import { AsaasService } from '../services/asaas.service';
+import { PaymentGateway } from '../../payment/gateway/payment.gateway';
 
 @Injectable()
 export class AsaasGateway extends PaymentGateway<{

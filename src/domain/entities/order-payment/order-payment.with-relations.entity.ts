@@ -3,12 +3,12 @@ import { AddressWithRelationsEntity } from '../address';
 import { OrderBankSlipEntity } from '../order-bank-slip';
 import { OrderCreditCardEntity } from '../order-credit-card';
 import { OrderPixEntity } from '../order-pix';
-import { PaymentMethodEntity } from '../payment-method';
+import { PaymentMethodWithRelationsEntity } from '../payment-method';
 import { OrderPaymentEntity } from './order-payment.entity';
 
 export class OrderPaymentWithRelations extends OrderPaymentEntity {
-  @ApiProperty({ type: PaymentMethodEntity })
-  paymentMethod: PaymentMethodEntity;
+  @ApiProperty({ type: PaymentMethodWithRelationsEntity })
+  paymentMethod: PaymentMethodWithRelationsEntity;
 
   @ApiProperty({ type: AddressWithRelationsEntity })
   address: AddressWithRelationsEntity;

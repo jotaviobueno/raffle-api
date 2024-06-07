@@ -38,6 +38,7 @@ model User {
   customerSellers CustomerSeller[]
   tickets         Ticket[]
   orderCustomers  OrderCustomer[]
+  gatewayConfig   GatewayConfig?
 
   @@map("user")
 }
@@ -158,19 +159,18 @@ model Seller {
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
-  addresses            Address[]
-  categories           Category[]
-  raffles              Raffle[]
-  orders               Order[]
-  awards               Award[]
-  socialMedias         SocialMedia[]
-  paymentMethodSellers PaymentMethodSeller[]
-  utmCampaigns         UtmCampaign[]
-  carts                Cart[]
-  finances             Finance[]
-  customerSellers      CustomerSeller[]
-  files                File[]
-  theme                Theme                 @relation(fields: [themeId], references: [id])
+  addresses       Address[]
+  categories      Category[]
+  raffles         Raffle[]
+  orders          Order[]
+  awards          Award[]
+  socialMedias    SocialMedia[]
+  utmCampaigns    UtmCampaign[]
+  carts           Cart[]
+  finances        Finance[]
+  customerSellers CustomerSeller[]
+  files           File[]
+  theme           Theme            @relation(fields: [themeId], references: [id])
 
   @@map("seller")
 }
@@ -598,70 +598,56 @@ model OrderTotal {
   @@map("order_total")
 }
 
-model PaymentMethodSeller {
-  id              String @id @default(uuid())
-  sellerId        String @map("seller_id")
-  paymentMethodId String @map("payment_method_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
-
-  seller        Seller        @relation(fields: [sellerId], references: [id])
-  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
-
-  @@map("payment_method_seller")
-}
-
 model PaymentMethod {
-  id                     String  @id @default(uuid())
-  code                   String
-  name                   String
-  instructions           String
-  isActive               Boolean @default(true) @map("is_active")
-  paymentGatewayConfigId String? @map("payment_gateway_config_id")
+  id           String  @id @default(uuid())
+  code         String
+  name         String
+  instructions String
+  isActive     Boolean @default(true) @map("is_active")
 
   fee           Float @default(0)
   feePercentage Float @default(0) @map("fee_percentage")
 
+  gatewayId String @map("gateway_id")
+
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
-  paymentMethodSellers PaymentMethodSeller[]
-  orderPayments        OrderPayment[]
-  cartPayments         CartPayment[]
-  paymentGatewayConfig PaymentGatewayConfig? @relation(fields: [paymentGatewayConfigId], references: [id])
-  gatewayEvents        GatewayEvent[]
+  orderPayments OrderPayment[]
+  cartPayments  CartPayment[]
+  gatewayEvents GatewayEvent[]
+  gateway       Gateway        @relation(fields: [gatewayId], references: [id])
 
   @@map("payment_method")
 }
 
-model PaymentGatewayConfig {
-  id     String @id @default(uuid())
-  code   String
-  name   String
-  config Json
+model GatewayConfig {
+  id        String @id @default(uuid())
+  config    Json
+  gatewayId String @map("gateway_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
+  userId    String    @unique @map("user_id")
 
-  paymentMethods PaymentMethod[]
+  gateway Gateway @relation(fields: [gatewayId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 
-  @@map("payment_gateway_config")
+  @@map("gateway_config")
 }
 
 model OrderPayment {
-  id              String  @id @default(uuid())
-  orderId         String  @unique @map("order_id")
-  method          String
-  status          String?
-  paymentMethodId String  @map("payment_method_id")
-  addressId       String  @map("address_id")
-  gatewayPamentId String? @map("gateway_payment_id")
-  receiptUrl      String? @map("receipt_url")
-  invoiceUrl      String  @map("invoice_url")
+  id               String  @id @default(uuid())
+  orderId          String  @unique @map("order_id")
+  method           String
+  status           String?
+  paymentMethodId  String  @map("payment_method_id")
+  addressId        String  @map("address_id")
+  gatewayPaymentId String? @map("gateway_payment_id")
+  receiptUrl       String? @map("receipt_url")
+  invoiceUrl       String  @map("invoice_url")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
@@ -880,7 +866,8 @@ model GatewayEvent {
   orderId         String @map("order_id")
   paymentMethodId String @map("payment_method_id")
 
-  postback Json
+  postback  Json
+  gatewayId String
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
@@ -888,6 +875,7 @@ model GatewayEvent {
 
   order         Order         @relation(fields: [orderId], references: [id])
   paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  gateway       Gateway       @relation(fields: [gatewayId], references: [id])
 
   @@map("gateway_event")
 }
@@ -1042,4 +1030,20 @@ model OrderType {
   orders Order[]
 
   @@map("order_type")
+}
+
+model Gateway {
+  id   String @id @default(uuid())
+  name String
+  code String @unique
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
+
+  paymentMethods PaymentMethod[]
+  gatewayConfig  GatewayConfig[]
+  gatewayEvents  GatewayEvent[]
+
+  @@map("gateway")
 }
