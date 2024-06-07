@@ -21,6 +21,10 @@ import { QueryBuilder } from 'src/common/utils';
 import { UserService } from '../../user/services/user.service';
 import { SellerRepository } from '../repositories/seller.repository';
 import { ThemeService } from './theme.service';
+import { AsaasService } from '../../asaas/asaas.service';
+import { AddressService } from '../../user/services/address.service';
+import { environment } from 'src/config';
+import { SellerGatewayConfigService } from '../../gateway/services/seller-gateway-config.service';
 
 @Injectable()
 export class SellerService
@@ -28,23 +32,84 @@ export class SellerService
 {
   constructor(
     private readonly sellerRepository: SellerRepository,
+    private readonly addressService: AddressService,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
     private readonly themeService: ThemeService,
+    private readonly sellerGatewayConfigService: SellerGatewayConfigService,
+    private readonly assasService: AsaasService,
   ) {}
 
-  async create(dto: CreateSellerDto): Promise<SellerEntity> {
+  async create({ addressId, ...dto }: CreateSellerDto): Promise<SellerEntity> {
     const user = await this.userService.findById(dto.userId);
 
+    const address = await this.addressService.findById(addressId);
+
     const theme = await this.themeService.findById(dto.themeId);
+
+    const data = await this.assasService.createSubAccount({
+      name: 'VENDEDOR - ' + dto.name,
+      email: user.email,
+      cpfCnpj: user.document.replace(/[\.-]/g, ''),
+      mobilePhone: user.mobilePhone.replace(/[\D+55]/g, ''),
+      phone: user?.phone?.replace(/[\D+55]/g, ''),
+      address: address.street,
+      addressNumber: address.number,
+      complement: address.complement,
+      province: address.neighborhood,
+      postalCode: address.postcode,
+      incomeValue: user.incomeValue,
+      companyType: user.type != 'PF' && user.type != 'PJ' ? user.type : null,
+      birthDate: user.birthDate,
+      webhooks: [
+        {
+          apiVersion: 3,
+          email: environment.ASSAS_WARNING_EMAIL,
+          events: [
+            'PAYMENT_AUTHORIZED',
+            'PAYMENT_APPROVED_BY_RISK_ANALYSIS',
+            'PAYMENT_CREATED',
+            'PAYMENT_CONFIRMED',
+            'PAYMENT_ANTICIPATED',
+            'PAYMENT_DELETED',
+            'PAYMENT_REFUNDED',
+            'PAYMENT_REFUND_DENIED',
+            'PAYMENT_CHARGEBACK_REQUESTED',
+            'PAYMENT_AWAITING_CHARGEBACK_REVERSAL',
+            'PAYMENT_DUNNING_REQUESTED',
+            'PAYMENT_CHECKOUT_VIEWED',
+            'PAYMENT_PARTIALLY_REFUNDED',
+            'PAYMENT_AWAITING_RISK_ANALYSIS',
+            'PAYMENT_REPROVED_BY_RISK_ANALYSIS',
+            'PAYMENT_UPDATED',
+            'PAYMENT_RECEIVED',
+            'PAYMENT_OVERDUE',
+            'PAYMENT_RESTORED',
+            'PAYMENT_REFUND_IN_PROGRESS',
+            'PAYMENT_RECEIVED_IN_CASH_UNDONE',
+            'PAYMENT_CHARGEBACK_DISPUTE',
+            'PAYMENT_DUNNING_RECEIVED',
+            'PAYMENT_BANK_SLIP_VIEWED',
+            'PAYMENT_CREDIT_CARD_CAPTURE_REFUSED',
+          ],
+          enabled: true,
+          interrupted: false,
+          name: 'VENDEDOR - ' + dto.name,
+          sendType: 'SEQUENTIALLY',
+          url: environment.ASSAS_WEBHOOK_URL,
+        },
+      ],
+    });
 
     const seller = await this.sellerRepository.create({
       ...dto,
       userId: user.id,
       themeId: theme.id,
     });
+
+    await this.sellerGatewayConfigService.create({ data, seller });
 
     return seller;
   }

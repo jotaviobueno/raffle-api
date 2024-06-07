@@ -19,10 +19,12 @@ model User {
   name        String
   document    String?
   email       String
+  incomeValue Float?     @map("income_value")
   phone       String?
   mobilePhone String     @map("mobile_phone")
   password    String?
   avatar      String     @default("https://ethereal-menu.s3.us-east-2.amazonaws.com/default/user/0d9cf5a5-5288-4f12-9c46-11795dc9d09c.jpeg")
+  birthDate   DateTime?  @map("birth_date") @db.Timestamp
   createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamp
   updatedAt   DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt   DateTime?  @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
@@ -45,7 +47,10 @@ model User {
 enum USER_TYPE {
   PF
   PJ
-  E
+  MEI
+  LIMITED
+  INDIVIDUAL
+  ASSOCIATION
 }
 
 model CustomerSeller {
@@ -171,6 +176,8 @@ model Seller {
   customerSellers      CustomerSeller[]
   files                File[]
   theme                Theme                 @relation(fields: [themeId], references: [id])
+  sellerGatewayConfig  SellerGatewayConfig?
+  gatewayEvents        GatewayEvent[]
 
   @@map("seller")
 }
@@ -415,9 +422,9 @@ model Order {
   orderHistories OrderHistory[]
   orderStatus    OrderStatus?   @relation(fields: [orderStatusId], references: [id])
   finance        Finance?
-  gatewayEvents  GatewayEvent[]
   orderCustomer  OrderCustomer?
   orderType      OrderType?     @relation(fields: [orderTypeId], references: [id])
+  gatewayEvents  GatewayEvent[]
 
   @@map("order")
 }
@@ -614,12 +621,12 @@ model PaymentMethodSeller {
 }
 
 model PaymentMethod {
-  id                     String  @id @default(uuid())
-  code                   String
-  name                   String
-  instructions           String
-  isActive               Boolean @default(true) @map("is_active")
-  paymentGatewayConfigId String? @map("payment_gateway_config_id")
+  id           String  @id @default(uuid())
+  code         String
+  name         String
+  instructions String
+  isActive     Boolean @default(true) @map("is_active")
+  gatewayId    String  @map("gateway_id")
 
   fee           Float @default(0)
   feePercentage Float @default(0) @map("fee_percentage")
@@ -631,25 +638,41 @@ model PaymentMethod {
   paymentMethodSellers PaymentMethodSeller[]
   orderPayments        OrderPayment[]
   cartPayments         CartPayment[]
-  paymentGatewayConfig PaymentGatewayConfig? @relation(fields: [paymentGatewayConfigId], references: [id])
-  gatewayEvents        GatewayEvent[]
+  gateway              Gateway               @relation(fields: [gatewayId], references: [id])
 
   @@map("payment_method")
 }
 
-model PaymentGatewayConfig {
-  id     String @id @default(uuid())
-  code   String
-  name   String
+model Gateway {
+  id   String @id @default(uuid())
+  code String @unique
+  name String
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
+
+  sellerGatewayConfigs SellerGatewayConfig[]
+  paymentMethods       PaymentMethod[]
+
+  @@map("gateway")
+}
+
+model SellerGatewayConfig {
+  id        String  @id @default(uuid())
+  gatewayId String  @map("gateway_id")
+  sellerId  String? @unique @map("seller_id")
+
   config Json
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
-  paymentMethods PaymentMethod[]
+  seller  Seller? @relation(fields: [sellerId], references: [id])
+  gateway Gateway @relation(fields: [gatewayId], references: [id])
 
-  @@map("payment_gateway_config")
+  @@map("seller_gateway_config")
 }
 
 model OrderPayment {
@@ -875,19 +898,17 @@ model Winner {
 }
 
 model GatewayEvent {
-  id String @id @default(uuid())
-
-  orderId         String @map("order_id")
-  paymentMethodId String @map("payment_method_id")
-
+  id       String @id @default(uuid())
   postback Json
+  sellerId String @map("seller_id")
+  orderId  String @map("order_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
-  order         Order         @relation(fields: [orderId], references: [id])
-  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  seller Seller @relation(fields: [sellerId], references: [id])
+  order  Order  @relation(fields: [orderId], references: [id])
 
   @@map("gateway_event")
 }

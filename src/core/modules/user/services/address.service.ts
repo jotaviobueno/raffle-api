@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
 import { CreateAddressDto, UpdateAddressDto } from 'src/domain/dtos';
 import { AddressEntity } from 'src/domain/entities';
@@ -15,8 +21,10 @@ export class AddressService
   constructor(
     private readonly stateService: StateService,
     private readonly countryService: CountryService,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly addressRepository: AddressRepository,
+    @Inject(forwardRef(() => SellerService))
     private readonly sellerService: SellerService,
   ) {}
 

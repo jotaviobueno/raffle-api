@@ -5,9 +5,9 @@ import {
   UpdatePaymentMethodDto,
 } from 'src/domain/dtos';
 import {
-  PaymentGatewayConfigEntity,
   PaymentMethodEntity,
   QueryBuilderEntity,
+  SellerGatewayConfigEntity,
 } from 'src/domain/entities';
 
 @Injectable()
@@ -22,20 +22,6 @@ export class PaymentMethodRepository extends RepositoryFactory<
 
   findAll(query: QueryBuilderEntity): Promise<PaymentMethodEntity[]> {
     return this.prismaService.paymentMethod.findMany(query);
-  }
-
-  findByIdAndReturnRelations(id: string): Promise<
-    | (PaymentMethodEntity & {
-        paymentGatewayConfig: PaymentGatewayConfigEntity;
-      })
-    | null
-  > {
-    return this.prismaService.paymentMethod.findFirst({
-      where: { id, deletedAt: null },
-      include: {
-        paymentGatewayConfig: true,
-      },
-    });
   }
 
   findById(id: string): Promise<PaymentMethodEntity | null> {

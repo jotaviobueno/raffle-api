@@ -19,5 +19,11 @@ export class CreateSellerDto {
 
   @IsUUID()
   @IsNotEmpty()
+  @ApiProperty()
   themeId: string;
+
+  @IsNotEmpty()
+  @IsUUID()
+  @ApiProperty()
+  addressId: string;
 }

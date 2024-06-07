@@ -10,8 +10,8 @@ import {
 @Injectable()
 export class SellerRepository extends RepositoryFactory<
   SellerEntity,
-  CreateSellerDto & { logo: string },
-  UpdateSellerDto & { logo?: string }
+  Omit<CreateSellerDto & { logo: string }, 'addressId'>,
+  Omit<UpdateSellerDto & { logo?: string }, 'addressId'>
 > {
   constructor() {
     super('seller');

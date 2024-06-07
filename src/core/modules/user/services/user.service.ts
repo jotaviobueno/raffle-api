@@ -39,6 +39,12 @@ export class UserService
   }: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
     switch (code) {
       case 'CUSTOMER':
+        if (dto.incomeValue)
+          throw new HttpException(
+            'Not possible to create CUSTOMER with incomeValue',
+            HttpStatus.BAD_REQUEST,
+          );
+
         if (dto.password)
           throw new HttpException(
             'Not possible to create CUSTOMER with password',
@@ -65,6 +71,18 @@ export class UserService
 
         return customer;
       case 'USER':
+        if (!dto.birthDate)
+          throw new HttpException(
+            'birth date is not sent',
+            HttpStatus.BAD_REQUEST,
+          );
+
+        if (!dto.incomeValue)
+          throw new HttpException(
+            'Income value is not sent',
+            HttpStatus.BAD_REQUEST,
+          );
+
         if (!dto.password)
           throw new HttpException(
             'Not possible to create USER without password',

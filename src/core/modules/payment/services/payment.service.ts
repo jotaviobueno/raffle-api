@@ -1,26 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { AsaasGateway } from '../../asaas/asaas.gateway';
 import { CartWithRelationsEntity } from 'src/domain/entities';
-import { PaymentMethodService } from './payment-method.service';
 import { CreateCheckoutDto } from 'src/domain/dtos';
+import { SellerGatewayConfigService } from '../../gateway/services/seller-gateway-config.service';
 
 @Injectable()
 export class PaymentService {
   constructor(
     private readonly asaasGateway: AsaasGateway,
-    private readonly paymentMethodService: PaymentMethodService,
+    private readonly sellerGatewayConfigService: SellerGatewayConfigService,
   ) {}
 
   async process(data: {
     cart: CartWithRelationsEntity;
     dto: CreateCheckoutDto;
   }) {
-    const paymentMethod =
-      await this.paymentMethodService.findByIdAndReturnRelations(
-        data.cart.cartPayment.paymentMethod.id,
-      );
+    const sellerGatewayConfig =
+      await this.sellerGatewayConfigService.findBySellerId(data.cart.seller.id);
 
-    this.asaasGateway.setConfig(paymentMethod.paymentGatewayConfig.config);
+    this.asaasGateway.setConfig(sellerGatewayConfig.config);
 
     const response = await this.asaasGateway.process(data);
 

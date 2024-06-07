@@ -18,6 +18,8 @@ export const environment = {
   ASAAS_INTEREST: process.env.ASAAS_INTEREST,
   ASAAS_FINE: process.env.ASAAS_FINE,
   ASAAS_ACCESS_TOKEN: process.env.ASAAS_ACCESS_TOKEN,
+  ASSAS_WARNING_EMAIL: process.env.ASSAS_WARNING_EMAIL,
+  ASSAS_WEBHOOK_URL: process.env.ASSAS_WEBHOOK_URL,
   //
   SMTP_FROM_NAME: process.env.SMTP_FROM_NAME,
   SMTP_FROM_EMAIL: process.env.SMTP_FROM_EMAIL,

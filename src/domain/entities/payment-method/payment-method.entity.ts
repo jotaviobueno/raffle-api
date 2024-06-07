@@ -23,8 +23,8 @@ export class PaymentMethodEntity implements PaymentMethod {
   @ApiProperty({ type: Number })
   isActive: boolean;
 
-  @ApiProperty({ nullable: true })
-  paymentGatewayConfigId: string | null;
+  @ApiProperty()
+  gatewayId: string;
 
   @ApiProperty({ type: Date })
   createdAt: Date;

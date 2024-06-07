@@ -35,3 +35,4 @@ export * from './ticket-history';
 export * from './plan';
 export * from './plan-cycle';
 export * from './file';
+export * from './seller-gateway-config';

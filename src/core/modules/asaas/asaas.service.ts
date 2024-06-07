@@ -4,17 +4,19 @@ import { environment } from 'src/config';
 import {
   CreateAsaasCustomerDto,
   CreateAsaasPaymentDto,
+  CreateSubAccountDto,
   UpdateAsaasCustomerDto,
 } from 'src/domain/dtos';
 import {
   AsaasCustomerEntity,
   AsaasPaymentResponseEntity,
+  AssasSubcAccountEntity,
 } from 'src/domain/entities';
 
 @Injectable()
 export class AsaasService {
   private isProduction = environment.NODE_ENV === 'production';
-  private accessToken: string;
+  private accessToken: string = environment.ASAAS_ACCESS_TOKEN;
   private interest = 0;
   private fine = 0;
 
@@ -43,6 +45,26 @@ export class AsaasService {
       maxBodyLength: Infinity,
       baseURL: 'https://sandbox.asaas.com/api/v3/',
     });
+  }
+
+  public async createSubAccount(
+    subAccount: CreateSubAccountDto,
+  ): Promise<AssasSubcAccountEntity> {
+    try {
+      const { data } = await this.setup().post<AssasSubcAccountEntity>(
+        '/accounts',
+        { ...subAccount },
+      );
+
+      return data;
+    } catch (e) {
+      Logger.error(
+        'FAILED TO CREATE SUB ACCOUNT (ASAAS)',
+        JSON.stringify(e.response.data),
+      );
+
+      throw e;
+    }
   }
 
   public async createCustomer(

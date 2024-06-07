@@ -32,6 +32,8 @@ import { QuotasConsumer } from './consumers/quotas.consumer';
 import { QUEUES_ENUM } from 'src/common/enums';
 import { SellerDetailController } from './controllers/seller-detail.controller';
 import { SellerDetailService } from './services/seller-detail.service';
+import { AsaasModule } from '../asaas/asaas.module';
+import { GatewayModule } from '../gateway/gateway.module';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { SellerDetailService } from './services/seller-detail.service';
     BullModule.registerQueue({
       name: QUEUES_ENUM.QUOTAS,
     }),
+    AsaasModule,
+    GatewayModule,
   ],
   controllers: [
     SellerController,

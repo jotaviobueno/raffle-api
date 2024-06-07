@@ -19,3 +19,31 @@ export class CreateAsaasCustomerDto {
   groupName?: string;
   company?: string;
 }
+
+export class CreateSubAccountDto {
+  name: string;
+  email: string;
+  cpfCnpj: string;
+  loginEmail?: string;
+  birthDate?: Date;
+  companyType?: 'MEI' | 'LIMITED' | 'ASSOCIATION' | 'INDIVIDUAL';
+  phone?: string;
+  site?: string;
+  mobilePhone: string;
+  incomeValue: number;
+  address: string;
+  addressNumber: string;
+  complement?: string;
+  province: string;
+  postalCode: string;
+  webhooks: {
+    name?: string;
+    url: string;
+    email: string;
+    apiVersion: 2 | 3;
+    enabled: boolean;
+    interrupted: boolean;
+    events: string[];
+    sendType: 'SEQUENTIALLY' | 'NON_SEQUENTIALLY';
+  }[];
+}

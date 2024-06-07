@@ -435,7 +435,7 @@ export class OrderService
                     return data;
                   },
                 },
-                paymentMethodId: order.orderPayment.paymentMethodId,
+                sellerId: order.seller.id,
               },
             },
             ...query,

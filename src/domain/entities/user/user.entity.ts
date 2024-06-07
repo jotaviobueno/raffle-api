@@ -8,6 +8,9 @@ export class UserEntity implements User {
   @ApiProperty()
   mobilePhone: string;
 
+  @ApiProperty({ type: Number, nullable: true })
+  incomeValue: number | null;
+
   @ApiProperty()
   name: string;
 
@@ -27,6 +30,9 @@ export class UserEntity implements User {
 
   @ApiProperty({ nullable: true })
   document: string | null;
+
+  @ApiProperty({ type: Date, nullable: true })
+  birthDate: Date | null;
 
   @ApiProperty({ type: Date })
   createdAt: Date;
