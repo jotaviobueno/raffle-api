@@ -3,7 +3,7 @@ export enum ROLE_ENUM {
   DEV = 'DEV',
   CUSTOMER = 'CUSTOMER',
   USER = 'USER',
-  PLAN_1 = 'PLAN_1',
+  PLAN = 'PLAN',
 }
 
 export enum PUBLIC_ROLE_ENUM {

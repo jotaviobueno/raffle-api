@@ -2,31 +2,23 @@ import { PrismaClient } from '@prisma/client';
 import { seedCountries } from './country/seed-countries';
 import { seedRoles } from './role/seed-roles';
 import { seedOrderStatus } from './order-status/seed-order-status';
-import { seedPaymentMethod } from './payment-method/seed-payment-method';
 import { seedTicketStatus } from './ticket-status/seed-ticket-status';
 import { seedPlanCycle } from './plan-cycle/seed-plan-cycle';
-import { seedOrderType } from './order-type/seed-order-type';
 import { seedThemes } from './theme/seed-themes';
+import { seedGateway } from './gateway/seed-gateway';
+import { seedPlan } from './plan/seed-plan';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  return prisma.$transaction(
-    async (tx) => {
-      await seedCountries(tx);
-      await seedRoles(tx);
-      await seedOrderStatus(tx);
-      await seedPaymentMethod(tx);
-      await seedTicketStatus(tx);
-      await seedPlanCycle(tx);
-      await seedOrderType(tx);
-      await seedThemes(tx);
-    },
-    {
-      maxWait: 20000, // default: 2000
-      timeout: 50000, // default: 5000
-    },
-  );
+  await seedCountries();
+  await seedRoles();
+  await seedOrderStatus();
+  await seedGateway();
+  await seedTicketStatus();
+  await seedPlanCycle();
+  await seedThemes();
+  await seedPlan();
 }
 
 main()
@@ -37,4 +29,5 @@ main()
     console.error(e);
     await prisma.$disconnect();
     process.exit(1);
-  });
+  })
+  .finally(async () => await prisma.$disconnect());

@@ -5,12 +5,16 @@ import {
   CreateAsaasCustomerDto,
   CreateAsaasPaymentDto,
   CreateAsaasSubAccountDto,
+  CreateAsaasSubscriptionDto,
   UpdateAsaasCustomerDto,
 } from 'src/domain/dtos';
 import {
+  AsaasBankSlipEntity,
   AsaasCustomerEntity,
-  AsaasPaymentResponseEntity,
+  AsaasPaymentEntity,
+  AsaasPixEntity,
   AsaasSubAccountEntity,
+  AsaasSubscriptionEntity,
 } from 'src/domain/entities';
 
 @Injectable()
@@ -87,9 +91,9 @@ export class AsaasService {
 
   public async preAuthorization(
     paymentId: string,
-  ): Promise<AsaasPaymentResponseEntity> {
+  ): Promise<AsaasPaymentEntity> {
     try {
-      const { data } = await this.setup().post<AsaasPaymentResponseEntity>(
+      const { data } = await this.setup().post<AsaasPaymentEntity>(
         `/payments/${paymentId}/captureAuthorized`,
       );
 
@@ -125,11 +129,31 @@ export class AsaasService {
     }
   }
 
+  async createSubscription(
+    dto: CreateAsaasSubscriptionDto,
+  ): Promise<AsaasSubscriptionEntity> {
+    try {
+      const { data } = await this.setup().post<AsaasSubscriptionEntity>(
+        '/subscriptions',
+        dto,
+      );
+
+      return data;
+    } catch (e) {
+      Logger.error(
+        'FAILED TO CREATE SUBSCRIPTION (ASAAS)',
+        JSON.stringify(e.response.data),
+      );
+
+      throw e;
+    }
+  }
+
   public async createPayment(
     dto: CreateAsaasPaymentDto,
-  ): Promise<AsaasPaymentResponseEntity> {
+  ): Promise<AsaasPaymentEntity> {
     try {
-      const { data } = await this.setup().post<AsaasPaymentResponseEntity>(
+      const { data } = await this.setup().post<AsaasPaymentEntity>(
         '/payments/',
         {
           ...dto,
@@ -149,7 +173,7 @@ export class AsaasService {
     }
   }
 
-  public async getPixById(id: string) {
+  public async getPixById(id: string): Promise<AsaasPixEntity> {
     try {
       const { data } = await this.setup().get(`/payments/${id}/pixQrCode`);
 
@@ -164,22 +188,7 @@ export class AsaasService {
     }
   }
 
-  public async getStatusByPaymentId(paymentId: string) {
-    try {
-      const { data } = await this.setup().get(`/payments/${paymentId}/status`);
-
-      return data;
-    } catch (e) {
-      Logger.error(
-        'FAILED TO GET STATUS BY PAYMENT ID (ASAAS)',
-        e.response.data,
-      );
-
-      throw e;
-    }
-  }
-
-  public async getBankSlip(id: string) {
+  public async getBankSlip(id: string): Promise<AsaasBankSlipEntity> {
     try {
       const { data } = await this.setup().get(
         `/payments/${id}/identificationField`,

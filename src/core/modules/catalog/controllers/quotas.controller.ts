@@ -31,7 +31,7 @@ import { ApiOkFindAllResult } from 'src/common/decorators';
 @Controller('quotas')
 @ApiTags('quotas')
 @UseGuards(RoleGuard)
-@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN)
 @ApiBearerAuth('defaultBearerAuth')
 export class QuotasController {
   constructor(private readonly quotasService: QuotasService) {}

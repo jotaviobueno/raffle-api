@@ -17,6 +17,7 @@ import { FinanceModule } from './core/modules/finance/finance.module';
 import { BullModule } from '@nestjs/bull';
 import { environment } from './config';
 import { GatewayModule } from './core/modules/gateway/gateway.module';
+import { PlanModule } from './core/modules/plan/plan.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { GatewayModule } from './core/modules/gateway/gateway.module';
     MarketingModule,
     FinanceModule,
     SupportModule,
+    PlanModule,
   ],
   providers: [
     {

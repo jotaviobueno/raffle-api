@@ -16,7 +16,7 @@ import { ThemeService } from '../services/theme.service';
 @Controller('theme')
 @ApiTags('theme')
 @UseGuards(RoleGuard)
-@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN)
 @ApiBearerAuth('defaultBearerAuth')
 export class ThemeController {
   constructor(private readonly themeService: ThemeService) {}

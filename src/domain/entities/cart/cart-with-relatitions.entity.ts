@@ -64,6 +64,12 @@ export const cartQueryWithRelations = {
     },
     include: {
       raffle: true,
+      plan: {
+        include: {
+          planCycle: true,
+          rolePlans: true,
+        },
+      },
     },
   },
   cartCoupons: {

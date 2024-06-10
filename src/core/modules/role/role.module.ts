@@ -7,10 +7,13 @@ import { RoleRepository } from './repositories/role.repository';
 import { UserRoleController } from './controllers/user-role.controller';
 import { UserRoleRepository } from './repositories/user-role.repository';
 import { UserRoleService } from './services/user-role.service';
+import { UserRoleConsumer } from './consumers/user-role.consumer';
+import { GatewayModule } from '../gateway/gateway.module';
+import { TerminusModule } from '@nestjs/terminus';
 
 @Global()
 @Module({
-  imports: [forwardRef(() => UserModule)],
+  imports: [forwardRef(() => UserModule), GatewayModule, TerminusModule],
   controllers: [RoleController, UserRoleController],
   providers: [
     RoleGuard,
@@ -18,6 +21,7 @@ import { UserRoleService } from './services/user-role.service';
     RoleRepository,
     UserRoleRepository,
     UserRoleService,
+    UserRoleConsumer,
   ],
   exports: [RoleGuard, RoleService, UserRoleService],
 })

@@ -38,7 +38,7 @@ import { TicketService } from '../services/ticket.service';
 @Controller('ticket')
 @ApiTags('ticket')
 @UseGuards(RoleGuard)
-@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN)
 @ApiBearerAuth('defaultBearerAuth')
 export class TicketController {
   constructor(private readonly ticketService: TicketService) {}

@@ -1,4 +1,5 @@
 export enum QUEUES_ENUM {
   QUOTAS = 'QUOTAS',
   EMAIL = 'EMAIL',
+  USER_ROLE = 'USER_ROLE',
 }

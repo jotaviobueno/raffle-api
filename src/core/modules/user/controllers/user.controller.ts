@@ -21,7 +21,7 @@ import { RoleGuard } from '../../role/guards';
 
 @Controller('user')
 @ApiTags('user')
-@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN)
 @UseGuards(RoleGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}

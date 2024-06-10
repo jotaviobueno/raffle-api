@@ -25,6 +25,6 @@ interface SubAccountWebhookEntity {
   apiVersion: 2 | 3;
   enabled: boolean;
   interrupted: boolean;
-  authToken: string;
+  authToken?: string;
   events: string[];
 }

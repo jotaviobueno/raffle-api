@@ -17,9 +17,16 @@ import { CartCouponController } from './controllers/cart-coupon.controller';
 import { CartCouponService } from './services/cart-coupon.service';
 import { CartCouponRepository } from './repositories/cart-coupon.repository';
 import { MarketingModule } from '../marketing/marketing.module';
+import { PlanModule } from '../plan/plan.module';
 
 @Module({
-  imports: [CatalogModule, UserModule, PaymentModule, MarketingModule],
+  imports: [
+    CatalogModule,
+    UserModule,
+    PaymentModule,
+    MarketingModule,
+    PlanModule,
+  ],
   controllers: [
     CartController,
     CartItemController,

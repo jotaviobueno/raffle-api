@@ -1,5 +1,7 @@
-export interface AsaasCustomerEntity {
-  object: string;
+import { AsaasBaseEntity } from '../base-entity';
+
+export interface AsaasCustomerEntity
+  extends AsaasBaseEntity<AsaasCustomerEntity> {
   id: string;
   dateCreated: string;
   name: string;

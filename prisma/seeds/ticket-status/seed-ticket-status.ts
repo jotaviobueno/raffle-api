@@ -1,12 +1,16 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { data } from './data';
-import { DefaultArgs } from '@prisma/client/runtime/library';
 
-export async function seedTicketStatus(
-  tx: Omit<
-    PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
-  >,
-) {
-  await tx.ticketStatus.createMany({ data });
+const prisma = new PrismaClient();
+
+export async function seedTicketStatus() {
+  return prisma.$transaction(
+    async (tx) => {
+      await tx.ticketStatus.createMany({ data });
+    },
+    {
+      maxWait: 20000, // default: 2000
+      timeout: 50000, // default: 5000
+    },
+  );
 }

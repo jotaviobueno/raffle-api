@@ -29,7 +29,7 @@ import { RaffleCategoryEntity } from 'src/domain/entities';
 @Controller('raffle-category')
 @ApiTags('raffle-category')
 @UseGuards(RoleGuard)
-@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN)
 @ApiBearerAuth('defaultBearerAuth')
 export class RaffleCategoryController {
   constructor(private readonly raffleCategoryService: RaffleCategoryService) {}

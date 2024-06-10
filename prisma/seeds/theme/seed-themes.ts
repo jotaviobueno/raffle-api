@@ -1,14 +1,18 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { data } from './data';
-import { DefaultArgs } from '@prisma/client/runtime/library';
 
-export async function seedThemes(
-  tx: Omit<
-    PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
-  >,
-) {
-  await tx.theme.createMany({
-    data: data.map((code) => ({ code, deletedAt: null })),
-  });
+const prisma = new PrismaClient();
+
+export async function seedThemes() {
+  return prisma.$transaction(
+    async (tx) => {
+      await tx.theme.createMany({
+        data: data.map((code) => ({ code, deletedAt: null })),
+      });
+    },
+    {
+      maxWait: 20000, // default: 2000
+      timeout: 50000, // default: 5000
+    },
+  );
 }

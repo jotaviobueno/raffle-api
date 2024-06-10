@@ -57,4 +57,10 @@ export class CreateUserDto {
   @IsOptional()
   @ApiProperty({ nullable: true, required: false })
   sellerId?: string;
+
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty()
+  @ApiProperty({ nullable: true, required: false })
+  incomeValue?: string;
 }

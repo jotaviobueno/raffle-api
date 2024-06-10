@@ -1,5 +1,5 @@
 export class AsaasSubAccountEntity {
-  object: string;
+  object: 'sub-account';
   id: string;
   name: string;
   email: string;

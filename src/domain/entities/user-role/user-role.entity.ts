@@ -11,6 +11,9 @@ export class UserRoleEntity implements UserRole {
   @ApiProperty()
   roleId: string;
 
+  @ApiProperty({ type: Date, nullable: true })
+  expiresAt: Date | null;
+
   @ApiProperty({ type: Date })
   createdAt: Date;
 

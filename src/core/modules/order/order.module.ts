@@ -17,6 +17,7 @@ import { QUEUES_ENUM } from 'src/common/enums';
     BullModule.registerQueue(
       { name: QUEUES_ENUM.QUOTAS },
       { name: QUEUES_ENUM.EMAIL },
+      { name: QUEUES_ENUM.USER_ROLE },
     ),
   ],
   controllers: [OrderController, OrderStatusController],

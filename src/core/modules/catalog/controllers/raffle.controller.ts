@@ -39,7 +39,7 @@ import { ApiOkFindAllResult } from 'src/common/decorators';
 @Controller('raffle')
 @ApiTags('raffle')
 @UseGuards(RoleGuard)
-@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN)
 @ApiBearerAuth('defaultBearerAuth')
 export class ProductController {
   constructor(private readonly raffleService: RaffleService) {}

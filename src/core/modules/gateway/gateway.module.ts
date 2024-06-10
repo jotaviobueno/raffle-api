@@ -5,10 +5,20 @@ import { GatewayService } from './services/gateway.service';
 import { GatewayRepository } from './repositories/gateway.repository';
 import { GatewayConfigService } from './services/gateway-config.service';
 import { GatewayConfigRepository } from './repositories/gateway-config.repository';
+import {
+  AsaasProcessOrderByBankSlipUseCase,
+  AsaasProcessOrderByCreditCardUseCase,
+  AsaasProcessOrderByPixUseCase,
+} from './gateways/use-cases/order';
+import {
+  AsaasProcessSubscriptionByPixUseCase,
+  AsaasProcessSubscriptionByCreditCardUseCase,
+  AsaasProcessSubscriptionByBillingTypeUseCase,
+} from './gateways/use-cases/subscription';
+import { AsaasHandlerUseCase } from './gateways/use-cases/handler';
+import { CreateAsaasCustomerUseCase } from './gateways/use-cases/customer';
 
 @Module({
-  imports: [],
-  controllers: [],
   providers: [
     AsaasService,
     AsaasGateway,
@@ -16,6 +26,14 @@ import { GatewayConfigRepository } from './repositories/gateway-config.repositor
     GatewayRepository,
     GatewayConfigService,
     GatewayConfigRepository,
+    AsaasProcessOrderByBankSlipUseCase,
+    AsaasProcessOrderByCreditCardUseCase,
+    AsaasProcessOrderByPixUseCase,
+    AsaasProcessSubscriptionByPixUseCase,
+    AsaasProcessSubscriptionByCreditCardUseCase,
+    AsaasProcessSubscriptionByBillingTypeUseCase,
+    CreateAsaasCustomerUseCase,
+    AsaasHandlerUseCase,
   ],
   exports: [AsaasService, AsaasGateway, GatewayService, GatewayConfigService],
 })

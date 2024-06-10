@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsUUID, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsUUID, Min } from 'class-validator';
 
 export class CreateCartItemDto {
   @IsInt()
@@ -10,8 +10,15 @@ export class CreateCartItemDto {
 
   @IsUUID()
   @IsNotEmpty()
+  @IsOptional()
   @ApiProperty()
-  raffleId: string;
+  raffleId?: string;
+
+  @IsUUID()
+  @IsNotEmpty()
+  @IsOptional()
+  @ApiProperty()
+  planId?: string;
 
   @IsUUID()
   @IsNotEmpty()

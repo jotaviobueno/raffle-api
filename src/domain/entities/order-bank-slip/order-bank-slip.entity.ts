@@ -6,8 +6,6 @@ export class OrderBankSlipEntity implements OrderBankSlip {
   ourNumber: string;
   identificationField: string;
   barCode: string;
-  bankSlipUrl: string;
-  expirationAt: Date;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;

@@ -20,6 +20,9 @@ export class UserEntity implements User {
   password: string;
 
   @ApiProperty({ nullable: true })
+  incomeValue: string | null;
+
+  @ApiProperty({ nullable: true })
   phone: string | null;
 
   @ApiProperty()

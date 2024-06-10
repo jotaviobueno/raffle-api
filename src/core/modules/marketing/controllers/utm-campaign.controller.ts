@@ -37,7 +37,7 @@ import { ApiOkFindAllResult } from 'src/common/decorators';
 @Controller('utm-campaign')
 @ApiTags('utm-campaign')
 @UseGuards(RoleGuard)
-@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN)
 @ApiBearerAuth('defaultBearerAuth')
 export class UtmCampaignController {
   constructor(private readonly utmCampaignService: UtmCampaignService) {}

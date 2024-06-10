@@ -38,7 +38,7 @@ import { ApiOkFindAllResult } from 'src/common/decorators';
 @Controller('award')
 @ApiTags('award')
 @UseGuards(RoleGuard)
-@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN)
 @ApiBearerAuth('defaultBearerAuth')
 export class AwardController {
   constructor(private readonly awardService: AwardService) {}

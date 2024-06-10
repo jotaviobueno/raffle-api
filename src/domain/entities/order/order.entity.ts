@@ -9,10 +9,7 @@ export class OrderEntity implements Order {
   sellerId: string;
 
   @ApiProperty({ type: Number, nullable: true })
-  invoiceNumber: number | null;
-
-  @ApiProperty({ nullable: true })
-  orderTypeId: string | null;
+  externalReference: string | null;
 
   @ApiProperty({ nullable: true })
   comment: string | null;
@@ -25,9 +22,6 @@ export class OrderEntity implements Order {
 
   @ApiProperty()
   cartId: string;
-
-  @ApiProperty({ type: Date, nullable: true })
-  dueDate: Date | null;
 
   @ApiProperty({ nullable: true })
   orderStatusId: string | null;

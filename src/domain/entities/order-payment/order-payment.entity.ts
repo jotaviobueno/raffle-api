@@ -23,8 +23,8 @@ export class OrderPaymentEntity implements OrderPayment {
   @ApiProperty({ nullable: true })
   receiptUrl: string | null;
 
-  @ApiProperty()
-  invoiceUrl: string;
+  @ApiProperty({ nullable: true })
+  paymentLink: string | null;
 
   @ApiProperty()
   addressId: string;

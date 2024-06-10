@@ -26,12 +26,12 @@ export class OrderRepository extends RepositoryFactory<
     });
   }
 
-  findByInvoiceNumber(
-    invoiceNumber: number,
+  findByExternalReference(
+    externalReference: string,
   ): Promise<OrderWithRelationsEntity> {
     return this.prismaService.order.findFirst({
       where: {
-        invoiceNumber,
+        externalReference,
         deletedAt: null,
       },
       include: {

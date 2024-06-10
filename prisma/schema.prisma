@@ -19,6 +19,7 @@ model User {
   name        String
   document    String?
   email       String
+  incomeValue String?    @map("income_value")
   phone       String?
   mobilePhone String     @map("mobile_phone")
   password    String?
@@ -45,8 +46,10 @@ model User {
 
 enum USER_TYPE {
   PF
-  PJ
-  E
+  MEI
+  LIMITED
+  INDIVIDUAL
+  ASSOCIATION
 }
 
 model CustomerSeller {
@@ -95,6 +98,7 @@ model UserRole {
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
+  expiresAt DateTime? @default(dbgenerated("NULL")) @map("expires_at") @db.Timestamp
 
   user User @relation(fields: [userId], references: [id])
   role Role @relation(fields: [roleId], references: [id])
@@ -391,17 +395,15 @@ model RaffleCoupon {
 }
 
 model Order {
-  id            String  @id @default(uuid())
-  sellerId      String  @map("seller_id")
-  invoiceNumber Int?    @map("invoice_number")
-  comment       String?
-  ip            String?
-  orderTypeId   String? @map("order_type_id")
-  userAgent     String? @map("user_agent")
-  orderStatusId String? @map("order_status_id")
-  cartId        String  @map("cart_id")
+  id                String  @id @default(uuid())
+  sellerId          String  @map("seller_id")
+  externalReference String? @map("external_reference")
+  comment           String?
+  ip                String?
+  userAgent         String? @map("user_agent")
+  orderStatusId     String? @map("order_status_id")
+  cartId            String  @map("cart_id")
 
-  dueDate   DateTime? @map("due_date") @db.Timestamp
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
   deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
@@ -417,7 +419,6 @@ model Order {
   finance        Finance?
   gatewayEvents  GatewayEvent[]
   orderCustomer  OrderCustomer?
-  orderType      OrderType?     @relation(fields: [orderTypeId], references: [id])
 
   @@map("order")
 }
@@ -487,12 +488,10 @@ model OrderBankSlip {
   ourNumber           String @map("our_number")
   identificationField String @map("identification_field")
   barCode             String @map("bar_code")
-  bankSlipUrl         String @map("bank_slip_url")
 
-  expirationAt DateTime  @map("expiration_at") @db.Timestamp
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt    DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   orderPayment OrderPayment @relation(fields: [orderPaymentId], references: [id])
 
@@ -647,7 +646,7 @@ model OrderPayment {
   addressId        String  @map("address_id")
   gatewayPaymentId String? @map("gateway_payment_id")
   receiptUrl       String? @map("receipt_url")
-  invoiceUrl       String  @map("invoice_url")
+  paymentLink      String? @map("payment_link")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
@@ -953,6 +952,7 @@ model OrderCustomer {
   document    String
   phone       String?
   mobilePhone String  @map("mobile_phone")
+  incomeValue String? @map("income_value")
 
   customerId String @map("customer_id")
   orderId    String @unique @map("order_id")
@@ -968,10 +968,11 @@ model OrderCustomer {
 }
 
 model Plan {
-  id          String @id @default(uuid())
-  title       String
-  description String
-  planCycleId String @map("plan_cycle_id")
+  id               String @id @default(uuid())
+  title            String
+  shortDescription String @map("short_description")
+  description      String
+  planCycleId      String @map("plan_cycle_id")
 
   price Float
   tax   Float @default(0)
@@ -1018,20 +1019,6 @@ model PlanCycle {
   @@map("plan_cycle")
 }
 
-model OrderType {
-  id   String @id @default(uuid())
-  code String
-  name String
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
-
-  orders Order[]
-
-  @@map("order_type")
-}
-
 model Gateway {
   id   String @id @default(uuid())
   name String
@@ -1042,7 +1029,7 @@ model Gateway {
   deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
   paymentMethods PaymentMethod[]
-  gatewayConfig  GatewayConfig[]
+  gatewayConfigs GatewayConfig[]
   gatewayEvents  GatewayEvent[]
 
   @@map("gateway")

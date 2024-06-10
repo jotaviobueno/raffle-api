@@ -15,7 +15,7 @@ import { CustomerSellerService } from '../services/customer-seller.service';
 
 @Controller('customer-seller')
 @ApiTags('customer-seller')
-@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN)
 @UseGuards(RoleGuard)
 export class CustomerSellerController {
   constructor(private readonly customerSellerService: CustomerSellerService) {}

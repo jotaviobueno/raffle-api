@@ -9,6 +9,9 @@ export class PlanEntity implements Plan {
   title: string;
 
   @ApiProperty()
+  shortDescription: string;
+
+  @ApiProperty()
   description: string;
 
   @ApiProperty()

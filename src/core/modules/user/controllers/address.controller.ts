@@ -17,7 +17,7 @@ import { RoleGuard } from '../../role/guards';
 
 @Controller('address')
 @ApiTags('address')
-@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN_1)
+@Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN)
 @UseGuards(RoleGuard)
 export class AddressController {
   constructor(private readonly addressService: AddressService) {}

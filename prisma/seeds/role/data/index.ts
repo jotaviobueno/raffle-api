@@ -81,6 +81,11 @@ const ALL_PERMISSION = [
   'CAN_CREATE_PLAN',
   'CAN_UPDATE_PLAN',
   'CAN_DELETE_PLAN',
+  //
+  'CAN_CREATE_PLAN_CYCLE',
+  'CAN_UPDATE_PLAN_CYCLE',
+  'CAN_DELETE_PLAN_CYCLE',
+  'CAN_READ_PLAN_CYCLE',
 ];
 
 export const data = [
@@ -95,8 +100,8 @@ export const data = [
     permissions: ALL_PERMISSION,
   },
   {
-    name: 'Plano Simples',
-    code: 'PLAN_1',
+    name: 'Plano',
+    code: 'PLAN',
     permissions: [
       'CAN_READ_USER',
       'CAN_UPDATE_USER',

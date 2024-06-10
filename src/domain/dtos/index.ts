@@ -10,7 +10,6 @@ export * from './user-role';
 export * from './award';
 export * from './social-media';
 export * from './raffle-category';
-export * from './payment';
 export * from './order';
 export * from './cart';
 export * from './cart-item';

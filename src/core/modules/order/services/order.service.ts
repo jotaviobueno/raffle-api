@@ -5,6 +5,7 @@ import {
   JobQuotasDto,
   SearchOrderDto,
   SendEmailDto,
+  UserRoleConsumerDto,
 } from 'src/domain/dtos';
 import {
   FindAllResultEntity,
@@ -42,6 +43,8 @@ export class OrderService
     private readonly quotasQueue: Queue<JobQuotasDto>,
     @InjectQueue(QUEUES_ENUM.EMAIL)
     private readonly emailQueue: Queue<SendEmailDto>,
+    @InjectQueue(QUEUES_ENUM.USER_ROLE)
+    private readonly userRoleQueue: Queue<UserRoleConsumerDto>,
   ) {}
 
   async create(dto: CreateCheckoutDto): Promise<OrderWithRelationsEntity> {
@@ -72,26 +75,28 @@ export class OrderService
       );
 
     for (const item of cart.cartItems) {
-      if (
-        new Date() > item.raffle.drawDateAt ||
-        item.raffle.progressPercentage >= 100 ||
-        item.raffle.payeds >= item.raffle.totalNumbers ||
-        item.raffle.isFinished
-      )
-        throw new HttpException(
-          'Raffle has already been completed',
-          HttpStatus.UNPROCESSABLE_ENTITY,
-        );
+      if (item.raffleId) {
+        if (
+          new Date() > item.raffle.drawDateAt ||
+          item.raffle.progressPercentage >= 100 ||
+          item.raffle.payeds >= item.raffle.totalNumbers ||
+          item.raffle.isFinished
+        )
+          throw new HttpException(
+            'Raffle has already been completed',
+            HttpStatus.UNPROCESSABLE_ENTITY,
+          );
 
-      if (
-        ((item.raffle.payeds + item.quantity) / item.raffle.totalNumbers) *
-          100 >
-        100
-      )
-        throw new HttpException(
-          'You need to decrease your order quantity',
-          HttpStatus.UNPROCESSABLE_ENTITY,
-        );
+        if (
+          ((item.raffle.payeds + item.quantity) / item.raffle.totalNumbers) *
+            100 >
+          100
+        )
+          throw new HttpException(
+            'You need to decrease your order quantity',
+            HttpStatus.UNPROCESSABLE_ENTITY,
+          );
+      }
     }
 
     const orderStatus = await this.orderStatusService.findByCode(
@@ -104,10 +109,6 @@ export class OrderService
 
         const response = await this.paymentService.process({ dto, cart });
 
-        const orderType = await tx.orderType.findFirst({
-          where: { code: response?.data?.object },
-        });
-
         switch (cart.cartPayment.paymentMethod.code) {
           case 'pix':
             query = {
@@ -116,12 +117,12 @@ export class OrderService
                   addressId: cart.cartPayment.addressId,
                   method: cart.cartPayment.method,
                   paymentMethodId: cart.cartPayment.paymentMethodId,
-                  invoiceUrl: response.payment.invoiceUrl,
+                  paymentLink: response.data?.paymentLink,
                   orderPix: {
                     create: {
-                      copyPaste: response.data.payload,
-                      image: response.data.encodedImage,
-                      expiratAt: new Date(response.data.expirationDate),
+                      copyPaste: response.data.pix.payload,
+                      image: response.data.pix.encodedImage,
+                      expiratAt: new Date(response.data.pix.expirationDate),
                     },
                   },
                 },
@@ -133,9 +134,9 @@ export class OrderService
               orderPayment: {
                 create: {
                   addressId: cart.cartPayment.addressId,
-                  status: response.payment.status,
+                  status: response.data.status,
                   method: cart.cartPayment.method,
-                  invoiceUrl: response.payment.invoiceUrl,
+                  paymentLink: response.data.paymentLink,
                   paymentMethodId: cart.cartPayment.paymentMethodId,
                   orderCreditCard: {
                     create: {
@@ -144,7 +145,7 @@ export class OrderService
                       cvv: dto.cvv,
                       name: dto.holder,
                       expirationMonth: dto.expirationMonth,
-                      token: response.payment.creditCardToken,
+                      token: response.data?.creditCardToken,
                       expirationYear: dto.expirationYear,
                     },
                   },
@@ -159,14 +160,13 @@ export class OrderService
                   addressId: cart.cartPayment.addressId,
                   method: cart.cartPayment.method,
                   paymentMethodId: cart.cartPayment.paymentMethodId,
-                  invoiceUrl: response.payment.invoiceUrl,
+                  paymentLink: response.data.paymentLink,
                   orderBankSlip: {
                     create: {
-                      bankSlipUrl: response.payment.bankSlipUrl,
-                      ourNumber: response.payment.nossoNumero,
-                      expirationAt: new Date(response.payment.dueDate),
-                      identificationField: response?.data?.identificationField,
-                      barCode: response.data.barCode,
+                      ourNumber: response.data.bankSlip.nossoNumero,
+                      identificationField:
+                        response?.data?.bankSlip.identificationField,
+                      barCode: response.data.bankSlip.barCode,
                     },
                   },
                 },
@@ -178,11 +178,7 @@ export class OrderService
         const order = await tx.order.create({
           data: {
             ...query,
-            orderType: {
-              connect: { id: orderType.id },
-            },
-            invoiceNumber: +response.payment.invoiceNumber,
-            dueDate: new Date(response.payment.dueDate),
+            externalReference: response.data.id,
             ip: dto.ip,
             userAgent: dto.userAgent,
             orderCustomer: {
@@ -244,13 +240,20 @@ export class OrderService
             },
             orderItems: {
               createMany: {
-                data: cart.cartItems.map((cartItem) => ({
-                  price: cartItem.price,
-                  quantity: cartItem.quantity,
-                  raffleId: cartItem.raffleId,
-                  tax: cartItem.tax,
-                  total: cartItem.total,
-                })),
+                data: cart.cartItems.map((cartItem) => {
+                  const item: any = {};
+
+                  if (cartItem.raffleId) item.raffleId = cartItem.raffleId;
+                  if (cartItem.planId) item.planId = cartItem.planId;
+
+                  return {
+                    ...item,
+                    price: cartItem.price,
+                    quantity: cartItem.quantity,
+                    tax: cartItem.tax,
+                    total: cartItem.total,
+                  };
+                }),
               },
             },
           },
@@ -268,7 +271,7 @@ export class OrderService
             context: {
               name: cart.customer.name,
               raffles: order.orderItems.map((item) => ({
-                name: item.raffle.title,
+                name: item?.raffle?.title ? item.raffle.title : item.plan.title,
                 quantity: item.quantity,
                 total: item.total,
               })),
@@ -291,12 +294,13 @@ export class OrderService
     );
   }
 
+  // TODO:ARRUMAR ISSO PORQUE PODE HAVER RAFFLE E PLAN NO ITEMS
   async asaasPostback(data: AsaasEventDto) {
     const query = {};
 
     const orderStatus = await this.orderStatusService.findByCode(data.event);
 
-    const order = await this.findByInvoiceNumber(+data.payment.invoiceNumber);
+    const order = await this.findByExternalReference(data.payment.id);
 
     return this.prismaService.$transaction(
       async (tx) => {
@@ -349,37 +353,57 @@ export class OrderService
         if (data.event === ORDER_STATUS_ENUM.PAYMENT_CONFIRMED) {
           await Promise.all(
             order.orderItems.map(async (orderItem) => {
-              const data = {
-                progressPercentage:
-                  ((orderItem.raffle.payeds + orderItem.quantity) /
-                    orderItem.raffle.totalNumbers) *
-                  100,
-                payeds: {
-                  increment: orderItem.quantity,
-                },
-              };
-
-              await tx.raffle.update({
-                where: { id: orderItem.raffleId },
-                data: { ...data, isFinished: data.progressPercentage >= 100 },
-              });
-
-              await this.quotasQueue.add(
-                JOBS_ENUM.CREATE_MANY_QUOTAS_JOB,
-                {
-                  raffle: orderItem.raffle,
-                  dto: {
-                    raffleId: orderItem.raffle.id,
-                    customerId: order.orderCustomer.customerId,
-                    quantity: orderItem.quantity,
+              if (orderItem.raffleId) {
+                const data = {
+                  progressPercentage:
+                    ((orderItem.raffle.payeds + orderItem.quantity) /
+                      orderItem.raffle.totalNumbers) *
+                    100,
+                  payeds: {
+                    increment: orderItem.quantity,
                   },
-                },
-                {
-                  attempts: 3,
-                  removeOnFail: true,
-                  removeOnComplete: true,
-                },
-              );
+                };
+
+                await tx.raffle.update({
+                  where: { id: orderItem.raffleId },
+                  data: { ...data, isFinished: data.progressPercentage >= 100 },
+                });
+
+                await this.quotasQueue.add(
+                  JOBS_ENUM.CREATE_MANY_QUOTAS_JOB,
+                  {
+                    raffle: orderItem.raffle,
+                    dto: {
+                      raffleId: orderItem.raffle.id,
+                      customerId: order.orderCustomer.customerId,
+                      quantity: orderItem.quantity,
+                    },
+                  },
+                  {
+                    attempts: 3,
+                    removeOnFail: true,
+                    removeOnComplete: true,
+                  },
+                );
+              }
+
+              if (orderItem.planId) {
+                await this.userRoleQueue.add(
+                  JOBS_ENUM.ASSIGN_USER_ROLE_PLAN,
+                  {
+                    plans: order.orderItems.map((item) => {
+                      return item.plan;
+                    }),
+                    address: order.orderPayment.address,
+                    orderCustomer: order.orderCustomer,
+                  },
+                  {
+                    attempts: 3,
+                    removeOnFail: true,
+                    removeOnComplete: true,
+                  },
+                );
+              }
             }),
           );
 
@@ -436,6 +460,7 @@ export class OrderService
                   },
                 },
                 paymentMethodId: order.orderPayment.paymentMethodId,
+                gatewayId: order.orderPayment.paymentMethod.gatewayId,
               },
             },
             ...query,
@@ -449,10 +474,11 @@ export class OrderService
     );
   }
 
-  async findByInvoiceNumber(
-    invoiceNumber: number,
+  async findByExternalReference(
+    externalReference: string,
   ): Promise<OrderWithRelationsEntity> {
-    const order = await this.orderRepository.findByInvoiceNumber(invoiceNumber);
+    const order =
+      await this.orderRepository.findByExternalReference(externalReference);
 
     if (!order)
       throw new HttpException('Order not found', HttpStatus.NOT_FOUND);
