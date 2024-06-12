@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { AsaasService } from '../../../services/asaas.service';
+import { AsaasService } from '../../services/asaas.service';
 import { CreateCheckoutDto } from 'src/domain/dtos';
 import {
   CartWithRelationsEntity,
   AsaasCustomerEntity,
   AsaasGatewayEntity,
 } from 'src/domain/entities';
-import { getCycleDate } from 'src/common/utils';
+import { addMinutes } from 'date-fns';
+import { randomUUID } from 'crypto';
 
 @Injectable()
-export class AsaasProcessSubscriptionByCreditCardUseCase {
+export class AsaasProcessOrderByCreditCardUseCase {
   constructor(private readonly asaasService: AsaasService) {}
 
   public async execute(
@@ -17,18 +18,11 @@ export class AsaasProcessSubscriptionByCreditCardUseCase {
     customer: AsaasCustomerEntity,
     dto: CreateCheckoutDto,
   ): Promise<AsaasGatewayEntity> {
-    const subscription = await this.asaasService.createSubscription({
-      billingType: 'CREDIT_CARD',
+    const payment = await this.asaasService.createPayment({
       customer: customer.id,
-      cycle: cart.cartItems.find((item) => item.planId)?.plan?.planCycle?.code,
+      billingType: 'CREDIT_CARD',
       value: cart.cartTotal.total,
-      nextDueDate: getCycleDate(
-        cart.cartItems.find((item) => item.planId)?.plan?.planCycle?.code,
-      ),
-      endDate: new Date(),
-      maxPayments: 10,
-      externalReference: cart.cartItems.find((item) => item.planId)?.plan
-        ?.planCycle?.id,
+      dueDate: addMinutes(new Date(), 10),
       creditCard: {
         holderName: dto.holder,
         number: dto.number.replace(/\s/g, ''),
@@ -50,12 +44,9 @@ export class AsaasProcessSubscriptionByCreditCardUseCase {
         phone: cart.customer?.phone?.replace(/[\D+55]/g, ''),
       },
       remoteIp: dto.ip ? dto.ip : '',
+      externalReference: randomUUID(),
     });
 
-    return {
-      cart,
-      data: subscription,
-      customer,
-    };
+    return { cart, data: payment, customer };
   }
 }

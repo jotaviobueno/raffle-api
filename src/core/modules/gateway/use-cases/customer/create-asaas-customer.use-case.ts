@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { AsaasService } from '../../../services/asaas.service';
 import { AsaasGatewayDto } from 'src/domain/dtos';
 import { AsaasCustomerEntity } from 'src/domain/entities';
+import { randomUUID } from 'crypto';
+import { AsaasService } from '../../services/asaas.service';
 
 @Injectable()
 export class CreateAsaasCustomerUseCase {
@@ -18,7 +19,7 @@ export class CreateAsaasCustomerUseCase {
       name: data.cart.customer.name,
       province: data.cart.cartPayment.address.neighborhood,
       postalCode: data.cart.cartPayment.address.postcode,
-      externalReference: data.cart.customer.id,
+      externalReference: randomUUID(),
       notificationDisabled: true,
       address: data.cart.cartPayment.address.street,
     });

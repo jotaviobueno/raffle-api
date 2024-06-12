@@ -28,6 +28,9 @@ export class UserEntity implements User {
   @ApiProperty()
   avatar: string;
 
+  @ApiProperty({ type: Date, nullable: true })
+  birthDate: Date | null;
+
   @ApiProperty({ nullable: true })
   document: string | null;
 

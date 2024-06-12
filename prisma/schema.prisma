@@ -18,6 +18,7 @@ model User {
   type        USER_TYPE?
   name        String
   document    String?
+  birthDate   DateTime?  @map("birth_date") @db.Timestamp
   email       String
   incomeValue String?    @map("income_value")
   phone       String?
@@ -40,8 +41,43 @@ model User {
   tickets         Ticket[]
   orderCustomers  OrderCustomer[]
   gatewayConfig   GatewayConfig?
+  BankAccount     BankAccount[]
 
   @@map("user")
+}
+
+model BankAccount {
+  id           String  @id @default(uuid())
+  agency       String
+  account      String
+  accountDigit String
+  gatewayId    String?
+  userId       String  @map("user_id")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
+
+  gateway Gateway? @relation(fields: [gatewayId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
+
+  @@map("bank_account")
+}
+
+model GatewayFee {
+  id              String @id @default(uuid()) @db.Uuid
+  gatewayConfigId String @unique @map("gateway_config_id")
+  paymentMethodId String @map("payment_method_id")
+  fees            Json?
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
+
+  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  gatewayConfig GatewayConfig @relation(fields: [gatewayConfigId], references: [id])
+
+  @@map("gateway_fee")
 }
 
 enum USER_TYPE {
@@ -604,9 +640,6 @@ model PaymentMethod {
   instructions String
   isActive     Boolean @default(true) @map("is_active")
 
-  fee           Float @default(0)
-  feePercentage Float @default(0) @map("fee_percentage")
-
   gatewayId String @map("gateway_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
@@ -617,6 +650,7 @@ model PaymentMethod {
   cartPayments  CartPayment[]
   gatewayEvents GatewayEvent[]
   gateway       Gateway        @relation(fields: [gatewayId], references: [id])
+  gatewayFees   GatewayFee[]
 
   @@map("payment_method")
 }
@@ -631,8 +665,9 @@ model GatewayConfig {
   deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
   userId    String    @unique @map("user_id")
 
-  gateway Gateway @relation(fields: [gatewayId], references: [id])
-  user    User    @relation(fields: [userId], references: [id])
+  gateway     Gateway      @relation(fields: [gatewayId], references: [id])
+  user        User         @relation(fields: [userId], references: [id])
+  gatewayFees GatewayFee[]
 
   @@map("gateway_config")
 }
@@ -770,8 +805,6 @@ model CartTotal {
   discount       Float @default(0)
   discountManual Float @default(0) @map("discount_manual")
   shipping       Float @default(0)
-  fee            Float @default(0)
-  tax            Float @default(0)
   total          Float
 
   cartId String @unique @map("cart_id")
@@ -830,8 +863,6 @@ model FinanceTotal {
   discount       Float  @default(0)
   discountManual Float  @default(0) @map("discount_manual")
   shipping       Float  @default(0)
-  fee            Float  @default(0)
-  tax            Float  @default(0)
   total          Float
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
@@ -946,13 +977,14 @@ model TicketStatus {
 }
 
 model OrderCustomer {
-  id          String  @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   email       String
   document    String
   phone       String?
-  mobilePhone String  @map("mobile_phone")
-  incomeValue String? @map("income_value")
+  birthDate   DateTime? @map("birth_date") @db.Timestamp
+  mobilePhone String    @map("mobile_phone")
+  incomeValue String?   @map("income_value")
 
   customerId String @map("customer_id")
   orderId    String @unique @map("order_id")
@@ -1031,6 +1063,7 @@ model Gateway {
   paymentMethods PaymentMethod[]
   gatewayConfigs GatewayConfig[]
   gatewayEvents  GatewayEvent[]
+  BankAccount    BankAccount[]
 
   @@map("gateway")
 }

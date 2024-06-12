@@ -4,7 +4,6 @@ import { IS_PUBLIC_KEY } from '../../auth/decorators';
 import { ROLE_KEY } from '../decorators/role.decorator';
 import { UserWithRelationsEntity } from 'src/domain/entities';
 import { PERMISSION_KEY } from '../decorators';
-import { ROLE_ENUM } from 'src/common/enums';
 
 @Injectable()
 export class RoleGuard implements CanActivate {
@@ -36,12 +35,6 @@ export class RoleGuard implements CanActivate {
     let hasPermission = false;
 
     for (const userRole of user.userRoles) {
-      if (
-        userRole.role.code === ROLE_ENUM.ADMIN ||
-        userRole.role.code === ROLE_ENUM.DEV
-      )
-        hasPermission = true;
-
       if (requiredPermissions?.length >= 1)
         for (const { permission } of userRole.role.rolePermissions) {
           if (
@@ -55,7 +48,10 @@ export class RoleGuard implements CanActivate {
       if (
         requiredRoles?.length >= 1 &&
         requiredRoles.some(
-          (requiredRole) => requiredRole === userRole.role.code,
+          (requiredRole) =>
+            requiredRole === userRole.role.code &&
+            userRole.expiresAt &&
+            userRole.expiresAt >= new Date(),
         )
       )
         hasPermission = true;

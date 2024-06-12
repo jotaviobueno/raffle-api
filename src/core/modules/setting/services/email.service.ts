@@ -21,6 +21,5 @@ export class EmailService {
   //     },
   //   });
 
-  //   console.log(data);
   // }
 }

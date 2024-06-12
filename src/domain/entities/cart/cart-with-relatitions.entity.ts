@@ -20,6 +20,8 @@ export class CartWithRelationsEntity extends CartEntity {
       'createdAt',
       'updatedAt',
       'deletedAt',
+      'birthDate',
+      'incomeValue',
     ]),
   })
   customer: Pick<
@@ -34,6 +36,8 @@ export class CartWithRelationsEntity extends CartEntity {
     | 'updatedAt'
     | 'deletedAt'
     | 'avatar'
+    | 'birthDate'
+    | 'incomeValue'
   >;
 
   @ApiProperty({ type: CartTotalEntity, nullable: true })
@@ -93,8 +97,10 @@ export const cartQueryWithRelations = {
       document: true,
       email: true,
       createdAt: true,
+      birthDate: true,
       updatedAt: true,
       deletedAt: true,
+      incomeValue: true,
       avatar: true,
     },
   },

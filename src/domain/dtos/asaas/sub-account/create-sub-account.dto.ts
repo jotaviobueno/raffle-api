@@ -3,7 +3,7 @@ export class CreateAsaasSubAccountDto {
   email: string;
   loginEmail?: string;
   cpfCnpj: string;
-  bithDate?: Date;
+  birthDate?: Date;
   companyType?: 'MEI' | 'LIMITED' | 'INDIVIDUAL' | 'ASSOCIATION';
   phone?: string;
   mobilePhone: string;

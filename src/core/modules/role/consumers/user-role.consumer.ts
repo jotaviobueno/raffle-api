@@ -60,6 +60,9 @@ export class UserRoleConsumer {
             where: {
               code: 'asaas',
             },
+            include: {
+              paymentMethods: true,
+            },
           });
 
           const userAlreadyHaveGatewayConfig = await tx.gatewayConfig.findFirst(
@@ -79,17 +82,22 @@ export class UserRoleConsumer {
             addressNumber: data.address.number,
             complement: data.address.complement,
             cpfCnpj: data.orderCustomer.document,
-            mobilePhone: data.orderCustomer.mobilePhone,
-            phone: data.orderCustomer.phone,
+            mobilePhone: data.orderCustomer.mobilePhone?.replace(
+              /[\D+55]/g,
+              '',
+            ),
+            phone: data.orderCustomer.phone?.replace(/[\D+55]/g, ''),
             email: data.orderCustomer.email,
             name: data.orderCustomer.name,
             province: data.address.state.name,
+            birthDate: data.orderCustomer.birthDate,
+            // companyType,
             postalCode: data.address.postcode,
             incomeValue: data.orderCustomer.incomeValue,
             webhooks: [
               {
                 apiVersion: 3,
-                name: data.orderCustomer.name,
+                name: 'Eventos de pagamentos',
                 url: environment.ASSAS_WEBHOOK_URL,
                 events: [
                   'PAYMENT_CREATED',
@@ -125,11 +133,21 @@ export class UserRoleConsumer {
             ],
           });
 
-          await this.prismaService.gatewayConfig.create({
+          await tx.gatewayConfig.create({
             data: {
               config: {
                 toJSON() {
-                  return subAccount;
+                  return {
+                    id: subAccount.id,
+                    accountNumber: subAccount.accountNumber,
+                    bankSlip: {
+                      fine: 2,
+                      interest: 1,
+                    },
+                    walletId: subAccount.walletId,
+                    accessToken: subAccount.apiKey,
+                    $raw: subAccount,
+                  };
                 },
               },
               deletedAt: null,
@@ -137,6 +155,49 @@ export class UserRoleConsumer {
               userId: data.orderCustomer.customerId,
             },
           });
+
+          this.prismaService.setConfig({ accessToken: subAccount.apiKey });
+          const fees = await this.asaasService.recoverAccountFees();
+
+          // const creditCardPaymentMethod = gatewayConfig.paymentMethods.find(
+          //   (paymentMethod) => paymentMethod.code === 'credit.card',
+          // );
+          // const pixPaymentMethod = gatewayConfig.paymentMethods.find(
+          //   (paymentMethod) => paymentMethod.code === 'pix',
+          // );
+          // const bankSlipPaymentMethod = gatewayConfig.paymentMethods.find(
+          //   (paymentMethod) => paymentMethod.code === 'bank.slip',
+          // );
+
+          const values = [];
+
+          for (const paymentMethod of gatewayConfig.paymentMethods) {
+            switch (paymentMethod.code) {
+              case 'credit.card':
+                values.push({
+                  gatewayConfigId: gatewayConfig.id,
+                  paymentMethodId: paymentMethod.id,
+                  fees: fees,
+                });
+                break;
+              case 'pix':
+                values.push({
+                  gatewayConfigId: gatewayConfig.id,
+                  paymentMethodId: paymentMethod.id,
+                  fees: fees,
+                });
+                break;
+              case 'bank.slip':
+                values.push({
+                  gatewayConfigId: gatewayConfig.id,
+                  paymentMethodId: paymentMethod.id,
+                  fees: fees,
+                });
+                break;
+            }
+          }
+
+          await tx.gatewayFee.createMany({ data: values });
         }
       },
       {
