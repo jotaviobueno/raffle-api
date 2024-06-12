@@ -108,20 +108,18 @@ model File {
   id String @id @default(uuid())
 
   fieldname    String?
-  originalname String?
   filename     String?
-  path         String
+  originalname String?
   size         Float?
-  destination  String?
-  mimetype     String?
-
-  sellerId String? @map("seller_id")
+  path         String?
+  sellerId     String? @map("seller_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
-  seller Seller? @relation(fields: [sellerId], references: [id])
+  seller      Seller?      @relation(fields: [sellerId], references: [id])
+  raffleFiles RaffleFile[]
 
   @@map("file")
 }
@@ -345,10 +343,7 @@ model Raffle {
   title            String
   shortDescription String @map("short_description")
   description      String
-
-  price  Float
-  tax    Float    @default(0)
-  images String[] @default([])
+  price            Float
 
   isFinished Boolean  @default(false) @map("is_finished")
   isVisible  Boolean  @default(true) @map("is_visible")
@@ -379,8 +374,25 @@ model Raffle {
   cartItems        CartItem[]
   orderItems       OrderItem[]
   winners          Winner[]
+  raffleFiles      RaffleFile[]
 
   @@map("raffle")
+}
+
+model RaffleFile {
+  id String @id @default(uuid())
+
+  fileId   String @map("file_id")
+  raffleId String @map("raffle_id")
+
+  raffle Raffle @relation(fields: [raffleId], references: [id])
+  file   File   @relation(fields: [fileId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
+
+  @@map("raffle_file")
 }
 
 model Quotas {

@@ -52,3 +52,4 @@ export * from './raffle';
 export * from './gateway';
 export * from './asaas';
 export * from './role-plan';
+export * from './raffle-file';

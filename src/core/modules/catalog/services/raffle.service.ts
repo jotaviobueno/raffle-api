@@ -14,6 +14,7 @@ import { RaffleRepository } from '../repositories/raffle.repository';
 import { QueryBuilder } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from './seller.service';
+import { RaffleFileService } from './raffle-file.service';
 
 @Injectable()
 export class RaffleService
@@ -29,9 +30,10 @@ export class RaffleService
     private readonly sellerService: SellerService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    private readonly raffleFileService: RaffleFileService,
   ) {}
 
-  async create(dto: CreateRaffleDto): Promise<RaffleEntity> {
+  async create({ filesIds, ...dto }: CreateRaffleDto): Promise<RaffleEntity> {
     const seller = await this.sellerService.findById(dto.sellerId);
 
     const raffle = await this.raffleRepository.create({
@@ -40,6 +42,13 @@ export class RaffleService
       final: dto.totalNumbers - 1,
       sellerId: seller.id,
     });
+
+    await this.raffleFileService.createMany(
+      filesIds.map((id) => ({
+        fileId: id,
+        raffleId: raffle.id,
+      })),
+    );
 
     return raffle;
   }
@@ -101,7 +110,7 @@ export class RaffleService
     return raffle;
   }
 
-  async update(dto: UpdateRaffleDto): Promise<RaffleEntity> {
+  async update({ filesIds, ...dto }: UpdateRaffleDto): Promise<RaffleEntity> {
     const raffle = await this.findById(dto.id);
 
     if (dto.totalNumbers && dto.totalNumbers < raffle.totalNumbers)
@@ -125,6 +134,14 @@ export class RaffleService
 
     if (!update)
       throw new HttpException('Failed to update', HttpStatus.NOT_ACCEPTABLE);
+
+    if (filesIds)
+      await this.raffleFileService.createMany(
+        filesIds.map((id) => ({
+          fileId: id,
+          raffleId: raffle.id,
+        })),
+      );
 
     return update;
   }

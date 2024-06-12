@@ -32,6 +32,8 @@ import { QuotasConsumer } from './consumers/quotas.consumer';
 import { QUEUES_ENUM } from 'src/common/enums';
 import { SellerDetailController } from './controllers/seller-detail.controller';
 import { SellerDetailService } from './services/seller-detail.service';
+import { RaffleFileService } from './services/raffle-file.service';
+import { RaffleFileRepository } from './repositories/raffle-file.repository';
 
 @Module({
   imports: [
@@ -73,6 +75,8 @@ import { SellerDetailService } from './services/seller-detail.service';
     ThemeService,
     QuotasConsumer,
     SellerDetailService,
+    RaffleFileService,
+    RaffleFileRepository,
   ],
   exports: [
     SellerService,
@@ -84,6 +88,7 @@ import { SellerDetailService } from './services/seller-detail.service';
     QuotasService,
     WinnerService,
     ThemeService,
+    RaffleFileService,
   ],
 })
 export class CatalogModule {}

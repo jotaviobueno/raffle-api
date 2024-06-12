@@ -89,9 +89,9 @@ export class CreateRaffleDto {
   @IsOptional()
   packages?: string[];
 
-  @IsNotEmpty()
+  @ApiProperty({ type: [String], nullable: true, required: false })
   @IsString({ each: true })
+  @IsOptional()
   @IsArray()
-  @ApiProperty({ type: [String] })
-  images: string[];
+  filesIds: string[];
 }
