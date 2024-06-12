@@ -156,7 +156,7 @@ export class UserRoleConsumer {
             },
           });
 
-          this.prismaService.setConfig({ accessToken: subAccount.apiKey });
+          this.asaasService.setConfig({ accessToken: subAccount.apiKey });
           const fees = await this.asaasService.recoverAccountFees();
 
           // const creditCardPaymentMethod = gatewayConfig.paymentMethods.find(

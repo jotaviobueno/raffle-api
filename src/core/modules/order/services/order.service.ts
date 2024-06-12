@@ -226,8 +226,6 @@ export class OrderService
                 shipping: cart.cartTotal.shipping,
                 subtotal: cart.cartTotal.subtotal,
                 total: cart.cartTotal.total,
-                fee: cart.cartTotal.fee,
-                tax: cart.cartTotal.tax,
               },
             },
             orderCoupons: {
@@ -420,8 +418,6 @@ export class OrderService
                   discount: order.orderTotal.discount,
                   discountManual: order.orderTotal.discountManual,
                   shipping: order.orderTotal.shipping,
-                  fee: order.orderTotal.fee,
-                  tax: order.orderTotal.tax,
                   total: order.orderTotal.total,
                 },
               },

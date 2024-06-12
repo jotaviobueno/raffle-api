@@ -21,12 +21,6 @@ export class FinanceTotalEntity implements FinanceTotal {
   shipping: number;
 
   @ApiProperty({ type: Number })
-  fee: number;
-
-  @ApiProperty({ type: Number })
-  tax: number;
-
-  @ApiProperty({ type: Number })
   total: number;
 
   @ApiProperty({ type: Date })

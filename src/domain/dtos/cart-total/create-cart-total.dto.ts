@@ -5,6 +5,4 @@ export class CreateCartTotalDto {
   shipping: number;
   total: number;
   cartId: string;
-  fee: number;
-  tax: number;
 }

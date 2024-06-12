@@ -620,8 +620,6 @@ model OrderTotal {
   discount       Float @default(0)
   discountManual Float @default(0) @map("discount_manual")
   shipping       Float @default(0)
-  fee            Float @default(0)
-  tax            Float @default(0)
   total          Float
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp

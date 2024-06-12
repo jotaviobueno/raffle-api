@@ -19,11 +19,6 @@ export class CreatePaymentMethodDto {
   @ApiProperty()
   name: string;
 
-  @IsNumber()
-  @IsOptional()
-  @ApiProperty({ type: Number, nullable: true })
-  fee?: number;
-
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
