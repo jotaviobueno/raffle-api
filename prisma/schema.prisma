@@ -112,14 +112,13 @@ model File {
   originalname String?
   size         Float?
   path         String?
-  sellerId     String? @map("seller_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
   deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
 
-  seller      Seller?      @relation(fields: [sellerId], references: [id])
   raffleFiles RaffleFile[]
+  Seller      Seller[]
 
   @@map("file")
 }
@@ -191,7 +190,8 @@ model Seller {
   userId String @map("user_id")
 
   themeId String @map("theme_id")
-  logo    String
+
+  fileId String @map("file_id")
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
@@ -207,8 +207,8 @@ model Seller {
   carts           Cart[]
   finances        Finance[]
   customerSellers CustomerSeller[]
-  files           File[]
   theme           Theme            @relation(fields: [themeId], references: [id])
+  file            File             @relation(fields: [fileId], references: [id])
 
   @@map("seller")
 }

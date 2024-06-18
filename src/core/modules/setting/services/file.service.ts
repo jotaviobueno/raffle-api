@@ -37,7 +37,6 @@ export class FileService {
             originalname: file.originalname,
             size: file.size,
             path: url,
-            sellerId: dto?.sellerId,
           },
         });
       }),

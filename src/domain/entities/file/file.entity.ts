@@ -7,7 +7,6 @@ export class FileEntity implements File {
   originalname: string | null;
   size: number | null;
   path: string | null;
-  sellerId: string | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
