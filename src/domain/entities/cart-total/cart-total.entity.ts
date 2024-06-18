@@ -19,12 +19,6 @@ export class CartTotalEntity implements CartTotal {
   @ApiProperty({ type: Number })
   total: number;
 
-  @ApiProperty({ type: Number })
-  fee: number;
-
-  @ApiProperty({ type: Number })
-  tax: number;
-
   @ApiProperty()
   cartId: string;
 

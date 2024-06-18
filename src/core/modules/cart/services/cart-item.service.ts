@@ -71,7 +71,6 @@ export class CartItemService
           id: raffleAlreadyExistInCart.id,
           price: raffle.price,
           quantity: raffleAlreadyExistInCart.quantity + dto.quantity,
-          tax: raffleAlreadyExistInCart.tax + raffle.tax,
           total: dto.quantity * raffle.price + raffleAlreadyExistInCart.total,
         });
 
@@ -80,7 +79,6 @@ export class CartItemService
           total:
             dto.quantity * raffle.price + cart.cartTotal.total + cartItem.tax,
           subtotal: dto.quantity * raffle.price + cart.cartTotal.subtotal,
-          tax: cart.cartTotal.tax + cartItem.tax,
         });
 
         return cartItem;
@@ -90,7 +88,6 @@ export class CartItemService
           raffleId: raffle.id,
           price: raffle.price,
           quantity: dto.quantity,
-          tax: raffle.tax,
           total: dto.quantity * raffle.price,
         });
 
@@ -99,7 +96,6 @@ export class CartItemService
           total:
             dto.quantity * raffle.price + cart.cartTotal.total + cartItem.tax,
           subtotal: dto.quantity * raffle.price + cart.cartTotal.subtotal,
-          tax: cart.cartTotal.tax + cartItem.tax,
         });
 
         return cartItem;
@@ -127,7 +123,6 @@ export class CartItemService
         planId: plan.id,
         price: plan.price,
         quantity: dto.quantity,
-        tax: plan.tax,
         total: dto.quantity * plan.price,
       });
 
@@ -135,7 +130,6 @@ export class CartItemService
         id: cart.cartTotal.id,
         total: dto.quantity * plan.price + cart.cartTotal.total + cartItem.tax,
         subtotal: dto.quantity * plan.price + cart.cartTotal.subtotal,
-        tax: cart.cartTotal.tax + cartItem.tax,
       });
 
       return cartItem;

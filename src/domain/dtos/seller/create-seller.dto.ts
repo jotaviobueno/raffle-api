@@ -12,6 +12,11 @@ export class CreateSellerDto {
   @IsNotEmpty()
   userId: string;
 
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsUUID()
+  fileId: string;
+
   @IsString()
   @IsNotEmpty()
   @ApiProperty()

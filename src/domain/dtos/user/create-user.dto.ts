@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsDate,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -63,4 +64,10 @@ export class CreateUserDto {
   @IsNotEmpty()
   @ApiProperty({ nullable: true, required: false })
   incomeValue?: string;
+
+  @IsDate()
+  @IsOptional()
+  @IsNotEmpty()
+  @ApiProperty({ nullable: true, required: false })
+  birthDate?: Date;
 }

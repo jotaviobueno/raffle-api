@@ -15,7 +15,7 @@ export class S3Service {
     },
   });
 
-  async singleFile(data: UploadFileDto): Promise<Express.Multer.File> {
+  async singleFile(data: UploadFileDto): Promise<string> {
     try {
       const url = `${data.path}/${randomUUID()}.${data.file.mimetype.split('/')[1]}`;
 
@@ -29,16 +29,13 @@ export class S3Service {
         }),
       );
 
-      return {
-        ...data.file,
-        path: `https://${environment.AWS_S3_BUCKET}.s3.${environment.AWS_REGION}.amazonaws.com/${url}`,
-      };
+      return `https://${environment.AWS_S3_BUCKET}.s3.${environment.AWS_REGION}.amazonaws.com/${url}`;
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  manyFiles(data: UploadFileDto[]): Promise<Express.Multer.File[]> {
+  manyFiles(data: UploadFileDto[]): Promise<string[]> {
     try {
       return Promise.all(
         data.map(async ({ file, path }) => {

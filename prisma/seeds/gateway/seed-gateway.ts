@@ -25,8 +25,6 @@ export async function seedGateway() {
                   name: method.name,
                   isActive: method.isActive,
                   instructions: method.instructions,
-                  fee: method.fee,
-                  feePercentage: method.feePercentage,
                   deletedAt: null,
                 })),
                 skipDuplicates: true,

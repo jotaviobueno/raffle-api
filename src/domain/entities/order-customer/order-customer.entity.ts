@@ -17,6 +17,9 @@ export class OrderCustomerEntity implements OrderCustomer {
   @ApiProperty({ nullable: true })
   incomeValue: string | null;
 
+  @ApiProperty({ type: Date, nullable: true })
+  birthDate: Date | null;
+
   @ApiProperty()
   mobilePhone: string;
 

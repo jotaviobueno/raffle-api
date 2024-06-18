@@ -11,14 +11,20 @@ import {
 @Injectable()
 export class RaffleRepository extends RepositoryFactory<
   RaffleEntity,
-  CreateRaffleDto & {
-    digits: number;
-    final: number;
-  },
-  UpdateRaffleDto & {
-    digits?: number;
-    isFinished?: boolean;
-  }
+  Omit<
+    CreateRaffleDto & {
+      digits: number;
+      final: number;
+    },
+    'filesIds'
+  >,
+  Omit<
+    UpdateRaffleDto & {
+      digits?: number;
+      isFinished?: boolean;
+    },
+    'filesIds'
+  >
 > {
   constructor() {
     super('raffle');

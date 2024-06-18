@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { AsaasService } from '../../../services/asaas.service';
 import { CreateCheckoutDto } from 'src/domain/dtos';
 import {
   CartWithRelationsEntity,
   AsaasCustomerEntity,
   AsaasGatewayEntity,
 } from 'src/domain/entities';
-import { addMinutes } from 'date-fns';
+import { addDays } from 'date-fns';
+import { randomUUID } from 'crypto';
+import { AsaasService } from '../../services/asaas.service';
 
 @Injectable()
-export class AsaasProcessOrderByPixUseCase {
+export class AsaasProcessOrderByBankSlipUseCase {
   constructor(private readonly asaasService: AsaasService) {}
 
   public async execute(
@@ -19,15 +20,15 @@ export class AsaasProcessOrderByPixUseCase {
   ): Promise<AsaasGatewayEntity> {
     const payment = await this.asaasService.createPayment({
       customer: customer.id,
-      billingType: 'PIX',
+      billingType: 'BOLETO',
       value: cart.cartTotal.total,
-      dueDate: addMinutes(new Date(), 10),
-      discount: { value: cart.cartTotal.discount },
+      dueDate: addDays(new Date(), 3),
       remoteIp: dto.ip ? dto.ip : '',
+      externalReference: randomUUID(),
     });
 
-    const pix = await this.asaasService.getPixById(payment.id);
+    const bankSlip = await this.asaasService.getBankSlip(payment.id);
 
-    return { cart, data: { ...payment, pix }, customer };
+    return { cart, data: { ...payment, bankSlip }, customer };
   }
 }

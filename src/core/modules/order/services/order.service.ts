@@ -178,7 +178,7 @@ export class OrderService
         const order = await tx.order.create({
           data: {
             ...query,
-            externalReference: response.data.id,
+            externalReference: response.data.externalReference,
             ip: dto.ip,
             userAgent: dto.userAgent,
             orderCustomer: {
@@ -193,6 +193,8 @@ export class OrderService
                     id: cart.customer.id,
                   },
                 },
+                birthDate: cart.customer.birthDate,
+                incomeValue: cart.customer.incomeValue,
               },
             },
             cart: {
@@ -224,8 +226,6 @@ export class OrderService
                 shipping: cart.cartTotal.shipping,
                 subtotal: cart.cartTotal.subtotal,
                 total: cart.cartTotal.total,
-                fee: cart.cartTotal.fee,
-                tax: cart.cartTotal.tax,
               },
             },
             orderCoupons: {
@@ -294,13 +294,14 @@ export class OrderService
     );
   }
 
-  // TODO:ARRUMAR ISSO PORQUE PODE HAVER RAFFLE E PLAN NO ITEMS
   async asaasPostback(data: AsaasEventDto) {
     const query = {};
 
     const orderStatus = await this.orderStatusService.findByCode(data.event);
 
-    const order = await this.findByExternalReference(data.payment.id);
+    const order = await this.findByExternalReference(
+      data.payment.externalReference,
+    );
 
     return this.prismaService.$transaction(
       async (tx) => {
@@ -417,8 +418,6 @@ export class OrderService
                   discount: order.orderTotal.discount,
                   discountManual: order.orderTotal.discountManual,
                   shipping: order.orderTotal.shipping,
-                  fee: order.orderTotal.fee,
-                  tax: order.orderTotal.tax,
                   total: order.orderTotal.total,
                 },
               },

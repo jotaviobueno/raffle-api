@@ -6,3 +6,4 @@ export * from './subscription';
 export * from './base-entity';
 export * from './gateway';
 export * from './shared';
+export * from './fees';

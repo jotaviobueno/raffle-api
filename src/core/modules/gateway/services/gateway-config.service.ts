@@ -3,7 +3,6 @@ import { ServiceBase } from 'src/common/base';
 import { GatewayConfigEntity } from 'src/domain/entities';
 import { GatewayConfigRepository } from '../repositories/gateway-config.repository';
 import { CreateGatewayConfigDto } from 'src/domain/dtos';
-import { AsaasService } from './asaas.service';
 
 @Injectable()
 export class GatewayConfigService
@@ -11,7 +10,6 @@ export class GatewayConfigService
 {
   constructor(
     private readonly gatewayConfigRepository: GatewayConfigRepository,
-    private readonly asaasService: AsaasService,
   ) {}
 
   create(dto: CreateGatewayConfigDto): Promise<GatewayConfigEntity> {

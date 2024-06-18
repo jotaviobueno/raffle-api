@@ -14,8 +14,8 @@ export class SellerEntity implements Seller {
   @ApiProperty()
   userId: string;
 
-  @ApiProperty({ type: String, nullable: true })
-  logo: string | null;
+  @ApiProperty()
+  fileId: string;
 
   @ApiProperty({ type: Date })
   createdAt: Date;

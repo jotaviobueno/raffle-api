@@ -9,9 +9,6 @@ export class OrderTotalEntity implements OrderTotal {
   orderId: string;
 
   @ApiProperty({ type: Number })
-  tax: number;
-
-  @ApiProperty({ type: Number })
   subtotal: number;
 
   @ApiProperty({ type: Number })
@@ -22,9 +19,6 @@ export class OrderTotalEntity implements OrderTotal {
 
   @ApiProperty({ type: Number })
   shipping: number;
-
-  @ApiProperty({ type: Number })
-  fee: number;
 
   @ApiProperty({ type: Number })
   total: number;

@@ -5,18 +5,18 @@ import { GatewayService } from './services/gateway.service';
 import { GatewayRepository } from './repositories/gateway.repository';
 import { GatewayConfigService } from './services/gateway-config.service';
 import { GatewayConfigRepository } from './repositories/gateway-config.repository';
+import { CreateAsaasCustomerUseCase } from './use-cases/customer';
+import { AsaasHandlerUseCase } from './use-cases/handler';
 import {
   AsaasProcessOrderByBankSlipUseCase,
   AsaasProcessOrderByCreditCardUseCase,
   AsaasProcessOrderByPixUseCase,
-} from './gateways/use-cases/order';
+} from './use-cases/order';
 import {
   AsaasProcessSubscriptionByPixUseCase,
   AsaasProcessSubscriptionByCreditCardUseCase,
   AsaasProcessSubscriptionByBillingTypeUseCase,
-} from './gateways/use-cases/subscription';
-import { AsaasHandlerUseCase } from './gateways/use-cases/handler';
-import { CreateAsaasCustomerUseCase } from './gateways/use-cases/customer';
+} from './use-cases/subscription';
 
 @Module({
   providers: [

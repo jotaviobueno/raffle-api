@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   FileTypeValidator,
   MaxFileSizeValidator,
+  Param,
   ParseFilePipe,
   Post,
   UploadedFiles,
@@ -36,5 +38,10 @@ export class FileController {
     files: Express.Multer.File[],
   ) {
     return this.fileService.create({ ...createFileDto, files });
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.fileService.remove(id);
   }
 }

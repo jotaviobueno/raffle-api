@@ -34,3 +34,4 @@ export * from './plan-cycle';
 export * from './file';
 export * from './gateway-config';
 export * from './asaas';
+export * from './raffle-file';

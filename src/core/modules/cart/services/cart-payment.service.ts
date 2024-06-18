@@ -7,7 +7,6 @@ import { AddressService } from '../../user/services/address.service';
 import { CartPaymentRepository } from '../repositories/cart-payment.repository';
 import { CartService } from './cart.service';
 import { CartTotalService } from './cart-total.service';
-import { asaasCalculateFeeUtil } from 'src/common/utils';
 
 @Injectable()
 export class CartPaymentService
@@ -46,12 +45,9 @@ export class CartPaymentService
       method: paymentMethod.name,
     });
 
-    const fee = asaasCalculateFeeUtil(paymentMethod, cart.cartTotal.total);
-
     await this.cartTotalService.update({
       id: cart.cartTotal.id,
-      fee,
-      total: cart.cartTotal.total + fee,
+      total: cart.cartTotal.total,
     });
 
     return cartPayment;

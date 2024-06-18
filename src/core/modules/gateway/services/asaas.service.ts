@@ -11,6 +11,7 @@ import {
 import {
   AsaasBankSlipEntity,
   AsaasCustomerEntity,
+  AsaasFeesEntity,
   AsaasPaymentEntity,
   AsaasPixEntity,
   AsaasSubAccountEntity,
@@ -64,6 +65,21 @@ export class AsaasService {
     } catch (e) {
       Logger.error(
         'FAILED TO CREATE SUB ACCOUNT (ASAAS)',
+        JSON.stringify(e.response.data),
+      );
+      throw e;
+    }
+  }
+
+  public async recoverAccountFees(): Promise<AsaasFeesEntity> {
+    try {
+      const { data } =
+        await this.setup().post<AsaasFeesEntity>('/myAccount/fees');
+
+      return data;
+    } catch (e) {
+      Logger.error(
+        'FAILED TO RECOVER ACCOUNT FEES (ASAAS)',
         JSON.stringify(e.response.data),
       );
       throw e;
