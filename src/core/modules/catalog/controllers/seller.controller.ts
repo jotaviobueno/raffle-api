@@ -38,9 +38,9 @@ import { IsPublic } from '../../auth/decorators';
 
 @Controller('seller')
 @ApiTags('seller')
-@UseGuards(RoleGuard)
 @Roles(ROLE_ENUM.ADMIN, ROLE_ENUM.DEV, ROLE_ENUM.PLAN)
 @ApiBearerAuth('defaultBearerAuth')
+@UseGuards(RoleGuard)
 export class SellerController {
   constructor(private readonly sellerService: SellerService) {}
 
@@ -62,18 +62,17 @@ export class SellerController {
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(30)
   @ApiUnauthorizedResponse()
-  @Permissions(PERMISSION_ENUM.CAN_READ_SELLER)
   @ApiOkFindAllResult(SellerEntity)
+  @IsPublic()
   findAll(@Query() queryParams: SearchSellerDto) {
     return this.sellerService.findAll(queryParams);
   }
 
   @Get(':id')
-  @Permissions(PERMISSION_ENUM.CAN_READ_SELLER)
   @ApiUnauthorizedResponse()
-  @IsPublic()
   @ApiNotFoundResponse()
   @ApiOkResponse({ type: SellerEntity })
+  @IsPublic()
   findById(@Param('id') id: string) {
     return this.sellerService.findByIdAndPopulate(id);
   }

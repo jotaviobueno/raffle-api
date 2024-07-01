@@ -9,7 +9,7 @@ import {
 import { CreateUserRoleDto } from 'src/domain/dtos';
 import { ApiTags } from '@nestjs/swagger';
 import { RoleGuard } from '../guards';
-import { UserRoleService } from '../services/user-role.service';
+import { UserRoleService } from '../../user/services/user-role.service';
 import { Roles } from '../decorators';
 import { ROLE_ENUM } from 'src/common/enums';
 

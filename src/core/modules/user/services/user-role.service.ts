@@ -6,12 +6,13 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { ServiceBase } from 'src/common/base';
-import { CreateUserRoleDto } from 'src/domain/dtos';
+import { CreateUserRoleDto, UserCreateEventDto } from 'src/domain/dtos';
 import { UserRoleEntity } from 'src/domain/entities';
 import { UserRoleRepository } from '../repositories/user-role.repository';
-import { UserService } from '../../user/services/user.service';
-import { RoleService } from './role.service';
-import { ROLE_ENUM } from 'src/common/enums';
+import { UserService } from './user.service';
+import { RoleService } from '../../role/services/role.service';
+import { EVENTS_ENUM } from 'src/common/enums';
+import { OnEvents } from 'src/common/decorators';
 
 @Injectable()
 export class UserRoleService
@@ -24,9 +25,8 @@ export class UserRoleService
     private readonly userService: UserService,
   ) {}
 
-  async assing(
-    dto: Omit<CreateUserRoleDto & { code: keyof typeof ROLE_ENUM }, 'roleId'>,
-  ): Promise<UserRoleEntity> {
+  @OnEvents([EVENTS_ENUM.customer.created, EVENTS_ENUM.user.created])
+  async assing(dto: UserCreateEventDto): Promise<UserRoleEntity> {
     const role = await this.roleService.findByCode(dto.code);
 
     const userRole = await this.userRoleRepository.create({

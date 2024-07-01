@@ -2,8 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   Post,
   Query,
@@ -45,13 +43,6 @@ export class OrderController {
       userAgent: req.headers['user-agent'],
       ip: req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'],
     });
-  }
-
-  @Post('asaas-postback')
-  @IsPublic()
-  @HttpCode(HttpStatus.OK)
-  asaasPostback(@Body() data) {
-    return this.orderService.asaasPostback(data);
   }
 
   @Get()

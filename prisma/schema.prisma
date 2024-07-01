@@ -41,27 +41,10 @@ model User {
   tickets         Ticket[]
   orderCustomers  OrderCustomer[]
   gatewayConfig   GatewayConfig?
-  BankAccount     BankAccount[]
+  emails          Email[]
+  Notification    Notification[]
 
   @@map("user")
-}
-
-model BankAccount {
-  id           String  @id @default(uuid())
-  agency       String
-  account      String
-  accountDigit String
-  gatewayId    String?
-  userId       String  @map("user_id")
-
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
-  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp
-  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
-
-  gateway Gateway? @relation(fields: [gatewayId], references: [id])
-  user    User     @relation(fields: [userId], references: [id])
-
-  @@map("bank_account")
 }
 
 model GatewayFee {
@@ -920,6 +903,18 @@ model GatewayEvent {
   @@map("gateway_event")
 }
 
+model Webhook {
+  id    String @id @default(uuid())
+  event String
+  data  Json
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
+
+  @@map("webhook")
+}
+
 model Audit {
   id        String @id @default(uuid())
   namespace String
@@ -1073,7 +1068,37 @@ model Gateway {
   paymentMethods PaymentMethod[]
   gatewayConfigs GatewayConfig[]
   gatewayEvents  GatewayEvent[]
-  BankAccount    BankAccount[]
 
   @@map("gateway")
+}
+
+model Email {
+  id     String @id @default(uuid())
+  userId String @map("user_id")
+  data   Json
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("email")
+}
+
+model Notification {
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  title   String
+  content String
+  event   String
+
+  readAt    DateTime? @default(dbgenerated("NULL")) @map("read_at") @db.Timestamp
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp
+  deletedAt DateTime? @default(dbgenerated("NULL")) @map("deleted_at") @db.Timestamp
+
+  @@map("notification")
 }

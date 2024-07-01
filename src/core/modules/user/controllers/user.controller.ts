@@ -41,6 +41,7 @@ export class UserController {
   }
 
   @Get(':id')
+  @IsPublic()
   @Permissions(PERMISSION_ENUM.CAN_READ_USER)
   findById(@Param('id') id: string) {
     return this.userService.findById(id);

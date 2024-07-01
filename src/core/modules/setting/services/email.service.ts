@@ -1,25 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { SendEmailDto } from 'src/domain/dtos';
+import { EmailRepository } from '../repositories/email.repository';
 
 @Injectable()
 export class EmailService {
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(
+    private readonly mailerService: MailerService,
+    private readonly emailRepository: EmailRepository,
+  ) {}
 
   async sendEmail(data: SendEmailDto) {
+    await this.emailRepository.create({
+      userId: data.userId,
+      data: {
+        to: data.to,
+        subject: data.subject,
+        template: data.template,
+        context: data.context,
+      },
+    });
+
     return this.mailerService.sendMail(data);
   }
-
-  // async send() {
-  //   const data = await this.mailerService.sendMail({
-  //     to: 'talarikduceu@gmail.com', // list of receivers
-  //     subject: 'Test', // Subject line
-  //     template: './user/active-account.hbs',
-  //     context: {
-  //       name: 'Otavio Bueno',
-  //       url: 'https://www.google.com',
-  //     },
-  //   });
-
-  // }
 }

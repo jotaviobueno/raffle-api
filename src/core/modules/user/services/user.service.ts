@@ -10,9 +10,8 @@ import { UserRepository } from '../repositories/user.repository';
 import { QueryBuilder, hash } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { SellerService } from '../../catalog/services/seller.service';
-import { UserRoleService } from '../../role/services/user-role.service';
-import { ROLE_ENUM } from 'src/common/enums';
-import { CustomerSellerService } from './customer-seller.service';
+import { EVENTS_ENUM } from 'src/common/enums';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class UserService
@@ -28,83 +27,71 @@ export class UserService
     private readonly sellerService: SellerService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    private readonly userRoleService: UserRoleService,
-    private readonly customerSellerService: CustomerSellerService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async create({
-    sellerId,
-    code,
-    ...dto
-  }: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
-    switch (code) {
+  async create(dto: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
+    switch (dto.code) {
       case 'CUSTOMER':
-        if (dto.incomeValue)
-          throw new HttpException(
-            'Income value is not sent',
-            HttpStatus.BAD_REQUEST,
-          );
-
-        if (dto.password)
-          throw new HttpException(
-            'Not possible to create CUSTOMER with password',
-            HttpStatus.UNPROCESSABLE_ENTITY,
-          );
-
-        if (!sellerId)
-          throw new HttpException(
-            'Seller id is not sent',
-            HttpStatus.BAD_REQUEST,
-          );
-
-        const seller = await this.sellerService.findById(sellerId);
-
-        const customer = await this.handleCreate({
-          ...dto,
-          code,
-        });
-
-        await this.customerSellerService.create({
-          customerId: customer.id,
-          sellerId: seller.id,
-        });
-
-        return customer;
+        return this.handleCreateCustomer(dto);
       case 'USER':
-        if (!dto.birthDate)
-          throw new HttpException(
-            'Birth date is not sent',
-            HttpStatus.BAD_REQUEST,
-          );
-
-        if (!dto.incomeValue)
-          throw new HttpException(
-            'Income value is not sent',
-            HttpStatus.BAD_REQUEST,
-          );
-
-        if (!dto.password)
-          throw new HttpException(
-            'Not possible to create USER without password',
-            HttpStatus.UNPROCESSABLE_ENTITY,
-          );
-
-        const user = await this.handleCreate({
-          ...dto,
-          code,
-        });
-
-        return user;
-
+        return this.handleCreateUser(dto);
       default:
         throw new HttpException('Invalid type', HttpStatus.BAD_REQUEST);
     }
   }
 
-  private async handleCreate({
+  private async handleCreateUser({
     code,
     ...dto
-  }: Omit<CreateUserDto, 'sellerId'>) {
+  }: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
+    await this.handleCreateValidation({
+      ...dto,
+      code,
+    });
+
+    dto.password = await hash(dto.password);
+
+    const user = await this.userRepository.create(dto);
+
+    this.eventEmitter.emit(EVENTS_ENUM.user.created, {
+      userId: user.id,
+      code,
+    });
+
+    return user;
+  }
+
+  private async handleCreateCustomer({
+    code,
+    sellerId,
+    ...dto
+  }: CreateUserDto): Promise<Omit<UserEntity, 'password'>> {
+    const seller = await this.sellerService.findById(sellerId);
+
+    await this.handleCreateValidation({
+      ...dto,
+      code,
+    });
+
+    const customer = await this.userRepository.create(dto);
+
+    this.eventEmitter.emit(EVENTS_ENUM.customer.created, {
+      userId: customer.id,
+      code,
+    });
+
+    this.eventEmitter.emit(EVENTS_ENUM.customer.assign_to_seller, {
+      customerId: customer.id,
+      sellerId: seller.id,
+    });
+
+    return customer;
+  }
+
+  private async handleCreateValidation(
+    dto: Omit<CreateUserDto, 'sellerId'>,
+  ): Promise<void> {
     const mobilePhoneAlreadyExist = await this.userRepository.findByMobilePhone(
       dto.mobilePhone,
     );
@@ -132,17 +119,6 @@ export class UserService
         'Email, phone or document already exist.',
         HttpStatus.CONFLICT,
       );
-
-    if (code === ROLE_ENUM.USER) dto.password = await hash(dto.password);
-
-    const user = await this.userRepository.create(dto);
-
-    await this.userRoleService.assing({
-      code,
-      userId: user.id,
-    });
-
-    return user;
   }
 
   async findCustomerByMobilePhone(mobilePhone: string): Promise<UserEntity> {

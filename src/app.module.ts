@@ -12,20 +12,14 @@ import { CartModule } from './core/modules/cart/cart.module';
 import { OrderModule } from './core/modules/order/order.module';
 import { PaymentModule } from './core/modules/payment/payment.module';
 import { MarketingModule } from './core/modules/marketing/marketing.module';
-import { SupportModule } from './core/modules/support/support.module';
 import { FinanceModule } from './core/modules/finance/finance.module';
-import { BullModule } from '@nestjs/bull';
-import { environment } from './config';
 import { GatewayModule } from './core/modules/gateway/gateway.module';
 import { PlanModule } from './core/modules/plan/plan.module';
+import { WebhookModule } from './core/modules/webhook/webhook.module';
+import { NotificationModule } from './core/modules/notification/notification.module';
 
 @Module({
   imports: [
-    BullModule.forRoot({
-      redis: {
-        port: +environment.REDIS_PORT,
-      },
-    }),
     PrismaModule,
     RedisModule,
     UserModule,
@@ -39,8 +33,9 @@ import { PlanModule } from './core/modules/plan/plan.module';
     PaymentModule,
     MarketingModule,
     FinanceModule,
-    SupportModule,
     PlanModule,
+    WebhookModule,
+    NotificationModule,
   ],
   providers: [
     {

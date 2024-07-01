@@ -3,13 +3,12 @@ import { ServiceBase } from 'src/common/base';
 import {
   CreateCheckoutDto,
   JobQuotasDto,
+  OrderChargeDto,
   SearchOrderDto,
   SendEmailDto,
-  UserRoleConsumerDto,
 } from 'src/domain/dtos';
 import {
   FindAllResultEntity,
-  AsaasEventDto,
   OrderEntity,
   OrderWithRelationsEntity,
   orderQueryWithRelations,
@@ -19,9 +18,8 @@ import { CartService } from '../../cart/services/cart.service';
 import { PaymentService } from '../../payment/services/payment.service';
 import { OrderStatusService } from './order-status.service';
 import { PrismaService } from 'src/infra/database/prisma/prisma.service';
-import { QueryBuilder, prettyCardNumber } from 'src/common/utils';
+import { QueryBuilder } from 'src/common/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
-import * as creditCardType from 'credit-card-type';
 import { InjectQueue } from '@nestjs/bull';
 import { JOBS_ENUM, ORDER_STATUS_ENUM, QUEUES_ENUM } from 'src/common/enums';
 import { Queue } from 'bull';
@@ -43,8 +41,6 @@ export class OrderService
     private readonly quotasQueue: Queue<JobQuotasDto>,
     @InjectQueue(QUEUES_ENUM.EMAIL)
     private readonly emailQueue: Queue<SendEmailDto>,
-    @InjectQueue(QUEUES_ENUM.USER_ROLE)
-    private readonly userRoleQueue: Queue<UserRoleConsumerDto>,
   ) {}
 
   async create(dto: CreateCheckoutDto): Promise<OrderWithRelationsEntity> {
@@ -140,8 +136,8 @@ export class OrderService
                   paymentMethodId: cart.cartPayment.paymentMethodId,
                   orderCreditCard: {
                     create: {
-                      number: prettyCardNumber(dto.number),
-                      brand: creditCardType(dto.number)[0].niceType,
+                      number: response.data.creditCard.creditCardNumber,
+                      brand: response.data.creditCard.creditCardBrand,
                       cvv: dto.cvv,
                       name: dto.holder,
                       expirationMonth: dto.expirationMonth,
@@ -257,9 +253,7 @@ export class OrderService
               },
             },
           },
-          include: {
-            ...orderQueryWithRelations,
-          },
+          include: orderQueryWithRelations,
         });
 
         await this.emailQueue.add(
@@ -277,6 +271,7 @@ export class OrderService
               })),
               total: order.orderTotal.total,
             },
+            userId: order.orderCustomer.customerId,
           },
           {
             attempts: 3,
@@ -294,14 +289,8 @@ export class OrderService
     );
   }
 
-  async asaasPostback(data: AsaasEventDto) {
+  async asaasCharge({ data, order, orderStatus }: OrderChargeDto) {
     const query = {};
-
-    const orderStatus = await this.orderStatusService.findByCode(data.event);
-
-    const order = await this.findByExternalReference(
-      data.payment.externalReference,
-    );
 
     return this.prismaService.$transaction(
       async (tx) => {
@@ -314,7 +303,7 @@ export class OrderService
 
         if (orderAlreadyUpdated) return;
 
-        if (order?.orderPayment?.orderCreditCard)
+        if (order?.orderPayment?.orderCreditCard) {
           query['orderPayment'] = {
             update: {
               data: {
@@ -331,6 +320,7 @@ export class OrderService
               },
             },
           };
+        }
 
         await this.emailQueue.add(
           JOBS_ENUM.SEND_EMAIL_JOB,
@@ -343,6 +333,7 @@ export class OrderService
               name: order.orderCustomer.name,
               status: orderStatus.name,
             },
+            userId: order.orderCustomer.customerId,
           },
           {
             attempts: 3,
@@ -351,79 +342,64 @@ export class OrderService
           },
         );
 
-        if (data.event === ORDER_STATUS_ENUM.PAYMENT_CONFIRMED) {
-          await Promise.all(
-            order.orderItems.map(async (orderItem) => {
-              if (orderItem.raffleId) {
-                const data = {
-                  progressPercentage:
-                    ((orderItem.raffle.payeds + orderItem.quantity) /
-                      orderItem.raffle.totalNumbers) *
-                    100,
-                  payeds: {
-                    increment: orderItem.quantity,
-                  },
-                };
+        // if (data.event === ORDER_STATUS_ENUM.PAYMENT_CONFIRMED) {
+        //   await Promise.all(
+        //     order.orderItems.map(async (orderItem) => {
+        //       if (orderItem.raffleId) {
+        //         const data = {
+        //           progressPercentage:
+        //             ((orderItem.raffle.payeds + orderItem.quantity) /
+        //               orderItem.raffle.totalNumbers) *
+        //             100,
+        //           payeds: {
+        //             increment: orderItem.quantity,
+        //           },
+        //         };
 
-                await tx.raffle.update({
-                  where: { id: orderItem.raffleId },
-                  data: { ...data, isFinished: data.progressPercentage >= 100 },
-                });
+        //         await tx.raffle.update({
+        //           where: { id: orderItem.raffleId },
+        //           data: { ...data, isFinished: data.progressPercentage >= 100 },
+        //         });
 
-                await this.quotasQueue.add(
-                  JOBS_ENUM.CREATE_MANY_QUOTAS_JOB,
-                  {
-                    raffle: orderItem.raffle,
-                    dto: {
-                      raffleId: orderItem.raffle.id,
-                      customerId: order.orderCustomer.customerId,
-                      quantity: orderItem.quantity,
-                    },
-                  },
-                  {
-                    attempts: 3,
-                    removeOnFail: true,
-                    removeOnComplete: true,
-                  },
-                );
-              }
+        //         await this.quotasQueue.add(
+        //           JOBS_ENUM.CREATE_MANY_QUOTAS_JOB,
+        //           {
+        //             raffle: orderItem.raffle,
+        //             dto: {
+        //               raffleId: orderItem.raffle.id,
+        //               customerId: order.orderCustomer.customerId,
+        //               quantity: orderItem.quantity,
+        //             },
+        //           },
+        //           {
+        //             attempts: 3,
+        //             removeOnFail: true,
+        //             removeOnComplete: true,
+        //           },
+        //         );
+        //       }
 
-              if (orderItem.planId) {
-                await this.userRoleQueue.add(
-                  JOBS_ENUM.ASSIGN_USER_ROLE_PLAN,
-                  {
-                    plans: order.orderItems.map((item) => {
-                      return item.plan;
-                    }),
-                    address: order.orderPayment.address,
-                    orderCustomer: order.orderCustomer,
-                  },
-                  {
-                    attempts: 3,
-                    removeOnFail: true,
-                    removeOnComplete: true,
-                  },
-                );
-              }
-            }),
-          );
+        //       // if (orderItem.planId)
+        //       // this.eventEmitter.emit(EVENTS_ENUM.ORDER_WITH_PLAN);
+        //     }),
+        //   );
 
-          query['finance'] = {
-            create: {
-              sellerId: order.seller.id,
-              customerId: order.orderCustomer.customerId,
-              financeTotal: {
-                create: {
-                  subtotal: order.orderTotal.subtotal,
-                  discount: order.orderTotal.discount,
-                  discountManual: order.orderTotal.discountManual,
-                  shipping: order.orderTotal.shipping,
-                  total: order.orderTotal.total,
-                },
-              },
-            },
-          };
-        }
+        //   query['finance'] = {
+        //     create: {
+        //       sellerId: order.seller.id,
+        //       customerId: order.orderCustomer.customerId,
+        //       financeTotal: {
+        //         create: {
+        //           subtotal: order.orderTotal.subtotal,
+        //           discount: order.orderTotal.discount,
+        //           discountManual: order.orderTotal.discountManual,
+        //           shipping: order.orderTotal.shipping,
+        //           total: order.orderTotal.total,
+        //         },
+        //       },
+        //     },
+        //   };
+        // }
 
         return tx.order.update({
           where: {
@@ -462,7 +438,6 @@ export class OrderService
                 gatewayId: order.orderPayment.paymentMethod.gatewayId,
               },
             },
-            ...query,
           },
         });
       },

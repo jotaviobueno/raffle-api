@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsDate,
   IsEmail,
@@ -8,8 +9,9 @@ import {
   IsPhoneNumber,
   IsString,
   IsUUID,
+  ValidateIf,
 } from 'class-validator';
-import { PUBLIC_ROLE_ENUM, USER_TYPE_ENUM } from 'src/common/enums';
+import { PUBLIC_ROLE_ENUM, ROLE_ENUM, USER_TYPE_ENUM } from 'src/common/enums';
 import { IsCpfCnpj } from 'src/common/validators';
 
 export class CreateUserDto {
@@ -23,8 +25,9 @@ export class CreateUserDto {
   @ApiProperty()
   email: string;
 
+  @ValidateIf((dto) => dto.code === ROLE_ENUM.USER)
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   @ApiProperty({ nullable: true, required: false })
   password?: string;
 
@@ -34,9 +37,9 @@ export class CreateUserDto {
   mobilePhone: string;
 
   @IsEnum(USER_TYPE_ENUM)
-  @IsOptional()
+  @IsNotEmpty()
   @ApiProperty({ enum: USER_TYPE_ENUM })
-  type?: USER_TYPE_ENUM;
+  type: USER_TYPE_ENUM;
 
   @IsCpfCnpj()
   @IsOptional()
@@ -47,27 +50,27 @@ export class CreateUserDto {
   @IsEnum(PUBLIC_ROLE_ENUM)
   @IsNotEmpty()
   @ApiProperty({ enum: PUBLIC_ROLE_ENUM })
-  code: keyof typeof PUBLIC_ROLE_ENUM;
+  code: PUBLIC_ROLE_ENUM;
 
   @IsPhoneNumber()
   @IsOptional()
   @ApiProperty({ nullable: true, required: false })
   phone?: string;
 
+  @ValidateIf((dto) => dto.code === ROLE_ENUM.CUSTOMER)
   @IsUUID()
-  @IsOptional()
+  @IsNotEmpty()
   @ApiProperty({ nullable: true, required: false })
   sellerId?: string;
 
   @IsString()
-  @IsOptional()
   @IsNotEmpty()
-  @ApiProperty({ nullable: true, required: false })
-  incomeValue?: string;
+  @ApiProperty()
+  incomeValue: string;
 
   @IsDate()
-  @IsOptional()
   @IsNotEmpty()
   @ApiProperty({ nullable: true, required: false })
-  birthDate?: Date;
+  @Transform(({ value }) => new Date(value))
+  birthDate: Date;
 }

@@ -8,6 +8,8 @@ import {
 } from 'src/domain/dtos';
 import { CustomerSellerEntity, FindAllResultEntity } from 'src/domain/entities';
 import { CustomerSellerRepository } from '../repositories/customer-seller.repository';
+import { OnEvents } from 'src/common/decorators';
+import { EVENTS_ENUM } from 'src/common/enums';
 
 @Injectable()
 export class CustomerSellerService
@@ -19,6 +21,7 @@ export class CustomerSellerService
     private readonly cacheManager: Cache,
   ) {}
 
+  @OnEvents([EVENTS_ENUM.customer.assign_to_seller])
   async create(dto: CreateCustomerSellerDto): Promise<CustomerSellerEntity> {
     const customerAlreadyExistInSeller =
       await this.customerSellerRepository.findByCustomerIdAndSellerId(
@@ -31,7 +34,8 @@ export class CustomerSellerService
         id: customerAlreadyExistInSeller.id,
         ...dto,
       });
-    else return this.customerSellerRepository.create(dto);
+
+    return this.customerSellerRepository.create(dto);
   }
 
   async findAll(

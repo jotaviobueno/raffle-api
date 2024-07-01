@@ -18,6 +18,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailConsumer } from './consumers/email.consumer';
 import { FileController } from './controllers/file.controller';
 import { FileService } from './services/file.service';
+import { EmailRepository } from './repositories/email.repository';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { FileService } from './services/file.service';
     EmailService,
     EmailConsumer,
     FileService,
+    EmailRepository,
   ],
   exports: [CountryService, StateService, S3Service, EmailService, FileService],
 })
